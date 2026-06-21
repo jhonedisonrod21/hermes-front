@@ -10,11 +10,19 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "paths": {
+      // i18next@26 / react-i18next@17 ship broken ESM type entrypoints: their
+      // `.d.mts` stubs don't re-export the real declarations, so under modern
+      // moduleResolution `TFunction` degrades to a non-callable `any` and named
+      // exports vanish. Pin both packages to their valid CommonJS `.d.ts`.
+      "react-i18next": ["./node_modules/react-i18next/index.d.ts"],
+      "i18next": ["./node_modules/i18next/index.d.ts"]
+    }
   },
   "include": ["src"]
 }

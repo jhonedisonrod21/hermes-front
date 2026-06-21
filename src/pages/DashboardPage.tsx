@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { AppNavBrand } from '../components/AppNavBrand';
 import { UserAccountMenu } from '../components/UserAccountMenu';
 import { useAuth } from '../hermes-security/useAuth';
+import { actorKind } from '../hermes-security/sessionStore';
 import { Badge, Card } from '../components/ui';
 
 export function DashboardPage() {
@@ -10,6 +11,20 @@ export function DashboardPage() {
   const { t } = useTranslation(['common', 'dashboard']);
   const profile = session?.profile;
   const userLabel = profile?.email ?? profile?.preferred_username ?? profile?.sub ?? t('dashboard:fallback.user');
+  const kind = actorKind(profile);
+  const isTenant = kind === 'tenant';
+  const scopeLabel =
+    kind === 'system-admin'
+      ? t('dashboard:scope.platform')
+      : kind === 'guest'
+        ? t('dashboard:scope.guest')
+        : t('dashboard:scope.tenant');
+  const workspaceLabel =
+    kind === 'system-admin'
+      ? t('dashboard:fallback.systemAdmin')
+      : kind === 'guest'
+        ? t('dashboard:fallback.guest')
+        : profile?.tenant_name ?? profile?.tenant_slug ?? t('dashboard:fallback.tenant');
 
   return (
     <div className="app-layout">
@@ -31,13 +46,16 @@ export function DashboardPage() {
         <header className="dashboard-hero">
           <div>
             <Badge tone="success">{t('dashboard:hero.sessionActive')}</Badge>
+            <Badge tone={kind === 'system-admin' ? 'accent' : kind === 'guest' ? 'warning' : 'info'}>
+              {scopeLabel}
+            </Badge>
             <h1>{t('dashboard:hero.title')}</h1>
             <p>{t('dashboard:hero.description')}</p>
           </div>
           <Card className="session-card">
             <UserRound size={22} />
             <span>{userLabel}</span>
-            <strong>{profile?.tenant_name ?? profile?.tenant_slug ?? t('dashboard:fallback.tenant')}</strong>
+            <strong>{workspaceLabel}</strong>
           </Card>
         </header>
 
@@ -76,8 +94,12 @@ export function DashboardPage() {
                 <dd>{userLabel}</dd>
               </div>
               <div>
-                <dt>{t('dashboard:authState.tenant')}</dt>
-                <dd>{profile?.tenant_name ?? profile?.tenant_slug ?? profile?.tenant_id ?? t('common:unavailable')}</dd>
+                <dt>{t('dashboard:authState.scope')}</dt>
+                <dd>{scopeLabel}</dd>
+              </div>
+              <div>
+                <dt>{isTenant ? t('dashboard:authState.tenant') : t('dashboard:authState.workspace')}</dt>
+                <dd>{isTenant ? profile?.tenant_name ?? profile?.tenant_slug ?? profile?.tenant_id ?? t('common:unavailable') : workspaceLabel}</dd>
               </div>
               <div>
                 <dt>{t('dashboard:authState.subject')}</dt>

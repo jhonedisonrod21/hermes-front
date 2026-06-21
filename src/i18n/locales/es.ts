@@ -25,7 +25,8 @@ export const es = {
       passwordPlaceholder: 'admin123',
       showPassword: 'Mostrar password',
       hidePassword: 'Ocultar password',
-      submit: 'Iniciar sesion'
+      submit: 'Iniciar sesion',
+      submitting: 'Iniciando sesion...'
     },
     callback: {
       rejectedTitle: 'Callback rechazado',
@@ -60,7 +61,14 @@ export const es = {
     },
     fallback: {
       user: 'Usuario Hermes',
-      tenant: 'Tenant local'
+      tenant: 'Tenant local',
+      systemAdmin: 'Administracion del sistema',
+      guest: 'Invitado'
+    },
+    scope: {
+      platform: 'Plataforma',
+      tenant: 'Organizacion',
+      guest: 'Invitado'
     },
     metrics: {
       todayAppointments: 'Citas de hoy',
@@ -71,7 +79,9 @@ export const es = {
     authState: {
       title: 'Estado de autenticacion',
       user: 'Usuario',
+      scope: 'Alcance',
       tenant: 'Tenant',
+      workspace: 'Espacio de trabajo',
       subject: 'Subject'
     },
     claims: {

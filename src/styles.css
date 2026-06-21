@@ -546,6 +546,15 @@ p {
   margin-bottom: 0;
 }
 
+.login-error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--hc-danger-soft);
+  color: var(--hc-danger);
+  font-size: 0.88rem;
+}
+
 .app-layout {
   background: var(--hc-bg);
   display: grid;

@@ -1,6 +1,6 @@
 import { oauthEndpoints } from './authConfig';
 import { i18n } from '../i18n';
-import { clearSession, type HermesProfile, type HermesSession } from './sessionStore';
+import { clearSession, type AccountScope, type HermesProfile, type HermesSession } from './sessionStore';
 
 type BffSessionUser = {
   authenticated?: boolean;
@@ -8,6 +8,7 @@ type BffSessionUser = {
   userId?: string;
   preferredUsername?: string;
   email?: string;
+  accountScope?: string;
   tenantId?: string;
   tenantSlug?: string;
   tenantName?: string;
@@ -16,12 +17,22 @@ type BffSessionUser = {
   claims?: Record<string, unknown>;
 };
 
+function resolveAccountScope(user: BffSessionUser): AccountScope {
+  const candidate = user.accountScope ?? user.claims?.['account_scope'];
+  if (candidate === 'PLATFORM' || candidate === 'TENANT') {
+    return candidate;
+  }
+  // Sin alcance explícito: una cuenta sin tenant es cuenta de plataforma (p. ej. SYSTEM_ADMIN).
+  return user.tenantId ? 'TENANT' : 'PLATFORM';
+}
+
 function toSession(user: BffSessionUser): HermesSession {
   const profile: HermesProfile = {
     sub: user.sub,
     user_id: user.userId,
     preferred_username: user.preferredUsername,
     email: user.email,
+    account_scope: resolveAccountScope(user),
     tenant_id: user.tenantId,
     tenant_slug: user.tenantSlug,
     tenant_name: user.tenantName,

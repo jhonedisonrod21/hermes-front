@@ -17,6 +17,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
           setSession(validSession);
         }
       })
+      .catch((error) => {
+        // Un error del BFF (5xx/red) no es "no autenticado": no debe quedar como rechazo sin
+        // capturar. Degradamos a sesión nula de forma controlada.
+        console.error('Hermes session load failed', error);
+        if (mounted) {
+          setSession(null);
+        }
+      })
       .finally(() => {
         if (mounted) {
           setLoading(false);

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown, LogOut, UserCircle, UserRound } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from './LanguageSwitcher';
-import type { HermesProfile } from '../hermes-security/sessionStore';
+import { actorKind, type HermesProfile } from '../hermes-security/sessionStore';
 
 type UserAccountMenuProps = {
   profile?: HermesProfile;
@@ -26,7 +26,13 @@ export function UserAccountMenu({ profile, onLogout }: UserAccountMenuProps) {
 
   const userName = useMemo(() => displayName(profile, t('dashboard:fallback.user')), [profile, t]);
   const userFirstName = useMemo(() => firstName(profile, t('dashboard:fallback.user')), [profile, t]);
-  const tenantName = profile?.tenant_name ?? profile?.tenant_slug ?? t('dashboard:fallback.tenant');
+  const kind = actorKind(profile);
+  const workspaceLabel =
+    kind === 'system-admin'
+      ? t('dashboard:fallback.systemAdmin')
+      : kind === 'guest'
+        ? t('dashboard:fallback.guest')
+        : profile?.tenant_name ?? profile?.tenant_slug ?? t('dashboard:fallback.tenant');
 
   useEffect(() => {
     if (!open) {
@@ -78,7 +84,7 @@ export function UserAccountMenu({ profile, onLogout }: UserAccountMenuProps) {
             </span>
             <div>
               <strong>{userName}</strong>
-              <span>{tenantName}</span>
+              <span>{workspaceLabel}</span>
             </div>
           </div>
 
