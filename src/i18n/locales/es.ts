@@ -177,6 +177,7 @@ export const es = {
       reports: 'Reportes',
       appointments: 'Citas',
       bookings: 'Mis reservas',
+      payments: 'Pagos',
       team: 'Equipo',
       organization: 'Organización',
       tenants: 'Organizaciones',
@@ -188,6 +189,9 @@ export const es = {
       'tenant-admin': 'Administrador de organización',
       'tenant-partner': 'Colaborador',
       guest: 'Invitado'
+    },
+    orgSwitcher: {
+      label: 'Organización activa'
     }
   },
   overview: {
@@ -206,6 +210,17 @@ export const es = {
       'tenant-admin': 'Administra tu catálogo de servicios, tu agenda y tu equipo.',
       'tenant-partner': 'Opera la agenda: crea y gestiona las citas de la organización.',
       guest: 'Explora los servicios disponibles y encuentra dónde reservar.'
+    },
+    guest: {
+      next: 'Tu próxima cita',
+      service: 'Tu servicio',
+      viewBooking: 'Ver mis reservas',
+      payNow: 'Pagar ahora',
+      noNext: 'Aún no tienes citas',
+      noNextHint: 'Explora los servicios disponibles y reserva tu primera cita.',
+      exploreCta: 'Explorar servicios',
+      upcoming: 'Próximas citas',
+      pendingPayment: 'Pendientes de pago'
     },
     tenant: {
       offerings: 'Servicios',
@@ -233,6 +248,7 @@ export const es = {
     description: 'Define los servicios que tu organización ofrece para reservar.',
     empty: 'Aún no has creado servicios. Crea el primero.',
     searchPlaceholder: 'Buscar por nombre o categoría...',
+    allStatus: 'Todos los estados',
     actions: {
       new: 'Nuevo servicio',
       activate: 'Activar',
@@ -280,6 +296,15 @@ export const es = {
       status: 'Estado',
       requiresOnlinePayment: 'Requiere pago online por adelantado'
     },
+    hints: {
+      name: 'Nombre del servicio tal como lo verán tus clientes.',
+      category: 'Agrupa servicios similares (p. ej. Consultas, Vacunas).',
+      modality: 'Cómo se presta: presencial, virtual o ambos.',
+      duration: 'Cuánto dura cada cita, en minutos.',
+      price: 'Precio por cita. Usa 0 si es gratuito.',
+      currency: 'Moneda en la que cobras este servicio.',
+      description: 'Detalles que ayuden al cliente a decidir.'
+    },
     modality: {
       IN_PERSON: 'Presencial',
       VIRTUAL: 'Virtual',
@@ -303,12 +328,15 @@ export const es = {
       add: 'Agregar excepción',
       empty: 'No hay excepciones registradas.',
       date: 'Fecha',
+      dateHint: 'Día concreto que será una excepción a tu horario habitual.',
       type: 'Tipo',
+      typeHint: 'Cerrado todo el día u horario especial solo ese día.',
       closed: 'Cerrado',
       customHours: 'Horario especial',
       opensAt: 'Abre',
       closesAt: 'Cierra',
-      description: 'Descripción'
+      description: 'Descripción',
+      descriptionHint: 'Motivo de la excepción (opcional), p. ej. Festivo.'
     },
     toast: {
       hoursSaved: 'Horario guardado.',
@@ -325,6 +353,7 @@ export const es = {
     description: 'Agrega o quita miembros y define su rol dentro de la organización.',
     empty: 'Todavía no hay miembros además de ti.',
     searchPlaceholder: 'Buscar por ID o rol...',
+    allRoles: 'Todos los roles',
     actions: {
       add: 'Agregar miembro'
     },
@@ -337,8 +366,9 @@ export const es = {
     },
     fields: {
       userId: 'ID de usuario',
-      userIdHint: 'Identificador del usuario en Hermes (UUID).',
+      userIdHint: 'UUID del usuario. Cada persona encuentra el suyo en su pantalla "Cuenta".',
       role: 'Rol',
+      roleHint: 'Admin gestiona toda la organización; Profesional solo atiende sus citas.',
       roles: 'Roles',
       status: 'Estado',
       since: 'Desde'
@@ -362,6 +392,14 @@ export const es = {
       city: 'Ciudad',
       address: 'Dirección',
       description: 'Descripción'
+    },
+    hints: {
+      name: 'Nombre comercial de la organización.',
+      taxId: 'Identificación tributaria (p. ej. NIT o RUT), sin puntos.',
+      country: 'País donde está registrada la organización.',
+      city: 'Ciudad principal donde operas.',
+      address: 'Dirección física donde atiendes a tus clientes.',
+      description: 'Breve descripción que verán tus clientes.'
     }
   },
   admin: {
@@ -371,6 +409,7 @@ export const es = {
       description: 'Gestiona las organizaciones registradas en la plataforma.',
       empty: 'No hay organizaciones registradas.',
       searchPlaceholder: 'Buscar por nombre, slug o ciudad...',
+      allStatus: 'Todos los estados',
       name: 'Nombre',
       slug: 'Slug',
       location: 'Ubicación',
@@ -395,7 +434,13 @@ export const es = {
       pickHint: 'Selecciona un usuario registrado. Como TENANT_ADMIN administrará la organización.',
       searchEmpty: 'No hay usuarios disponibles para agregar.',
       clear: 'Quitar selección',
-      empty: 'Esta organización aún no tiene miembros.',
+      filterRole: 'Filtrar por rol',
+      allRoles: 'Todos los roles',
+      hideLocked: 'Ocultar bloqueados',
+      matches: '{{count}} disponibles',
+      assignRole: 'Rol en la organización',
+      assignRoleHint: 'Administrador gestiona la organización; Profesional atiende citas.',
+      empty: 'Aún no hay miembros. Busca un usuario arriba y agrégalo.',
       roles: {
         TENANT_ADMIN: 'Administrador',
         TENANT_PARTNER: 'Colaborador'
@@ -407,9 +452,13 @@ export const es = {
       description: 'Consulta y administra las cuentas de usuario.',
       empty: 'No hay usuarios registrados.',
       searchPlaceholder: 'Buscar por usuario o correo...',
+      allRoles: 'Todos los roles',
+      allStatus: 'Todos los estados',
       editTitle: 'Editar usuario',
       username: 'Usuario',
+      usernameHint: 'Nombre con el que el usuario inicia sesión.',
       email: 'Correo',
+      emailHint: 'Correo de contacto del usuario.',
       roles: 'Roles',
       status: 'Estado',
       created: 'Creado',
@@ -429,10 +478,14 @@ export const es = {
     }
   },
   explore: {
-    eyebrow: 'Explorar',
+    eyebrow: 'Reserva en minutos',
     title: 'Encuentra servicios',
+    heroTitle: 'Reserva tu próxima cita',
+    heroSubtitle: 'Explora servicios de las organizaciones de Hermes y reserva tu horario en segundos.',
     description: 'Busca servicios disponibles en las organizaciones de Hermes.',
     search: 'Buscar',
+    book: 'Reservar ahora',
+    onlinePayment: 'Pago en línea',
     anyModality: 'Cualquier modalidad',
     noResults: 'No se encontraron servicios para tu búsqueda.',
     fields: {
@@ -443,12 +496,46 @@ export const es = {
   appointments: {
     eyebrow: 'Operación',
     title: 'Citas',
-    description: 'Crea y gestiona las citas, reservaciones y su ciclo de estados.',
-    capabilities: {
-      create: 'Crear citas / reservaciones',
-      reschedule: 'Reprogramar una cita',
-      cancel: 'Eliminar o cancelar una cita',
-      markStates: 'Marcar estados: completada, no atendida, pagada, finalizada, cancelada'
+    listDescription: 'Gestiona las citas de tu organización: cancela o reprograma según el estado.',
+    searchPlaceholder: 'Buscar por servicio o cliente...',
+    allStatus: 'Todos los estados',
+    empty: 'Aún no hay citas registradas.',
+    columns: {
+      service: 'Servicio',
+      customer: 'Cliente',
+      start: 'Inicio',
+      status: 'Estado',
+      price: 'Precio'
+    },
+    status: {
+      PENDING_PAYMENT: 'Pendiente de pago',
+      CONFIRMED: 'Confirmada',
+      COMPLETED: 'Completada',
+      CANCELLED: 'Cancelada',
+      NO_SHOW: 'No atendida',
+      EXPIRED: 'Expirada'
+    },
+    actions: {
+      cancel: 'Cancelar',
+      reschedule: 'Reprogramar'
+    },
+    confirm: {
+      cancelTitle: 'Cancelar cita',
+      cancelMessage: '¿Seguro que quieres cancelar esta cita?'
+    },
+    toast: {
+      cancelled: 'Cita cancelada.',
+      rescheduled: 'Cita reprogramada.'
+    },
+    reschedule: {
+      title: 'Reprogramar: {{service}}',
+      date: 'Nueva fecha',
+      dateHint: 'Elige una nueva fecha y selecciona un horario disponible.',
+      slots: 'Horarios disponibles',
+      noSlots: 'No hay horarios disponibles ese día. Prueba otra fecha.',
+      pickSlot: 'Elige un horario disponible.',
+      conflict: 'Ese horario ya no está disponible. Elige otro.',
+      submit: 'Reprogramar'
     }
   },
   reports: {
@@ -462,20 +549,77 @@ export const es = {
     }
   },
   bookings: {
-    eyebrow: 'Mis reservas',
-    title: 'Reservas y pagos',
-    description: 'Reserva un horario de cita y efectúa el pago de los servicios.',
-    capabilities: {
-      book: 'Reservar un horario de cita',
-      pay: 'Efectuar un pago',
-      history: 'Historial de reservas y comprobantes'
+    eyebrow: 'Reservas',
+    title: 'Mis reservas',
+    listDescription: 'Tus citas reservadas. Puedes reprogramarlas o cancelarlas mientras estén activas.',
+    explore: 'Explorar servicios',
+    empty: 'Aún no tienes reservas. Explora los servicios y reserva tu primera cita.',
+    sections: {
+      upcoming: 'Próximas',
+      past: 'Historial'
+    },
+    loadMore: 'Cargar más ({{count}})',
+    confirm: {
+      cancelTitle: 'Cancelar reserva',
+      cancelMessage: '¿Seguro que quieres cancelar esta reserva?'
+    },
+    book: {
+      title: 'Reservar: {{service}}',
+      date: 'Fecha',
+      dateHint: 'Elige el día de tu cita y verás los horarios disponibles.',
+      slots: 'Horarios disponibles',
+      noSlots: 'No hay horarios disponibles ese día. Prueba otra fecha.',
+      pickSlot: 'Elige un horario disponible.',
+      requirements: 'Datos requeridos',
+      fillRequired: 'Completa los datos obligatorios.',
+      typeHint: {
+        NUMBER: 'Ingresa solo números.',
+        DATE: 'Selecciona una fecha.',
+        FILE: 'Adjunta el archivo solicitado.'
+      },
+      paymentNote: 'requiere pago en línea',
+      confirm: 'Confirmar reserva',
+      booking: 'Reservando...',
+      booked: 'Reserva creada. Revísala en "Mis reservas".'
+    },
+    pay: {
+      action: 'Pagar',
+      title: 'Pagar: {{service}}',
+      bank: 'Banco (PSE)',
+      bankHint: 'Elige el banco desde el que harás la transferencia PSE.',
+      pickBank: 'Selecciona tu banco',
+      legalType: 'Tipo de persona',
+      legal: { NATURAL: 'Natural', JURIDICAL: 'Jurídica' },
+      documentType: 'Tipo de documento',
+      documentNumber: 'Número de documento',
+      documentNumberHint: 'Solo números, sin puntos ni guiones.',
+      fullName: 'Nombre completo',
+      fullNameHint: 'Tal como aparece en tu documento de identidad.',
+      email: 'Correo',
+      emailHint: 'Te enviaremos aquí el comprobante del pago.',
+      phone: 'Teléfono',
+      phoneHint: 'Número de contacto por si hay alguna novedad con el pago.',
+      submit: 'Ir a pagar',
+      processing: 'Redirigiendo...',
+      unavailable: 'El servicio de pago no está disponible ahora. Inténtalo de nuevo en unos minutos.'
+    },
+    return: {
+      title: 'Pago en proceso',
+      message: 'Estamos confirmando tu pago. El estado de tu reserva se actualizará en cuanto lo recibamos.',
+      failedTitle: 'El pago no se completó',
+      failedMessage: 'No se pudo procesar el pago. Puedes intentarlo de nuevo desde tu reserva.',
+      action: 'Ver mis reservas'
     }
   },
   account: {
     eyebrow: 'Cuenta',
     title: 'Mi cuenta',
     description: 'Tus datos de acceso y de sesión en Hermes.',
-    guestHint: 'Aún no perteneces a ninguna organización. Comparte tu ID de usuario con un administrador para que te asocie.',
+    guest: {
+      clientNote: 'Estás usando Hermes como cliente: reserva y gestiona tus citas. No necesitas configurar nada más.',
+      staffQuestion: '¿Trabajas en un negocio que usa Hermes?',
+      staffHint: 'Comparte tu ID de usuario (arriba) con el administrador del negocio para que te asocie y puedas gestionar su agenda.'
+    },
     workspace: 'Organización',
     profile: {
       title: 'Perfil',
@@ -483,11 +627,83 @@ export const es = {
       role: 'Rol',
       userId: 'ID de usuario',
       copy: 'Copiar',
-      copied: 'Copiado'
+      copied: 'Copiado',
+      phone: 'Teléfono',
+      phoneHint: 'Lo usamos para enviarte recordatorios de tus citas por SMS.',
+      saved: 'Teléfono actualizado.'
     },
     password: {
       title: 'Cambiar contraseña',
-      pending: 'El cambio de contraseña estará disponible cuando el servicio de identidad lo exponga.'
+      intro: 'Te enviamos un código a tu correo; úsalo abajo para definir una nueva contraseña.',
+      request: 'Enviar código a mi correo',
+      sending: 'Enviando...',
+      resend: 'Reenviar código',
+      requestSent: 'Código enviado. Revisa tu correo.',
+      token: 'Código',
+      tokenHint: 'El código que llegó a tu correo.',
+      newPassword: 'Nueva contraseña',
+      newPasswordHint: 'Mínimo 8 caracteres.',
+      confirmPassword: 'Confirmar contraseña',
+      confirmPasswordHint: 'Repite la misma contraseña para confirmar.',
+      submit: 'Cambiar contraseña',
+      changed: 'Contraseña actualizada.',
+      mismatch: 'Las contraseñas no coinciden.',
+      tooShort: 'La contraseña debe tener al menos {{min}} caracteres.'
+    }
+  },
+  payments: {
+    eyebrow: 'Cobros',
+    title: 'Configuración de pagos',
+    description: 'Conecta tu pasarela PSE para cobrar las reservas de tus servicios.',
+    notConfigured: 'Sin configurar',
+    active: 'Cobros activos',
+    inactive: 'Cobros inactivos',
+    configured: 'Ya configurada',
+    secretHint: 'Solo se guarda; no se vuelve a mostrar. Déjalo vacío para no cambiarla.',
+    updatedAt: 'Actualizada el {{date}}',
+    saved: 'Configuración guardada.',
+    delete: 'Eliminar configuración',
+    deleted: 'Configuración eliminada.',
+    deleteConfirm: {
+      title: 'Eliminar configuración de pagos',
+      message: '¿Eliminar la configuración? Dejarás de poder cobrar en línea.'
+    },
+    fields: {
+      provider: 'Pasarela',
+      enabled: 'Activar cobros en línea',
+      merchantAccount: 'Cuenta de comercio',
+      publicKey: 'Llave pública',
+      privateKey: 'Llave privada',
+      eventsSecret: 'Secreto de eventos'
+    },
+    hints: {
+      provider: 'Pasarela que procesará los pagos en línea.',
+      merchantAccount: 'Identificador de tu comercio en la pasarela.',
+      publicKey: 'Clave pública que te entrega la pasarela.'
+    },
+    providers: {
+      FAKE_PSE: 'PSE de prueba',
+      WOMPI: 'Wompi',
+      PAYU: 'PayU'
+    },
+    received: {
+      title: 'Cobros recibidos'
+    },
+    history: {
+      title: 'Historial de pagos',
+      empty: 'Aún no hay pagos registrados.',
+      date: 'Fecha',
+      amount: 'Monto',
+      status: 'Estado',
+      appointment: 'Cita',
+      resume: 'Continuar pago',
+      statuses: {
+        PENDING: 'Pendiente',
+        PAID: 'Pagado',
+        FAILED: 'Fallido',
+        EXPIRED: 'Expirado',
+        CANCELLED: 'Cancelado'
+      }
     }
   },
   landing: {

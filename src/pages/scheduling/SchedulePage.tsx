@@ -186,6 +186,7 @@ function ExceptionsPanel({
         <div className="hc-form-row">
           <TextField
             label={t('schedule:exceptions.date')}
+            hint={t('schedule:exceptions.dateHint')}
             type="date"
             required
             value={form.date}
@@ -193,6 +194,7 @@ function ExceptionsPanel({
           />
           <Select
             label={t('schedule:exceptions.type')}
+            hint={t('schedule:exceptions.typeHint')}
             value={form.type}
             onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))}
             options={[
@@ -219,6 +221,7 @@ function ExceptionsPanel({
         ) : null}
         <TextField
           label={t('schedule:exceptions.description')}
+          hint={t('schedule:exceptions.descriptionHint')}
           value={form.description}
           onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
         />

@@ -4,8 +4,9 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AppNavBrand } from './AppNavBrand';
 import { UserAccountMenu } from './UserAccountMenu';
+import { OrganizationSwitcher } from './OrganizationSwitcher';
 import { useAuth } from '../hermes-security/useAuth';
-import { actorKind } from '../hermes-security/sessionStore';
+import { actorKind, isTenantActor } from '../hermes-security/sessionStore';
 import { navigationFor } from '../app/navigation';
 
 export function AppShell() {
@@ -70,6 +71,7 @@ export function AppShell() {
           >
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
+          {isTenantActor(kind) ? <OrganizationSwitcher /> : null}
           <div className="app-topbar-spacer" />
           <UserAccountMenu onLogout={logout} profile={profile} />
         </header>

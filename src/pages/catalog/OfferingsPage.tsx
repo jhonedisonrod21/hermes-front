@@ -3,7 +3,7 @@ import { Pencil, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '../../components/PageHeader';
 import { DataState } from '../../components/DataState';
-import { Badge, Button, Card, Pagination, SearchInput } from '../../components/ui';
+import { Badge, Button, Card, Pagination, SearchInput, Select } from '../../components/ui';
 import { OfferingFormModal } from './OfferingFormModal';
 import { useResource } from '../../hooks/useResource';
 import { useClientTable } from '../../hooks/useClientTable';
@@ -25,9 +25,11 @@ export function OfferingsPage() {
   const [editing, setEditing] = useState<OfferingResponse | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
 
   const items = offerings.data?.content ?? [];
-  const { paged, page, setPage, totalPages, total } = useClientTable(items, {
+  const visible = statusFilter ? items.filter((o) => (statusFilter === 'active' ? o.active : !o.active)) : items;
+  const { paged, page, setPage, totalPages, total } = useClientTable(visible, {
     query,
     match: useCallback(matchOffering, [])
   });
@@ -78,11 +80,23 @@ export function OfferingsPage() {
 
       <Card className="table-card">
         <div className="table-toolbar">
-          <SearchInput
-            placeholder={t('catalog:searchPlaceholder')}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
+          <div className="table-toolbar-filters">
+            <SearchInput
+              placeholder={t('catalog:searchPlaceholder')}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <Select
+              className="toolbar-filter"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              placeholder={t('catalog:allStatus')}
+              options={[
+                { value: 'active', label: t('catalog:status.active') },
+                { value: 'inactive', label: t('catalog:status.inactive') }
+              ]}
+            />
+          </div>
           <span className="table-toolbar-count">{t('common:pagination.items', { count: total })}</span>
         </div>
         <DataState

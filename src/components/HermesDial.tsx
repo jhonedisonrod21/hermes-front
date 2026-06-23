@@ -2,6 +2,8 @@ type HermesDialProps = {
   className?: string;
   /** Etiquetas mono alrededor del dial (coordenadas/instrumento). */
   labels?: boolean;
+  /** Glifo de reloj simplificado, legible a tamaños pequeños (cabeceras, chips). */
+  minimal?: boolean;
 };
 
 const CENTER = 200;
@@ -12,11 +14,60 @@ function polar(angleDeg: number, radius: number) {
   return { x: CENTER + radius * Math.cos(a), y: CENTER + radius * Math.sin(a) };
 }
 
+/** Reloj mínimo (viewBox 40, trazo no escalable) marcando las 9:00 como el readout de marca. */
+function MinimalDial({ className = '' }: { className?: string }) {
+  // 12 marcas; las cardinales (12/3/6/9) más largas, como un reloj real.
+  const ticks = Array.from({ length: 12 }, (_, i) => {
+    const a = ((i * 30 - 90) * Math.PI) / 180;
+    const cardinal = i % 3 === 0;
+    const r1 = cardinal ? 13.4 : 15;
+    const r2 = 16.4;
+    return {
+      x1: 20 + r1 * Math.cos(a),
+      y1: 20 + r1 * Math.sin(a),
+      x2: 20 + r2 * Math.cos(a),
+      y2: 20 + r2 * Math.sin(a),
+      cardinal
+    };
+  });
+  return (
+    <svg
+      className={`lp-dial lp-dial-mini ${className}`.trim()}
+      viewBox="0 0 40 40"
+      role="img"
+      aria-label="Reloj de Hermes"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="20" cy="20" r="18" className="lp-dial-mini-disc" />
+      <circle cx="20" cy="20" r="17" className="lp-dial-ring" />
+      {ticks.map((t, i) => (
+        <line
+          key={i}
+          x1={t.x1}
+          y1={t.y1}
+          x2={t.x2}
+          y2={t.y2}
+          className={t.cardinal ? 'lp-dial-tick-major' : 'lp-dial-tick'}
+        />
+      ))}
+      {/* manecillas marcando las 9:00 */}
+      <line x1="20" y1="20" x2="20" y2="7.8" className="lp-dial-hand-minute" />
+      <line x1="20" y1="20" x2="10.6" y2="20" className="lp-dial-hand-hour" />
+      <circle cx="20" cy="20" r="2.1" className="lp-dial-hub" />
+      <circle cx="20" cy="20" r="0.9" className="lp-dial-hub-dot" />
+    </svg>
+  );
+}
+
 /**
  * Cronógrafo de Hermes: instrumento de latón sobre cielo nocturno. Reloj + la trayectoria
  * del mensajero alado. Es la pieza-firma de la marca; se reutiliza en toda la app.
  */
-export function HermesDial({ className = '', labels = true }: HermesDialProps) {
+export function HermesDial({ className = '', labels = true, minimal = false }: HermesDialProps) {
+  if (minimal) {
+    return <MinimalDial className={className} />;
+  }
+
   const ticks = Array.from({ length: TICKS }, (_, i) => {
     const angle = (360 / TICKS) * i;
     const major = i % 4 === 0;
@@ -75,10 +126,14 @@ export function HermesDial({ className = '', labels = true }: HermesDialProps) {
         return <circle key={i} cx={p.x} cy={p.y} r={i === 1 ? 5 : 3.5} className="lp-dial-node" />;
       })}
 
-      {/* Aguja que barre (se anima al cargar) */}
+      {/* Manecillas de reloj marcando las 9:00 (coherente con el readout 09:00) */}
+      <line x1={CENTER} y1={CENTER} x2={CENTER} y2="84" className="lp-dial-minute" />
+      <line x1={CENTER} y1={CENTER} x2="116" y2={CENTER} className="lp-dial-hour" />
+
+      {/* Segundero que barre al cargar (firma de cronógrafo) */}
       <g className="lp-dial-hand">
-        <line x1={CENTER} y1={CENTER} x2={CENTER} y2="44" className="lp-dial-hand-line" />
-        <circle cx={CENTER} cy="44" r="5" className="lp-dial-hand-tip" />
+        <line x1={CENTER} y1={CENTER} x2={CENTER} y2="52" className="lp-dial-second" />
+        <circle cx={CENTER} cy="52" r="4" className="lp-dial-hand-tip" />
       </g>
 
       {/* Núcleo */}

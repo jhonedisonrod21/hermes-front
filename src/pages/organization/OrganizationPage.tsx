@@ -93,6 +93,7 @@ export function OrganizationPage() {
           <form className="hc-form" onSubmit={submit} noValidate>
             <TextField
               label={t('organization:fields.taxId')}
+              hint={t('organization:hints.taxId')}
               maxLength={MAX.taxId}
               required
               value={form.taxId}
@@ -101,6 +102,7 @@ export function OrganizationPage() {
             />
             <TextField
               label={t('organization:fields.address')}
+              hint={t('organization:hints.address')}
               maxLength={MAX.address}
               value={form.address}
               error={errors.address}
@@ -108,6 +110,7 @@ export function OrganizationPage() {
             />
             <Textarea
               label={t('organization:fields.description')}
+              hint={t('organization:hints.description')}
               rows={3}
               maxLength={MAX.description}
               value={form.description}

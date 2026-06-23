@@ -1,9 +1,9 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Lock, Pencil, Unlock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '../../components/PageHeader';
 import { DataState } from '../../components/DataState';
-import { Badge, Button, Card, Pagination, SearchInput } from '../../components/ui';
+import { Badge, Button, Card, Pagination, SearchInput, Select } from '../../components/ui';
 import { UserEditModal } from './UserEditModal';
 import { useResource } from '../../hooks/useResource';
 import { useClientTable } from '../../hooks/useClientTable';
@@ -24,9 +24,28 @@ export function UsersPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [editing, setEditing] = useState<UserResponse | null>(null);
   const [query, setQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
 
-  const items = users.data?.content ?? [];
-  const { paged, page, setPage, totalPages, total } = useClientTable(items, {
+  const items = useMemo(() => users.data?.content ?? [], [users.data]);
+  const availableRoles = useMemo(
+    () => Array.from(new Set(items.flatMap((u) => u.roles ?? []))).sort(),
+    [items]
+  );
+  const visible = useMemo(
+    () =>
+      items
+        .filter((u) => (roleFilter ? (u.roles ?? []).includes(roleFilter) : true))
+        .filter((u) => {
+          if (!statusFilter) return true;
+          if (statusFilter === 'active') return u.enabled && !u.locked;
+          if (statusFilter === 'locked') return u.locked;
+          if (statusFilter === 'disabled') return !u.enabled && !u.locked;
+          return true;
+        }),
+    [items, roleFilter, statusFilter]
+  );
+  const { paged, page, setPage, totalPages, total } = useClientTable(visible, {
     query,
     match: useCallback(matchUser, [])
   });
@@ -59,11 +78,31 @@ export function UsersPage() {
 
       <Card className="table-card">
         <div className="table-toolbar">
-          <SearchInput
-            placeholder={t('admin:users.searchPlaceholder')}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
+          <div className="table-toolbar-filters">
+            <SearchInput
+              placeholder={t('admin:users.searchPlaceholder')}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <Select
+              className="toolbar-filter"
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              placeholder={t('admin:users.allRoles')}
+              options={availableRoles.map((r) => ({ value: r, label: r }))}
+            />
+            <Select
+              className="toolbar-filter"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              placeholder={t('admin:users.allStatus')}
+              options={[
+                { value: 'active', label: t('admin:users.active') },
+                { value: 'locked', label: t('admin:users.locked') },
+                { value: 'disabled', label: t('admin:users.disabled') }
+              ]}
+            />
+          </div>
           <span className="table-toolbar-count">{t('common:pagination.items', { count: total })}</span>
         </div>
         <DataState

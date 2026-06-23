@@ -37,7 +37,7 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
         <header className="hc-modal-header">
           <div className="hc-modal-title">
             <span className="hc-modal-dial" aria-hidden="true">
-              <HermesDial labels={false} />
+              <HermesDial minimal />
             </span>
             <h2>{title}</h2>
           </div>

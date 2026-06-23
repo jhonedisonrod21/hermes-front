@@ -3,7 +3,7 @@ import { Trash2, UserPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '../../components/Modal';
 import { DataState } from '../../components/DataState';
-import { Badge, Button, Combobox, Select } from '../../components/ui';
+import { Badge, Button, Checkbox, Combobox, Select } from '../../components/ui';
 import { useResource } from '../../hooks/useResource';
 import { useMutation } from '../../hooks/useMutation';
 import { useToast } from '../../components/feedback/toast';
@@ -33,21 +33,35 @@ export function TenantMembersModal({ tenant, onClose }: Props) {
     [tenant?.id]
   );
   const [form, setForm] = useState({ userId: '', role: ROLES[0] });
+  const [roleFilter, setRoleFilter] = useState('');
+  const [hideLocked, setHideLocked] = useState(true);
   const add = useMutation(() => tenantApi.addTenantMember(tenant!.id, { userId: form.userId, role: form.role }));
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  const items = members.data?.content ?? [];
+  const items = useMemo(() => members.data?.content ?? [], [members.data]);
   const allUsers = useMemo(() => users.data?.content ?? [], [users.data]);
   const usersById = useMemo(() => new Map(allUsers.map((u) => [u.id, u])), [allUsers]);
 
-  // Excluye usuarios que ya son miembros del tenant.
+  // Roles de plataforma presentes entre los usuarios (para el filtro).
+  const availableRoles = useMemo(
+    () => Array.from(new Set(allUsers.flatMap((u) => u.roles ?? []))).sort(),
+    [allUsers]
+  );
+
+  // Excluye miembros actuales y aplica los filtros activos.
   const memberIds = useMemo(() => new Set(items.map((m) => m.userId)), [items]);
   const userOptions = useMemo(
     () =>
       allUsers
         .filter((u) => !memberIds.has(u.id))
-        .map((u: UserResponse) => ({ value: u.id, label: u.username, sublabel: u.email })),
-    [allUsers, memberIds]
+        .filter((u: UserResponse) => (hideLocked ? !u.locked : true))
+        .filter((u: UserResponse) => (roleFilter ? (u.roles ?? []).includes(roleFilter) : true))
+        .map((u: UserResponse) => ({
+          value: u.id,
+          label: u.username,
+          sublabel: u.email && u.email !== u.username ? u.email : undefined
+        })),
+    [allUsers, memberIds, hideLocked, roleFilter]
   );
 
   async function submit(e: FormEvent) {
@@ -86,7 +100,7 @@ export function TenantMembersModal({ tenant, onClose }: Props) {
 
   return (
     <Modal open={open} title={t('admin:members.title', { name: tenant?.name ?? '' })} onClose={onClose}>
-      <form className="hc-form member-form" onSubmit={submit}>
+      <form className="hc-form member-add-form" onSubmit={submit}>
         <Combobox
           label={t('admin:members.pickUser')}
           value={form.userId}
@@ -97,15 +111,40 @@ export function TenantMembersModal({ tenant, onClose }: Props) {
           emptyText={t('admin:members.searchEmpty')}
           clearLabel={t('admin:members.clear')}
         />
-        <Select
-          label={t('team:fields.role')}
-          value={form.role}
-          onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
-          options={ROLES.map((r) => ({ value: r, label: t(`admin:members.roles.${r}`, r) }))}
-        />
-        <Button type="submit" icon={<UserPlus size={17} />} disabled={add.submitting || !form.userId}>
-          {t('team:actions.add')}
-        </Button>
+        {!form.userId ? (
+          <div className="member-filters">
+            <Select
+              className="member-filter-role"
+              label={t('admin:members.filterRole')}
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              options={[
+                { value: '', label: t('admin:members.allRoles') },
+                ...availableRoles.map((r) => ({ value: r, label: r }))
+              ]}
+            />
+            <Checkbox
+              label={t('admin:members.hideLocked')}
+              checked={hideLocked}
+              onChange={(e) => setHideLocked(e.target.checked)}
+            />
+            <span className="member-filter-count">
+              {t('admin:members.matches', { count: userOptions.length })}
+            </span>
+          </div>
+        ) : null}
+        <div className="member-add-row">
+          <Select
+            label={t('admin:members.assignRole')}
+            hint={t('admin:members.assignRoleHint')}
+            value={form.role}
+            onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
+            options={ROLES.map((r) => ({ value: r, label: t(`admin:members.roles.${r}`, r) }))}
+          />
+          <Button type="submit" icon={<UserPlus size={17} />} disabled={add.submitting || !form.userId}>
+            {t('team:actions.add')}
+          </Button>
+        </div>
       </form>
       {add.error ? <p className="login-error">{add.error.message}</p> : null}
 
@@ -126,7 +165,7 @@ export function TenantMembersModal({ tenant, onClose }: Props) {
                     {user ? (
                       <span className="member-identity">
                         <strong>{user.username}</strong>
-                        <span>{user.email}</span>
+                        {user.email && user.email !== user.username ? <span>{user.email}</span> : null}
                       </span>
                     ) : (
                       <code>{m.userId}</code>

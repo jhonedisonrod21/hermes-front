@@ -65,6 +65,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// El hook se coloca junto al provider a propósito (mismo dominio de feedback).
+// eslint-disable-next-line react-refresh/only-export-components
 export function useToast(): ToastApi {
   const context = useContext(ToastContext);
   if (!context) {

@@ -24,3 +24,11 @@ export function formatDate(iso?: string, locale = 'es'): string {
   if (Number.isNaN(date.getTime())) return iso;
   return new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(date);
 }
+
+/** Fecha-hora ISO → fecha + hora local. */
+export function formatDateTime(iso?: string, locale = 'es'): string {
+  if (!iso) return '—';
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+}

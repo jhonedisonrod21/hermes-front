@@ -58,12 +58,14 @@ export function UserEditModal({ user, onClose, onSaved }: Props) {
       <form id="user-form" className="hc-form" onSubmit={submit}>
         <TextField
           label={t('admin:users.username')}
+          hint={t('admin:users.usernameHint')}
           required
           value={form.username}
           onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))}
         />
         <TextField
           label={t('admin:users.email')}
+          hint={t('admin:users.emailHint')}
           type="email"
           required
           value={form.email}

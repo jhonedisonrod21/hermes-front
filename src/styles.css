@@ -27,6 +27,12 @@
   --hc-midnight: #081633;
   --hc-midnight-2: #0c1f47;
   --hc-gold-soft: #f2d483;
+  /* Tokens del dial (mismos que en .lp) expuestos globalmente para que el
+     cronógrafo se pinte correctamente también fuera de la landing. */
+  --lp-midnight: #081633;
+  --lp-midnight-2: #0c1f47;
+  --lp-gold: #e0aa2c;
+  --lp-gold-soft: #f2d483;
   --hc-font-display: "Fraunces", Georgia, "Times New Roman", serif;
   --hc-font-mono: "Space Mono", ui-monospace, "SFMono-Regular", monospace;
   color: var(--hc-text);

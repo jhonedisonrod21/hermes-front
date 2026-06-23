@@ -27,9 +27,11 @@ export function MembersPage() {
   const add = useMutation(() => tenantApi.addMyMember({ userId: form.userId.trim(), role: form.role }));
   const [busyId, setBusyId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
 
   const items = members.data?.content ?? [];
-  const { paged, page, setPage, totalPages, total } = useClientTable(items, {
+  const visible = roleFilter ? items.filter((m) => m.roles.includes(roleFilter)) : items;
+  const { paged, page, setPage, totalPages, total } = useClientTable(visible, {
     query,
     match: useCallback(matchMember, [])
   });
@@ -71,7 +73,7 @@ export function MembersPage() {
       <PageHeader eyebrow={t('team:eyebrow')} title={t('team:title')} description={t('team:description')} />
 
       <Card className="panel">
-        <form className="hc-form member-form" onSubmit={submit}>
+        <form className="hc-form member-add-form" onSubmit={submit}>
           <TextField
             label={t('team:fields.userId')}
             hint={t('team:fields.userIdHint')}
@@ -79,25 +81,37 @@ export function MembersPage() {
             value={form.userId}
             onChange={(e) => setForm((f) => ({ ...f, userId: e.target.value }))}
           />
-          <Select
-            label={t('team:fields.role')}
-            value={form.role}
-            onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
-            options={ROLES.map((r) => ({ value: r, label: t(`team:roles.${r}`, r) }))}
-          />
-          <Button type="submit" icon={<UserPlus size={17} />} disabled={add.submitting || !form.userId.trim()}>
-            {t('team:actions.add')}
-          </Button>
+          <div className="member-add-row">
+            <Select
+              label={t('team:fields.role')}
+              hint={t('team:fields.roleHint')}
+              value={form.role}
+              onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
+              options={ROLES.map((r) => ({ value: r, label: t(`team:roles.${r}`, r) }))}
+            />
+            <Button type="submit" icon={<UserPlus size={17} />} disabled={add.submitting || !form.userId.trim()}>
+              {t('team:actions.add')}
+            </Button>
+          </div>
         </form>
       </Card>
 
       <Card className="table-card">
         <div className="table-toolbar">
-          <SearchInput
-            placeholder={t('team:searchPlaceholder')}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
+          <div className="table-toolbar-filters">
+            <SearchInput
+              placeholder={t('team:searchPlaceholder')}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <Select
+              className="toolbar-filter"
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              placeholder={t('team:allRoles')}
+              options={ROLES.map((r) => ({ value: r, label: t(`team:roles.${r}`, r) }))}
+            />
+          </div>
           <span className="table-toolbar-count">{t('common:pagination.items', { count: total })}</span>
         </div>
         <DataState

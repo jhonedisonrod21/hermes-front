@@ -187,6 +187,10 @@ export type SelfProfileResponse = {
 
 export type SelfProfileUpdateRequest = { phone?: string };
 
+// ---- Cambio / recuperación de contraseña (público en el gateway) ----
+export type PasswordResetRequest = { email: string };
+export type PasswordResetConfirmRequest = { token: string; newPassword: string };
+
 // ---- Organizaciones del usuario / cambio de tenant activo (multi-tenant) ----
 export type OrganizationResponse = {
   tenantId: string;
@@ -234,7 +238,9 @@ export type AppointmentResponse = {
   status: AppointmentStatus;
   priceAmount?: number;
   priceCurrency?: string;
+  requiresOnlinePayment?: boolean;
   requirementValues: Record<string, string>;
+  createdAt?: string;
 };
 
 // ---- Pagos PSE (hermes-payment-service) ----

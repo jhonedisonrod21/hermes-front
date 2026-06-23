@@ -3,7 +3,7 @@ import { Pencil, Plus, UsersRound } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '../../components/PageHeader';
 import { DataState } from '../../components/DataState';
-import { Badge, Button, Card, Pagination, SearchInput } from '../../components/ui';
+import { Badge, Button, Card, Pagination, SearchInput, Select } from '../../components/ui';
 import { TenantFormModal } from './TenantFormModal';
 import { TenantMembersModal } from './TenantMembersModal';
 import { useResource } from '../../hooks/useResource';
@@ -21,6 +21,7 @@ const STATUS_TONE: Record<string, 'success' | 'warning' | 'danger' | 'info'> = {
 };
 
 const NEXT_STATUS: Record<string, string> = { ACTIVE: 'SUSPENDED', SUSPENDED: 'ACTIVE', PENDING: 'ACTIVE' };
+const STATUSES = ['ACTIVE', 'PENDING', 'SUSPENDED'];
 
 const matchTenant = (tn: TenantResponse, q: string) =>
   tn.name.toLowerCase().includes(q) || tn.slug.toLowerCase().includes(q) || (tn.city ?? '').toLowerCase().includes(q);
@@ -35,9 +36,11 @@ export function TenantsPage() {
   const [formEditing, setFormEditing] = useState<TenantResponse | null>(null);
   const [membersOf, setMembersOf] = useState<TenantResponse | null>(null);
   const [query, setQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
 
   const items = tenants.data?.content ?? [];
-  const { paged, page, setPage, totalPages, total } = useClientTable(items, {
+  const visible = statusFilter ? items.filter((tn) => tn.status === statusFilter) : items;
+  const { paged, page, setPage, totalPages, total } = useClientTable(visible, {
     query,
     match: useCallback(matchTenant, [])
   });
@@ -89,11 +92,20 @@ export function TenantsPage() {
 
       <Card className="table-card">
         <div className="table-toolbar">
-          <SearchInput
-            placeholder={t('admin:tenants.searchPlaceholder')}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
+          <div className="table-toolbar-filters">
+            <SearchInput
+              placeholder={t('admin:tenants.searchPlaceholder')}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <Select
+              className="toolbar-filter"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              placeholder={t('admin:tenants.allStatus')}
+              options={STATUSES.map((s) => ({ value: s, label: s }))}
+            />
+          </div>
           <span className="table-toolbar-count">{t('common:pagination.items', { count: total })}</span>
         </div>
         <DataState

@@ -3,6 +3,7 @@ import {
   CalendarCheck,
   CalendarRange,
   Compass,
+  CreditCard,
   LayoutDashboard,
   Package,
   BarChart3,
@@ -32,15 +33,17 @@ const navByActor: Record<ActorKind, NavItem[]> = {
   ],
   'tenant-admin': [
     overview,
+    { to: '/citas', key: 'appointments', icon: CalendarCheck },
     { to: '/catalogo', key: 'catalog', icon: Package },
     { to: '/agenda', key: 'schedule', icon: CalendarRange },
     { to: '/reportes', key: 'reports', icon: BarChart3, pending: true },
+    { to: '/pagos', key: 'payments', icon: CreditCard },
     { to: '/equipo', key: 'team', icon: UsersRound },
     { to: '/organizacion', key: 'organization', icon: Building2 }
   ],
   'tenant-partner': [
     overview,
-    { to: '/citas', key: 'appointments', icon: CalendarCheck, pending: true }
+    { to: '/citas', key: 'appointments', icon: CalendarCheck }
   ],
   guest: [
     overview,

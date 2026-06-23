@@ -743,20 +743,17 @@
   position: relative;
 }
 
+/* En flujo: la lista empuja el contenido hacia abajo en vez de taparlo (ideal en modales) */
 .hc-combobox-list {
-  background: var(--hc-surface);
-  border: 1px solid var(--hc-border);
+  background: var(--hc-surface-alt);
+  border: 1px solid var(--hc-border-strong);
   border-radius: 8px;
-  box-shadow: var(--hc-shadow-card);
   display: grid;
-  left: 0;
-  max-height: 260px;
+  gap: 2px;
+  margin-top: 6px;
+  max-height: 240px;
   overflow-y: auto;
   padding: 6px;
-  position: absolute;
-  right: 0;
-  top: calc(100% + 4px);
-  z-index: 60;
 }
 
 .hc-combobox-option {
@@ -900,6 +897,62 @@
   color: var(--hc-text-secondary);
   font-size: 0.9rem;
   margin: 14px 0 0;
+}
+
+/* Nota del invitado: tranquiliza al cliente y oculta la opción de "asociarse"
+   tras un detalle plegable, para quienes sí necesitan ser staff de un negocio. */
+.account-guest-note {
+  border-top: 1px solid var(--hc-border);
+  margin-top: 16px;
+  padding-top: 14px;
+}
+
+.account-disclosure {
+  margin-top: 10px;
+}
+
+/* Garantiza el colapso del contenido aunque el navegador no aplique el
+   comportamiento por defecto de <details>. */
+.account-disclosure:not([open]) > :not(summary) {
+  display: none;
+}
+
+.account-disclosure > summary {
+  align-items: center;
+  color: var(--hc-primary);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.86rem;
+  font-weight: 700;
+  gap: 6px;
+  list-style: none;
+  user-select: none;
+}
+
+.account-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Triángulo indicador propio, que rota al abrir */
+.account-disclosure > summary::before {
+  border-left: 5px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  content: '';
+  display: inline-block;
+  transition: transform 150ms ease;
+}
+
+.account-disclosure[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.account-disclosure > summary:hover {
+  color: var(--hc-gold-strong, #b9870f);
+}
+
+.account-disclosure .account-hint {
+  margin-top: 8px;
 }
 
 /* Enlace de retorno al inicio desde el login */
@@ -1169,13 +1222,21 @@ a:focus-visible {
 }
 
 .dashboard-hero-dial {
-  bottom: -38%;
-  height: 280px;
-  opacity: 0.5;
+  height: clamp(190px, 23vw, 258px);
+  opacity: 0.82;
   pointer-events: none;
   position: absolute;
-  right: -6%;
-  width: 280px;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(190px, 23vw, 258px);
+}
+
+@media (max-width: 720px) {
+  .dashboard-hero-dial {
+    opacity: 0.5;
+    right: -16%;
+  }
 }
 
 .dashboard-hero-dial .lp-dial-hand {
@@ -1186,6 +1247,143 @@ a:focus-visible {
 .dashboard-hero > div {
   position: relative;
   z-index: 1;
+}
+
+/* ---- Inicio del invitado: próxima cita + métricas ---- */
+.guest-board {
+  display: grid;
+  gap: 16px;
+}
+
+/* Especificidad > .summary-grid (otra hoja) para asegurar 2 columnas */
+.guest-board .guest-metrics {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.guest-next {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 20px;
+}
+
+/* Casilla de fecha: ancla visual navy+gold (día grande + mes) */
+.guest-next-date {
+  align-items: center;
+  background: linear-gradient(150deg, var(--hc-midnight), var(--hc-midnight-2));
+  border: 1px solid rgba(242, 212, 131, 0.22);
+  border-radius: 14px;
+  color: var(--lp-gold-soft);
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  height: 74px;
+  justify-content: center;
+  width: 74px;
+}
+
+.guest-next-day {
+  font-family: var(--hc-font-display);
+  font-size: 1.85rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.guest-next-month {
+  font-family: var(--hc-font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  margin-top: 3px;
+  text-transform: uppercase;
+}
+
+.guest-next-info {
+  display: flex;
+  flex: 1 1 240px;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.guest-next-eyebrow {
+  color: var(--hc-text-muted);
+  font-family: var(--hc-font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.guest-next-info strong {
+  color: var(--hc-text);
+  font-family: var(--hc-font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.guest-next-meta {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 12px;
+  margin-top: 3px;
+}
+
+.guest-next-when {
+  align-items: center;
+  color: var(--hc-text-secondary);
+  display: flex;
+  font-weight: 600;
+  gap: 6px;
+  text-transform: capitalize;
+}
+
+.guest-next-cta {
+  flex: 0 0 auto;
+}
+
+/* Estado vacío: invita a explorar y reservar */
+.guest-empty {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 30px 24px;
+  text-align: center;
+}
+
+.guest-empty-mark {
+  align-items: center;
+  background: var(--hc-accent-soft);
+  border-radius: 999px;
+  color: #855f10;
+  display: inline-flex;
+  height: 56px;
+  justify-content: center;
+  width: 56px;
+}
+
+.guest-empty strong {
+  color: var(--hc-text);
+  font-family: var(--hc-font-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.guest-empty p {
+  color: var(--hc-text-secondary);
+  margin: 0 0 6px;
+  max-width: 420px;
+}
+
+@media (max-width: 640px) {
+  .guest-board .guest-metrics {
+    grid-template-columns: 1fr;
+  }
+  .guest-next-cta {
+    width: 100%;
+  }
 }
 
 /* Acento dorado en el ítem activo del sidebar (barra lateral) */
@@ -1346,4 +1544,775 @@ a:focus-visible {
 
 .hours-row:not(.hours-row-off):hover {
   border-color: var(--hc-border-strong);
+}
+
+/* ===========================================================================
+   Formulario de "agregar miembro": buscador a ancho completo + fila rol/botón
+   =========================================================================== */
+.member-add-form {
+  display: grid;
+  gap: 18px;
+}
+
+.member-add-row {
+  align-items: end;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr auto;
+}
+
+@media (max-width: 560px) {
+  .member-add-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Glifo de reloj mínimo (legible a tamaños pequeños; trazo no escalable) */
+.lp-dial-mini {
+  filter: none;
+}
+
+.lp-dial-mini line {
+  vector-effect: non-scaling-stroke;
+}
+
+.lp-dial-mini-disc {
+  fill: #0a1c42; /* cara ligeramente más clara que el disco, para que resalten las manecillas */
+}
+
+.lp-dial-mini .lp-dial-ring {
+  fill: none;
+  stroke: var(--lp-gold-soft);
+  stroke-width: 1.4;
+}
+
+.lp-dial-mini .lp-dial-tick-major {
+  stroke: var(--lp-gold);
+  stroke-width: 1.7;
+}
+
+.lp-dial-mini .lp-dial-tick {
+  stroke: rgba(242, 212, 131, 0.45);
+  stroke-width: 1;
+}
+
+.lp-dial-mini .lp-dial-hand-minute {
+  stroke: var(--lp-gold-soft);
+  stroke-linecap: round;
+  stroke-width: 1.7;
+}
+
+.lp-dial-mini .lp-dial-hand-hour {
+  stroke: var(--lp-gold);
+  stroke-linecap: round;
+  stroke-width: 2.3;
+}
+
+.lp-dial-mini .lp-dial-hub {
+  fill: var(--lp-gold);
+  stroke: none;
+}
+
+.lp-dial-mini .lp-dial-hub-dot {
+  fill: #0a1c42;
+}
+
+/* Disco un poco mayor para que el reloj respire en la cabecera del modal */
+.hc-modal-dial {
+  height: 38px;
+  padding: 4px;
+  width: 38px;
+}
+
+/* Barra de filtros del buscador de usuarios (modal de miembros) */
+.member-filters {
+  align-items: flex-end;
+  border-top: 1px solid var(--hc-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 20px;
+  padding-top: 14px;
+}
+
+.member-filter-role {
+  max-width: 240px;
+  min-width: 180px;
+}
+
+.member-filters .hc-checkbox {
+  margin-bottom: 13px;
+}
+
+.member-filter-count {
+  color: var(--hc-text-muted);
+  font-family: var(--hc-font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  margin-bottom: 15px;
+  margin-left: auto;
+}
+
+/* ===========================================================================
+   Barra lateral "cielo nocturno" (opción oscura del design system §3.4)
+   Trae el midnight + dorado de la landing al chrome persistente de la app.
+   =========================================================================== */
+.app-sidebar {
+  background: linear-gradient(185deg, var(--hc-midnight-2), var(--hc-midnight));
+  border-right: 1px solid rgba(242, 212, 131, 0.12);
+}
+
+.app-sidebar-brand {
+  border-bottom-color: rgba(159, 176, 206, 0.16);
+}
+
+/* El logo va sobre un chip claro para conservar contraste sobre el navy */
+.app-sidebar .app-nav-brand-mark {
+  background: #fff;
+  border-radius: 9px;
+  padding: 5px;
+}
+
+.app-sidebar .app-nav-brand-text strong {
+  color: #fff;
+  font-family: var(--hc-font-display);
+  font-weight: 600;
+}
+
+.app-sidebar .app-nav-brand-text span {
+  color: var(--hc-gold-soft);
+  font-family: var(--hc-font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+}
+
+.app-sidebar-link {
+  color: rgba(159, 176, 206, 0.88);
+}
+
+.app-sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.app-sidebar-link-active,
+.app-sidebar-link-active:hover {
+  background: rgba(224, 170, 44, 0.13);
+  color: var(--hc-gold-soft);
+  box-shadow: inset 3px 0 0 var(--hc-accent);
+}
+
+.app-sidebar-footer {
+  border-top-color: rgba(159, 176, 206, 0.16);
+}
+
+.app-sidebar-role {
+  color: rgba(242, 212, 131, 0.75);
+}
+
+.app-sidebar-footer strong {
+  color: #fff;
+}
+
+/* Un toque cálido en la topbar para enlazar con el riel oscuro */
+.app-topbar {
+  box-shadow: inset 0 -3px 0 -2px rgba(224, 170, 44, 0.25);
+}
+
+/* ===========================================================================
+   Legibilidad de los relojes a cualquier tamaño
+   Los trazos del dial estaban en unidades del viewBox (400) y al achicarse se
+   volvían invisibles. Con trazo no escalable se ven nítidos en hero, carga, etc.
+   =========================================================================== */
+.lp-dial line,
+.lp-dial circle,
+.lp-dial path {
+  vector-effect: non-scaling-stroke;
+}
+
+.lp-dial-ring {
+  stroke: rgba(242, 212, 131, 0.68);
+  stroke-width: 1.6;
+}
+
+.lp-dial-ring-thin {
+  stroke: rgba(159, 176, 206, 0.34);
+  stroke-width: 1.2;
+}
+
+.lp-dial-tick {
+  stroke: rgba(159, 176, 206, 0.5);
+  stroke-width: 1.2;
+}
+
+.lp-dial-tick-major {
+  stroke-width: 2;
+}
+
+.lp-dial-hand-line {
+  stroke-width: 2.4;
+}
+
+/* La cara más clara del reloj mínimo no debe llevar trazo */
+.lp-dial-mini-disc {
+  stroke: none;
+}
+
+/* Grupo de filtros en la barra de tabla (búsqueda + filtro por rol) */
+.table-toolbar-filters {
+  align-items: center;
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.toolbar-filter {
+  min-width: 170px;
+}
+
+/* ===========================================================================
+   Manecillas de reloj del dial completo (hora + minuto + segundero)
+   Las manecillas SÍ escalan con el dial (vector-effect:none) para verse
+   proporcionales; los aros/marcas se quedan con trazo no escalable.
+   =========================================================================== */
+.lp-dial-minute,
+.lp-dial-hour,
+.lp-dial-second {
+  stroke-linecap: round;
+  vector-effect: none;
+}
+
+.lp-dial-hour {
+  stroke: var(--lp-gold-soft);
+  stroke-width: 5;
+}
+
+.lp-dial-minute {
+  stroke: var(--lp-gold-soft);
+  stroke-width: 3.4;
+}
+
+.lp-dial-second {
+  stroke: var(--lp-gold);
+  stroke-width: 2;
+}
+
+/* Selector de organización activa (topbar, multi-tenant) */
+.org-switcher {
+  align-items: center;
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-border);
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 9px;
+  max-width: 290px;
+  min-height: 44px;
+  padding: 4px 12px;
+  position: relative;
+  transition: border-color 140ms ease;
+}
+
+.org-switcher:hover,
+.org-switcher:focus-within {
+  border-color: var(--hc-primary);
+}
+
+.org-switcher-icon {
+  color: var(--hc-primary);
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.org-switcher-text {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.org-switcher-eyebrow {
+  color: var(--hc-text-muted);
+  font-family: var(--hc-font-mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.org-switcher select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--hc-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 850;
+  max-width: 200px;
+  outline: none;
+  overflow: hidden;
+  padding: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.org-switcher-chevron {
+  color: var(--hc-text-secondary);
+  flex: 0 0 auto;
+}
+
+/* Mis reservas (invitado): tarjetas de cita */
+.booking-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+/* Mis reservas: separación entre "Próximas" e "Historial" */
+.booking-sections {
+  display: grid;
+  gap: 28px;
+}
+
+.booking-section-head {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.booking-section-head h2 {
+  color: var(--hc-text);
+  font-family: var(--hc-font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.booking-section-count {
+  background: var(--hc-primary-soft);
+  border-radius: 999px;
+  color: var(--hc-primary);
+  font-family: var(--hc-font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 9px;
+}
+
+.booking-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+/* Citas pasadas: atenuadas (solo lectura); recuperan color al pasar el cursor */
+.booking-card.is-past {
+  opacity: 0.72;
+  transition: opacity 160ms ease, transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.booking-card.is-past:hover {
+  opacity: 1;
+}
+
+.booking-price {
+  color: var(--hc-primary);
+  font-weight: 800;
+  margin: 0;
+}
+
+/* Acciones de la reserva: CTA principal a todo el ancho + fila secundaria atenuada */
+.booking-actions {
+  border-top: 1px solid var(--hc-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+  padding: 14px 18px 16px;
+}
+
+/* Reprogramar / Cancelar: siempre apilados, cada uno a ancho completo */
+.booking-actions-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Texto e icono centrados para que ambos botones se vean uniformes */
+.booking-actions-row .hc-button {
+  justify-content: center;
+  width: 100%;
+}
+
+/* Acción destructiva atenuada: rojo solo en texto, sin bloque sólido */
+.hc-button.booking-cancel {
+  color: var(--hc-danger);
+}
+
+.hc-button.booking-cancel:hover:not(:disabled) {
+  background: var(--hc-danger-soft);
+  color: var(--hc-danger);
+}
+
+/* Modal de reserva: horarios disponibles */
+.booking-summary {
+  color: var(--hc-text-secondary);
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+.slot-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.slot {
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-border-strong);
+  border-radius: 8px;
+  color: var(--hc-text);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  min-height: 40px;
+  padding: 0 14px;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.slot:hover {
+  border-color: var(--hc-primary);
+}
+
+.slot-active,
+.slot-active:hover {
+  background: var(--hc-primary);
+  border-color: var(--hc-primary);
+  color: #fff;
+}
+
+.slot:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--hc-focus-ring);
+}
+
+/* ===========================================================================
+   Explorar (vista del invitado): marketplace vistoso
+   =========================================================================== */
+.explore-hero {
+  background: radial-gradient(120% 150% at 92% 8%, var(--hc-midnight-2), var(--hc-midnight) 66%);
+  border: 1px solid rgba(242, 212, 131, 0.18);
+  border-radius: 14px;
+  color: #fff;
+  overflow: hidden;
+  padding: clamp(26px, 4.5vw, 46px);
+  position: relative;
+}
+
+.explore-hero-dial {
+  height: clamp(170px, 22vw, 230px);
+  opacity: 0.55;
+  pointer-events: none;
+  position: absolute;
+  right: 2%;
+  top: 46%;
+  transform: translateY(-50%);
+  width: clamp(170px, 22vw, 230px);
+}
+
+.explore-hero-copy {
+  max-width: 640px;
+  position: relative;
+  z-index: 1;
+}
+
+.explore-hero .eyebrow {
+  color: var(--hc-gold-soft);
+}
+
+.explore-hero h1 {
+  color: #fff;
+  font-family: var(--hc-font-display);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+  margin: 0 0 12px;
+}
+
+.explore-hero-copy p {
+  color: var(--hc-mist, #9fb0ce);
+  font-size: 1.02rem;
+  margin: 0;
+}
+
+.explore-searchbar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+  position: relative;
+  z-index: 1;
+}
+
+.explore-search-field {
+  align-items: center;
+  background: #fff;
+  border-radius: 999px;
+  color: var(--hc-text-muted);
+  display: flex;
+  flex: 1 1 280px;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 20px;
+}
+
+.explore-search-field input {
+  background: transparent;
+  border: 0;
+  color: var(--hc-text);
+  font: inherit;
+  font-size: 0.98rem;
+  outline: none;
+  width: 100%;
+}
+
+.explore-search-modality {
+  align-items: center;
+  background: #fff;
+  border-radius: 999px;
+  display: flex;
+  min-height: 52px;
+  padding: 0 6px 0 18px;
+}
+
+.explore-search-modality select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--hc-text);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  outline: none;
+  padding-right: 30px;
+}
+
+.explore-count {
+  color: var(--hc-text-muted);
+  font-family: var(--hc-font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  margin: 4px 2px;
+}
+
+/* Tarjetas de servicio */
+.svc-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.svc-card {
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.svc-card:hover {
+  border-color: rgba(224, 170, 44, 0.5);
+  box-shadow: var(--hc-shadow-card);
+  transform: translateY(-3px);
+}
+
+.svc-card-band {
+  align-items: center;
+  background: linear-gradient(135deg, var(--hc-midnight), var(--hc-midnight-2));
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 13px 18px;
+}
+
+.svc-modality {
+  color: var(--hc-gold-soft);
+  font-family: var(--hc-font-mono);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.svc-price {
+  color: var(--hc-gold-soft);
+  font-family: var(--hc-font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.svc-card-body {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 7px;
+  padding: 18px;
+}
+
+.svc-card-body h3 {
+  color: var(--hc-text);
+  font-family: var(--hc-font-display);
+  font-size: 1.18rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.svc-tenant,
+.svc-category {
+  align-items: center;
+  color: var(--hc-text-secondary);
+  display: flex;
+  font-size: 0.85rem;
+  gap: 6px;
+  margin: 0;
+}
+
+.svc-category {
+  color: var(--hc-text-muted);
+}
+
+.svc-desc {
+  color: var(--hc-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 2px 0 0;
+}
+
+.svc-card-foot {
+  align-items: center;
+  border-top: 1px solid var(--hc-border);
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 11px 18px;
+}
+
+.svc-duration {
+  align-items: center;
+  color: var(--hc-text-secondary);
+  display: flex;
+  font-size: 0.88rem;
+  font-weight: 700;
+  gap: 6px;
+}
+
+.svc-pay {
+  background: var(--hc-accent-soft);
+  border-radius: 999px;
+  color: #855f10;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 3px 9px;
+}
+
+.svc-card > .hc-button {
+  border-radius: 0;
+}
+
+@media (max-width: 560px) {
+  .explore-search-field,
+  .explore-search-modality,
+  .explore-searchbar .hc-button {
+    flex: 1 1 100%;
+  }
+}
+
+/* Mis reservas: el encabezado envuelve limpio (estado arriba, fecha en su propia línea) */
+.booking-card .svc-card-band {
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+
+.booking-band-date {
+  align-items: center;
+  color: var(--hc-gold-soft);
+  display: flex;
+  font-family: var(--hc-font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  gap: 6px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.booking-card .svc-card-body {
+  gap: 6px;
+}
+
+/* Formularios de la cuenta: separación de las secciones */
+.account-phone-form,
+.account-pass-form {
+  border-top: 1px solid var(--hc-border);
+  margin-top: 18px;
+  padding-top: 18px;
+}
+
+/* Título de la sección de pagos (cabecera de la tabla) */
+.payments-list-title {
+  color: var(--hc-text);
+  font-family: var(--hc-font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* Retorno tras el pago PSE */
+.payment-return {
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  margin: 24px auto 0;
+  max-width: 520px;
+  padding: 40px 28px;
+  text-align: center;
+}
+
+.payment-return-mark {
+  align-items: center;
+  border-radius: 50%;
+  display: inline-flex;
+  height: 64px;
+  justify-content: center;
+  width: 64px;
+}
+
+.payment-return-mark.is-ok {
+  background: var(--hc-success-soft);
+  color: var(--hc-success);
+}
+
+.payment-return-mark.is-error {
+  background: var(--hc-danger-soft);
+  color: var(--hc-danger);
+}
+
+.payment-return h1 {
+  color: var(--hc-text);
+  font-family: var(--hc-font-display);
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin: 4px 0 0;
+}
+
+.payment-return p {
+  color: var(--hc-text-secondary);
+  margin: 0 0 8px;
+  max-width: 40ch;
 }

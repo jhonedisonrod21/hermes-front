@@ -13,7 +13,9 @@ import { UsersPage } from '../pages/admin/UsersPage';
 import { ExplorePage } from '../pages/explore/ExplorePage';
 import { AppointmentsPage } from '../pages/appointments/AppointmentsPage';
 import { ReportsPage } from '../pages/reports/ReportsPage';
+import { PaymentConfigPage } from '../pages/payments/PaymentConfigPage';
 import { MyBookingsPage } from '../pages/bookings/MyBookingsPage';
+import { PaymentReturnPage } from '../pages/bookings/PaymentReturnPage';
 import { AccountPage } from '../pages/account/AccountPage';
 import { useAuth } from '../hermes-security/useAuth';
 import { actorKind } from '../hermes-security/sessionStore';
@@ -50,8 +52,9 @@ export function AppRoutes() {
     <Routes>
       <Route element={<AppShell />}>
         <Route index element={<OverviewPage />} />
-        {/* Cuenta: disponible para todos los actores. */}
+        {/* Cuenta y retorno de pago: disponibles para todos los actores autenticados. */}
         <Route path="cuenta" element={<AccountPage />} />
+        <Route path="payment/return" element={<PaymentReturnPage />} />
 
         {isAdmin && <Route path="admin/tenants" element={<TenantsPage />} />}
         {isAdmin && <Route path="admin/usuarios" element={<UsersPage />} />}
@@ -59,10 +62,11 @@ export function AppRoutes() {
         {isTenantAdmin && <Route path="catalogo" element={<OfferingsPage />} />}
         {isTenantAdmin && <Route path="agenda" element={<SchedulePage />} />}
         {isTenantAdmin && <Route path="reportes" element={<ReportsPage />} />}
+        {isTenantAdmin && <Route path="pagos" element={<PaymentConfigPage />} />}
         {isTenantAdmin && <Route path="equipo" element={<MembersPage />} />}
         {isTenantAdmin && <Route path="organizacion" element={<OrganizationPage />} />}
 
-        {isPartner && <Route path="citas" element={<AppointmentsPage />} />}
+        {(isTenantAdmin || isPartner) && <Route path="citas" element={<AppointmentsPage />} />}
 
         {isGuest && <Route path="explorar" element={<ExplorePage />} />}
         {isGuest && <Route path="mis-reservas" element={<MyBookingsPage />} />}

@@ -14,6 +14,8 @@ import type {
   OfferingResponse,
   OfferingSearchResult,
   OrganizationResponse,
+  PasswordResetConfirmRequest,
+  PasswordResetRequest,
   PaymentResponse,
   RescheduleRequest,
   ScheduleExceptionRequest,
@@ -120,6 +122,11 @@ export const identityApi = {
   // Perfil propio del usuario autenticado (incluye teléfono para recordatorios SMS).
   getMyProfile: () => api.get<SelfProfileResponse>('/identity/me'),
   updateMyProfile: (body: SelfProfileUpdateRequest) => api.put<SelfProfileResponse>('/identity/me', body),
+  // Cambio de contraseña por código al correo (endpoints públicos en el gateway).
+  requestPasswordReset: (body: PasswordResetRequest) =>
+    api.post<void>('/identity/users/password-reset/request', body),
+  confirmPasswordReset: (body: PasswordResetConfirmRequest) =>
+    api.post<void>('/identity/users/password-reset/confirm', body),
   // Administración de plataforma (SYSTEM_ADMIN)
   listUsers: (p?: PageParams) => api.get<Page<UserResponse>>(`/identity/admin/users${pageQuery(p)}`),
   getUser: (id: string) => api.get<UserResponse>(`/identity/admin/users/${id}`),

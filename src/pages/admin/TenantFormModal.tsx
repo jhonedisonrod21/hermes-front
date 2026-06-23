@@ -126,6 +126,7 @@ export function TenantFormModal({ open, editing, onClose, onSaved }: Props) {
       <form id="tenant-form" className="hc-form" onSubmit={submit} noValidate>
         <TextField
           label={t('organization:fields.name')}
+          hint={t('organization:hints.name')}
           maxLength={MAX.name}
           value={form.name}
           error={errors.name}
@@ -134,6 +135,7 @@ export function TenantFormModal({ open, editing, onClose, onSaved }: Props) {
         <div className="hc-form-row">
           <TextField
             label={t('organization:fields.taxId')}
+            hint={t('organization:hints.taxId')}
             maxLength={MAX.taxId}
             value={form.taxId}
             error={errors.taxId}
@@ -141,6 +143,7 @@ export function TenantFormModal({ open, editing, onClose, onSaved }: Props) {
           />
           <Select
             label={t('organization:fields.country')}
+            hint={t('organization:hints.country')}
             value={form.country}
             error={errors.country}
             placeholder={t('organization:fields.countryPlaceholder')}
@@ -149,6 +152,7 @@ export function TenantFormModal({ open, editing, onClose, onSaved }: Props) {
           />
           <DatalistField
             label={t('organization:fields.city')}
+            hint={t('organization:hints.city')}
             maxLength={MAX.city}
             value={form.city}
             error={errors.city}
@@ -158,6 +162,7 @@ export function TenantFormModal({ open, editing, onClose, onSaved }: Props) {
         </div>
         <TextField
           label={t('organization:fields.address')}
+          hint={t('organization:hints.address')}
           maxLength={MAX.address}
           value={form.address}
           error={errors.address}
@@ -165,6 +170,7 @@ export function TenantFormModal({ open, editing, onClose, onSaved }: Props) {
         />
         <Textarea
           label={t('organization:fields.description')}
+          hint={t('organization:hints.description')}
           rows={3}
           maxLength={MAX.description}
           value={form.description}

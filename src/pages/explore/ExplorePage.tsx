@@ -1,91 +1,122 @@
-import { useState, type FormEvent } from 'react';
-import { Clock, MapPin, Search } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { CalendarPlus, Clock, MapPin, Search, Tag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { PageHeader } from '../../components/PageHeader';
 import { DataState } from '../../components/DataState';
-import { Badge, Button, Card, Select, TextField } from '../../components/ui';
+import { HermesDial } from '../../components/HermesDial';
+import { Button } from '../../components/ui';
+import { BookingModal } from './BookingModal';
 import { catalogApi } from '../../api/services';
 import type { OfferingSearchResult } from '../../api/types';
-import type { Page } from '../../api/http';
 import { formatDuration, formatMoney } from '../../lib/format';
+
+const MODALITIES = ['', 'IN_PERSON', 'VIRTUAL', 'BOTH'];
 
 export function ExplorePage() {
   const { t, i18n } = useTranslation(['explore', 'catalog', 'common']);
-  const [query, setQuery] = useState({ q: '', modality: '' });
-  const [results, setResults] = useState<Page<OfferingSearchResult> | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [q, setQ] = useState('');
+  const [modality, setModality] = useState('');
+  const [items, setItems] = useState<OfferingSearchResult[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [searched, setSearched] = useState(false);
+  const [booking, setBooking] = useState<OfferingSearchResult | null>(null);
 
-  async function submit(e: FormEvent) {
-    e.preventDefault();
+  const runSearch = useCallback(async (text: string, mod: string) => {
     setLoading(true);
     setError(null);
-    setSearched(true);
     try {
-      const page = await catalogApi.search({ q: query.q || undefined, modality: query.modality || undefined, size: 50 });
-      setResults(page);
+      const page = await catalogApi.search({ q: text || undefined, modality: mod || undefined, size: 60 });
+      setItems(page.content);
     } catch (err) {
       setError(err instanceof Error ? err : new Error(String(err)));
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
-  const items = results?.content ?? [];
+  // Muestra servicios desde el primer momento (sin pantalla en blanco).
+  useEffect(() => {
+    runSearch('', '');
+  }, [runSearch]);
 
   return (
-    <div className="page">
-      <PageHeader eyebrow={t('explore:eyebrow')} title={t('explore:title')} description={t('explore:description')} />
-
-      <Card className="panel">
-        <form className="hc-form explore-form" onSubmit={submit}>
-          <TextField
-            label={t('explore:fields.query')}
-            leadingIcon={<Search size={18} />}
-            placeholder={t('explore:fields.queryPlaceholder')}
-            value={query.q}
-            onChange={(e) => setQuery((q) => ({ ...q, q: e.target.value }))}
-          />
-          <Select
-            label={t('catalog:fields.modality')}
-            value={query.modality}
-            onChange={(e) => setQuery((q) => ({ ...q, modality: e.target.value }))}
-            placeholder={t('explore:anyModality')}
-            options={[
-              { value: 'IN_PERSON', label: t('catalog:modality.IN_PERSON') },
-              { value: 'VIRTUAL', label: t('catalog:modality.VIRTUAL') },
-              { value: 'BOTH', label: t('catalog:modality.BOTH') }
-            ]}
-          />
-          <Button type="submit" icon={<Search size={17} />} disabled={loading}>
+    <div className="page explore-page">
+      <header className="explore-hero">
+        <HermesDial className="explore-hero-dial" labels={false} />
+        <div className="explore-hero-copy">
+          <p className="eyebrow">{t('explore:eyebrow')}</p>
+          <h1>{t('explore:heroTitle')}</h1>
+          <p>{t('explore:heroSubtitle')}</p>
+        </div>
+        <form
+          className="explore-searchbar"
+          onSubmit={(e) => {
+            e.preventDefault();
+            runSearch(q, modality);
+          }}
+        >
+          <span className="explore-search-field">
+            <Search size={18} />
+            <input
+              type="search"
+              placeholder={t('explore:fields.queryPlaceholder')}
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              aria-label={t('explore:fields.query')}
+            />
+          </span>
+          <span className="explore-search-modality">
+            <select value={modality} onChange={(e) => setModality(e.target.value)} aria-label={t('catalog:fields.modality')}>
+              {MODALITIES.map((m) => (
+                <option key={m || 'any'} value={m}>
+                  {m ? t(`catalog:modality.${m}`) : t('explore:anyModality')}
+                </option>
+              ))}
+            </select>
+          </span>
+          <Button type="submit" icon={<Search size={17} />}>
             {t('explore:search')}
           </Button>
         </form>
-      </Card>
+      </header>
 
-      {searched ? (
-        <DataState loading={loading} error={error} empty={items.length === 0} emptyMessage={t('explore:noResults')}>
-          <div className="offering-grid">
-            {items.map((o) => (
-              <Card key={o.id} className="offering-card">
-                <div className="offering-card-head">
-                  <h3>{o.name}</h3>
-                  <Badge tone="info">{t(`catalog:modality.${o.modality}`, o.modality)}</Badge>
-                </div>
+      <DataState loading={loading} error={error} empty={items.length === 0} emptyMessage={t('explore:noResults')} onRetry={() => runSearch(q, modality)}>
+        <p className="explore-count">{t('common:pagination.items', { count: items.length })}</p>
+        <div className="svc-grid">
+          {items.map((o) => (
+            <article className="svc-card" key={o.id}>
+              <div className="svc-card-band">
+                <span className="svc-modality">{t(`catalog:modality.${o.modality}`, o.modality)}</span>
+                <span className="svc-price">{formatMoney(o.priceAmount, o.priceCurrency, i18n.language)}</span>
+              </div>
+              <div className="svc-card-body">
+                <h3>{o.name}</h3>
                 {o.tenantName ? (
-                  <p className="offering-tenant"><MapPin size={14} /> {o.tenantName}</p>
+                  <p className="svc-tenant">
+                    <MapPin size={14} /> {o.tenantName}
+                  </p>
                 ) : null}
-                {o.description ? <p className="offering-desc">{o.description}</p> : null}
-                <div className="offering-card-foot">
-                  <span><Clock size={14} /> {formatDuration(o.durationMinutes, t('common:units.hour'), t('common:units.minute'))}</span>
-                  <strong>{formatMoney(o.priceAmount, o.priceCurrency, i18n.language)}</strong>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </DataState>
-      ) : null}
+                {o.category ? (
+                  <p className="svc-category">
+                    <Tag size={13} /> {o.category}
+                  </p>
+                ) : null}
+                {o.description ? <p className="svc-desc">{o.description}</p> : null}
+              </div>
+              <div className="svc-card-foot">
+                <span className="svc-duration">
+                  <Clock size={14} /> {formatDuration(o.durationMinutes, t('common:units.hour'), t('common:units.minute'))}
+                </span>
+                {o.requiresOnlinePayment ? <span className="svc-pay">{t('explore:onlinePayment')}</span> : null}
+              </div>
+              <Button variant="accent" fullWidth icon={<CalendarPlus size={17} />} onClick={() => setBooking(o)}>
+                {t('explore:book')}
+              </Button>
+            </article>
+          ))}
+        </div>
+      </DataState>
+
+      <BookingModal offering={booking} onClose={() => setBooking(null)} />
     </div>
   );
 }

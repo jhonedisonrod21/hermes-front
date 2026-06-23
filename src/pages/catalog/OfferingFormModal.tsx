@@ -151,6 +151,7 @@ export function OfferingFormModal({ open, editing, categories = [], onClose, onS
       <form id="offering-form" className="hc-form" onSubmit={submit}>
         <TextField
           label={t('catalog:fields.name')}
+          hint={t('catalog:hints.name')}
           name="name"
           required
           value={form.name}
@@ -159,6 +160,7 @@ export function OfferingFormModal({ open, editing, categories = [], onClose, onS
         <div className="hc-form-row">
           <DatalistField
             label={t('catalog:fields.category')}
+            hint={t('catalog:hints.category')}
             name="category"
             maxLength={80}
             value={form.category}
@@ -167,6 +169,7 @@ export function OfferingFormModal({ open, editing, categories = [], onClose, onS
           />
           <Select
             label={t('catalog:fields.modality')}
+            hint={t('catalog:hints.modality')}
             value={form.modality}
             onChange={(e) => set('modality', e.target.value)}
             options={MODALITIES.map((m) => ({ value: m, label: t(`catalog:modality.${m}`) }))}
@@ -175,6 +178,7 @@ export function OfferingFormModal({ open, editing, categories = [], onClose, onS
         <div className="hc-form-row">
           <TextField
             label={t('catalog:fields.duration')}
+            hint={t('catalog:hints.duration')}
             name="durationMinutes"
             type="number"
             min={1}
@@ -184,6 +188,7 @@ export function OfferingFormModal({ open, editing, categories = [], onClose, onS
           />
           <TextField
             label={t('catalog:fields.price')}
+            hint={t('catalog:hints.price')}
             name="priceAmount"
             type="number"
             min={0}
@@ -194,6 +199,7 @@ export function OfferingFormModal({ open, editing, categories = [], onClose, onS
           />
           <Select
             label={t('catalog:fields.currency')}
+            hint={t('catalog:hints.currency')}
             value={form.priceCurrency}
             onChange={(e) => set('priceCurrency', e.target.value)}
             options={currencies}
@@ -201,6 +207,7 @@ export function OfferingFormModal({ open, editing, categories = [], onClose, onS
         </div>
         <Textarea
           label={t('catalog:fields.description')}
+          hint={t('catalog:hints.description')}
           rows={3}
           value={form.description}
           onChange={(e) => set('description', e.target.value)}
