@@ -1,12 +1,15 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '../../components/Modal';
 import { Button, Checkbox, DatalistField, Select, Textarea, TextField } from '../../components/ui';
 import { useMutation } from '../../hooks/useMutation';
+import { useResource } from '../../hooks/useResource';
 import { useToast } from '../../components/feedback/toast';
 import { currencyOptions } from '../../lib/currencies';
-import { catalogApi } from '../../api/services';
+import { ApiError } from '../../api/http';
+import { catalogApi, paymentApi } from '../../api/services';
 import type { OfferingRequest, OfferingResponse, RequirementDto } from '../../api/types';
 
 const MODALITIES = ['IN_PERSON', 'VIRTUAL', 'BOTH'];
@@ -64,6 +67,14 @@ export function OfferingFormModal({ open, editing, categories = [], onClose, onS
   const save = useMutation((body: OfferingRequest) =>
     editing ? catalogApi.updateOffering(editing.id, body) : catalogApi.createOffering(body)
   );
+  // Estado de la configuración de cobro del tenant: 404 => aún no configurada.
+  const paymentConfig = useResource(
+    () => paymentApi.getMyConfig().catch((e) => (e instanceof ApiError && e.status === 404 ? null : Promise.reject(e))),
+    []
+  );
+  // Cobrar por adelantado exige tener los pagos configurados Y activados.
+  const paymentsReady = Boolean(paymentConfig.data?.enabled);
+  const blockedByPayments = form.requiresOnlinePayment && !paymentConfig.loading && !paymentsReady;
 
   // Reinicia el formulario cuando cambia el registro en edición o se reabre el modal.
   const [lastKey, setLastKey] = useState<string>('');
@@ -102,6 +113,11 @@ export function OfferingFormModal({ open, editing, categories = [], onClose, onS
 
   async function submit(e: FormEvent) {
     e.preventDefault();
+    // No se permite un servicio con cobro por adelantado sin pagos en línea configurados y activos.
+    if (form.requiresOnlinePayment && !paymentsReady) {
+      toast.error(t('catalog:payment.needsConfig'));
+      return;
+    }
     const requirements = form.requirements
       .filter((r) => r.label.trim())
       .map((r, i) => ({
@@ -142,7 +158,7 @@ export function OfferingFormModal({ open, editing, categories = [], onClose, onS
           <Button variant="secondary" onClick={onClose} disabled={save.submitting}>
             {t('common:actions.cancel')}
           </Button>
-          <Button type="submit" form="offering-form" disabled={save.submitting}>
+          <Button type="submit" form="offering-form" disabled={save.submitting || blockedByPayments}>
             {save.submitting ? t('common:actions.saving') : t('common:actions.save')}
           </Button>
         </>
@@ -217,6 +233,12 @@ export function OfferingFormModal({ open, editing, categories = [], onClose, onS
           checked={form.requiresOnlinePayment}
           onChange={(e) => set('requiresOnlinePayment', e.target.checked)}
         />
+        {blockedByPayments ? (
+          <p className="hc-field-message hc-field-error offering-payment-warn">
+            {t('catalog:payment.needsConfig')}{' '}
+            <Link to="/pagos" onClick={onClose}>{t('catalog:payment.configure')}</Link>
+          </p>
+        ) : null}
 
         <div className="requirements-editor">
           <div className="requirements-head">

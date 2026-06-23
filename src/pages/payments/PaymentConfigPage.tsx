@@ -14,7 +14,10 @@ import { paymentApi } from '../../api/services';
 import type { PaymentProvider, TenantPaymentConfigRequest, TenantPaymentConfigResponse } from '../../api/types';
 import { formatDate } from '../../lib/format';
 
-const PROVIDERS: PaymentProvider[] = ['FAKE_PSE', 'WOMPI', 'PAYU'];
+// Solo se ofrecen los proveedores con gateway implementado en el backend.
+// WOMPI/PAYU existen en el enum pero aún no tienen adaptador (el checkout daría 501),
+// así que no se listan aquí para no ofrecer una opción que no funciona.
+const PROVIDERS: PaymentProvider[] = ['FAKE_PSE'];
 
 function toForm(c: TenantPaymentConfigResponse | null) {
   return {
@@ -48,6 +51,17 @@ export function PaymentConfigPage() {
 
   async function submit(e: FormEvent) {
     e.preventDefault();
+    // Activar cobros exige una configuración completa: comercio, llave pública y ambos secretos
+    // (recién escritos o ya guardados). Evita habilitar pagos que luego fallan en el checkout.
+    if (form.enabled) {
+      const cfg = config.data;
+      const hasPrivate = Boolean(form.privateKey.trim() || cfg?.privateKeyConfigured);
+      const hasEvents = Boolean(form.eventsSecret.trim() || cfg?.eventsSecretConfigured);
+      if (!form.merchantAccount.trim() || !form.publicKey.trim() || !hasPrivate || !hasEvents) {
+        toast.error(t('payments:enableNeedsConfig'));
+        return;
+      }
+    }
     const body: TenantPaymentConfigRequest = {
       provider: form.provider,
       enabled: form.enabled,

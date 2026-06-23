@@ -31,6 +31,7 @@ export function BookingModal({ offering, onClose }: Props) {
   const [date, setDate] = useState('');
   const [slot, setSlot] = useState<AvailableSlot | null>(null);
   const [values, setValues] = useState<Record<string, string>>({});
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string | undefined>>({});
 
   // Reinicia el estado al abrir o cambiar de servicio.
   const [lastKey, setLastKey] = useState('');
@@ -40,6 +41,7 @@ export function BookingModal({ offering, onClose }: Props) {
     setDate('');
     setSlot(null);
     setValues({});
+    setFieldErrors({});
   }
 
   const availability = useResource(
@@ -54,7 +56,10 @@ export function BookingModal({ offering, onClose }: Props) {
   const slots = (availability.data ?? []).filter((s) => new Date(s.start).getTime() > Date.now());
   const requirements = offering?.requirements ?? [];
 
-  const setVal = (k: string, v: string) => setValues((s) => ({ ...s, [k]: v }));
+  const setVal = (k: string, v: string) => {
+    setValues((s) => ({ ...s, [k]: v }));
+    setFieldErrors((e) => ({ ...e, [k]: undefined }));
+  };
   const timeOf = (iso: string) => new Intl.DateTimeFormat(i18n.language, { timeStyle: 'short' }).format(new Date(iso));
   // Ayuda según el tipo del requisito (los requisitos no traen descripción propia del backend).
   const reqHint = (type: string): string | undefined => {
@@ -72,9 +77,16 @@ export function BookingModal({ offering, onClose }: Props) {
     }
     const missing = requirements.filter((r) => r.required && !(values[r.key] ?? '').trim());
     if (missing.length > 0) {
-      toast.error(t('bookings:book.fillRequired'));
+      const errs: Record<string, string> = {};
+      missing.forEach((r) => {
+        errs[r.key] = t('common:validation.required');
+      });
+      setFieldErrors(errs);
+      // Lleva el foco al primer campo obligatorio que falta.
+      requestAnimationFrame(() => document.getElementById(missing[0].key)?.focus());
       return;
     }
+    setFieldErrors({});
     try {
       await book.run();
       toast.success(t('bookings:book.booked'));
@@ -156,15 +168,17 @@ export function BookingModal({ offering, onClose }: Props) {
               r.type === 'BOOLEAN' ? (
                 <Checkbox
                   key={r.key}
-                  label={r.label}
+                  label={r.required ? `${r.label} *` : r.label}
                   checked={values[r.key] === 'true'}
                   onChange={(e) => setVal(r.key, e.target.checked ? 'true' : 'false')}
                 />
               ) : (
                 <TextField
                   key={r.key}
+                  name={r.key}
                   label={r.required ? `${r.label} *` : r.label}
                   hint={reqHint(r.type)}
+                  error={fieldErrors[r.key]}
                   type={r.type === 'NUMBER' ? 'number' : r.type === 'DATE' ? 'date' : 'text'}
                   value={values[r.key] ?? ''}
                   onChange={(e) => setVal(r.key, e.target.value)}
@@ -173,8 +187,6 @@ export function BookingModal({ offering, onClose }: Props) {
             )}
           </div>
         ) : null}
-
-        {book.error ? <p className="login-error">{book.error.message}</p> : null}
       </form>
     </Modal>
   );

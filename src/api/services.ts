@@ -22,7 +22,6 @@ import type {
   ScheduleExceptionResponse,
   SelfProfileResponse,
   SelfProfileUpdateRequest,
-  UserCard,
   TenantContactUpdateRequest,
   TenantCreateRequest,
   TenantPaymentConfigRequest,
@@ -91,7 +90,7 @@ export const tenantAppointmentsApi = {
   cancel: (id: string) => api.post<AppointmentResponse>(`/scheduling/me/appointments/${id}/cancel`),
   reschedule: (id: string, body: RescheduleRequest) =>
     api.post<AppointmentResponse>(`/scheduling/me/appointments/${id}/reschedule`, body),
-  // Cierre de la cita por el establecimiento (solo desde CONFIRMED).
+  // Asistencia (solo desde CONFIRMED): cerrar la cita como atendida o como no presentado.
   complete: (id: string) => api.post<AppointmentResponse>(`/scheduling/me/appointments/${id}/complete`),
   noShow: (id: string) => api.post<AppointmentResponse>(`/scheduling/me/appointments/${id}/no-show`)
 };
@@ -126,11 +125,6 @@ export const identityApi = {
   // Perfil propio del usuario autenticado (incluye teléfono para recordatorios SMS).
   getMyProfile: () => api.get<SelfProfileResponse>('/identity/me'),
   updateMyProfile: (body: SelfProfileUpdateRequest) => api.put<SelfProfileResponse>('/identity/me', body),
-  // Directorio: resolver id -> nombre/correo en pantallas de citas y pagos del establecimiento
-  // (TENANT_ADMIN / TENANT_PARTNER). 'resolveUsers' resuelve un lote para listados.
-  getUserCard: (id: string) => api.get<UserCard>(`/identity/directory/users/${id}`),
-  resolveUsers: (ids: string[]) =>
-    api.get<UserCard[]>(`/identity/directory/users${buildQuery({ ids: ids.join(',') })}`),
   // Cambio de contraseña por código al correo (endpoints públicos en el gateway).
   requestPasswordReset: (body: PasswordResetRequest) =>
     api.post<void>('/identity/users/password-reset/request', body),

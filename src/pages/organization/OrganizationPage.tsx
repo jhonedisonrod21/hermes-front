@@ -85,7 +85,9 @@ export function OrganizationPage() {
               <strong>{data?.name}</strong>
               <span className="org-slug">{data?.slug}{location ? ` · ${location}` : ''}</span>
             </div>
-            <Badge tone={data?.status === 'ACTIVE' ? 'success' : 'warning'}>{data?.status}</Badge>
+            <Badge tone={data?.status === 'ACTIVE' ? 'success' : 'warning'}>
+              {data?.status ? t(`common:statusValues.${data.status}`, data.status) : ''}
+            </Badge>
           </div>
 
           <p className="account-hint">{t('organization:readonlyNote')}</p>

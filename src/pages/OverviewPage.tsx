@@ -21,13 +21,20 @@ import { actorKind, type ActorKind, type HermesProfile } from '../hermes-securit
 import { appointmentsApi, catalogApi, identityApi, tenantApi } from '../api/services';
 import type { AppointmentStatus } from '../api/types';
 
-function MetricCard({ icon, label, value }: { icon: ReactNode; label: string; value: ReactNode }) {
-  return (
-    <Card className="summary-card">
+function MetricCard({ icon, label, value, to }: { icon: ReactNode; label: string; value: ReactNode; to?: string }) {
+  const card = (
+    <Card className={`summary-card${to ? ' summary-card-link' : ''}`}>
       {icon}
       <span>{label}</span>
       <strong>{value}</strong>
     </Card>
+  );
+  return to ? (
+    <Link to={to} className="summary-card-wrap">
+      {card}
+    </Link>
+  ) : (
+    card
   );
 }
 
@@ -58,8 +65,8 @@ function AdminOverview() {
   const users = useResource(() => identityApi.listUsers({ size: 1 }), []);
   return (
     <section className="summary-grid">
-      <MetricCard icon={<Building2 size={22} />} label={t('admin.tenants')} value={dash(tenants.loading, tenants.data?.totalElements)} />
-      <MetricCard icon={<ShieldCheck size={22} />} label={t('admin.users')} value={dash(users.loading, users.data?.totalElements)} />
+      <MetricCard icon={<Building2 size={22} />} label={t('admin.tenants')} value={dash(tenants.loading, tenants.data?.totalElements)} to="/admin/tenants" />
+      <MetricCard icon={<ShieldCheck size={22} />} label={t('admin.users')} value={dash(users.loading, users.data?.totalElements)} to="/admin/usuarios" />
     </section>
   );
 }
@@ -166,6 +173,8 @@ const QUICK_LINKS: Record<ActorKind, { to: string; key: string; icon: ReactNode 
   'tenant-admin': [
     { to: '/catalogo', key: 'catalog', icon: <Package size={18} /> },
     { to: '/agenda', key: 'schedule', icon: <CalendarRange size={18} /> },
+    { to: '/citas', key: 'appointments', icon: <CalendarCheck size={18} /> },
+    { to: '/pagos', key: 'payments', icon: <CreditCard size={18} /> },
     { to: '/equipo', key: 'team', icon: <UsersRound size={18} /> }
   ],
   'tenant-partner': [{ to: '/citas', key: 'appointments', icon: <CalendarCheck size={18} /> }],

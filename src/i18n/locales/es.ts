@@ -3,6 +3,19 @@ export const es = {
     appName: 'Hermes Calendar',
     unavailable: 'No disponible',
     loadingSession: 'Preparando sesion...',
+    roleNames: {
+      SYSTEM_ADMIN: 'Administrador del sistema',
+      TENANT_ADMIN: 'Administrador',
+      TENANT_PARTNER: 'Profesional',
+      TENANT_STAFF: 'Personal',
+      GUEST_USER: 'Cliente'
+    },
+    statusValues: {
+      ACTIVE: 'Activo',
+      INACTIVE: 'Inactivo',
+      SUSPENDED: 'Suspendido',
+      PENDING: 'Pendiente'
+    },
     language: {
       label: 'Idioma',
       es: 'ES',
@@ -38,6 +51,8 @@ export const es = {
       required: 'Este campo es obligatorio.',
       maxLength: 'Máximo {{max}} caracteres.',
       country: 'Selecciona un país (código ISO de 2 letras).',
+      email: 'Introduce un correo válido.',
+      uuid: 'Debe ser un UUID válido.',
       fix: 'Revisa los campos marcados.'
     },
     units: {
@@ -75,8 +90,8 @@ export const es = {
       title: 'Iniciar sesion',
       username: 'Usuario',
       password: 'Contraseña',
-      usernamePlaceholder: 'admin@hermes.local',
-      passwordPlaceholder: 'admin123',
+      usernamePlaceholder: 'tucorreo@ejemplo.com',
+      passwordPlaceholder: '••••••••',
       showPassword: 'Mostrar password',
       hidePassword: 'Ocultar password',
       submit: 'Iniciar sesion',
@@ -239,6 +254,7 @@ export const es = {
       users: 'Gestionar usuarios',
       explore: 'Explorar servicios',
       appointments: 'Gestionar citas',
+      payments: 'Configurar pagos',
       bookings: 'Mis reservas'
     }
   },
@@ -305,6 +321,10 @@ export const es = {
       currency: 'Moneda en la que cobras este servicio.',
       description: 'Detalles que ayuden al cliente a decidir.'
     },
+    payment: {
+      needsConfig: 'Para cobrar por adelantado primero debes configurar y activar los pagos en línea.',
+      configure: 'Configurar pagos'
+    },
     modality: {
       IN_PERSON: 'Presencial',
       VIRTUAL: 'Virtual',
@@ -321,12 +341,16 @@ export const es = {
     description: 'Configura el horario semanal y las excepciones (cierres o jornadas especiales).',
     hours: {
       title: 'Horario semanal',
-      save: 'Guardar horario'
+      save: 'Guardar horario',
+      invalidRange: 'En {{day}} la hora de apertura debe ser anterior a la de cierre.',
+      noneTitle: 'Agenda sin días abiertos',
+      noneMessage: 'No has dejado ningún día abierto: tus clientes no podrán reservar. ¿Guardar igualmente?'
     },
     exceptions: {
       title: 'Excepciones',
       add: 'Agregar excepción',
       empty: 'No hay excepciones registradas.',
+      invalidRange: 'La hora de apertura debe ser anterior a la de cierre.',
       date: 'Fecha',
       dateHint: 'Día concreto que será una excepción a tu horario habitual.',
       type: 'Tipo',
@@ -350,7 +374,8 @@ export const es = {
   team: {
     eyebrow: 'Equipo',
     title: 'Miembros de la organización',
-    description: 'Agrega o quita miembros y define su rol dentro de la organización.',
+    description: 'Agrega Profesionales a tu organización o quítalos.',
+    addAsPartner: 'Se añadirá como Profesional. El rol Administrador solo lo concede el administrador del sistema.',
     empty: 'Todavía no hay miembros además de ti.',
     searchPlaceholder: 'Buscar por ID o rol...',
     allRoles: 'Todos los roles',
@@ -414,8 +439,12 @@ export const es = {
       slug: 'Slug',
       location: 'Ubicación',
       status: 'Estado',
+      statusValues: {
+        ACTIVE: 'Activa',
+        INACTIVE: 'Inactiva'
+      },
       created: 'Creada',
-      suspend: 'Suspender',
+      suspend: 'Desactivar',
       activate: 'Activar',
       new: 'Nueva organización',
       create: 'Crear organización',
@@ -423,8 +452,8 @@ export const es = {
       editTitle: 'Editar organización',
       members: 'Miembros',
       confirm: {
-        suspendTitle: 'Suspender organización',
-        suspendMessage: '¿Suspender "{{name}}"? Sus miembros perderán acceso a la operación.'
+        suspendTitle: 'Desactivar organización',
+        suspendMessage: '¿Desactivar "{{name}}"? Sus miembros perderán acceso a la operación.'
       }
     },
     members: {
@@ -433,6 +462,7 @@ export const es = {
       pickPlaceholder: 'Buscar por usuario o correo...',
       pickHint: 'Selecciona un usuario registrado. Como TENANT_ADMIN administrará la organización.',
       searchEmpty: 'No hay usuarios disponibles para agregar.',
+      moreResults: 'Hay más coincidencias; refina la búsqueda.',
       clear: 'Quitar selección',
       filterRole: 'Filtrar por rol',
       allRoles: 'Todos los roles',
@@ -517,15 +547,45 @@ export const es = {
     },
     actions: {
       cancel: 'Cancelar',
-      reschedule: 'Reprogramar'
+      reschedule: 'Reprogramar',
+      view: 'Ver',
+      complete: 'Completada',
+      noShow: 'No asistió'
+    },
+    scope: {
+      label: 'Cuándo',
+      all: 'Todas',
+      today: 'Hoy',
+      upcoming: 'Próximas',
+      past: 'Pasadas'
+    },
+    detail: {
+      title: 'Detalle de la cita',
+      service: 'Servicio',
+      customer: 'Cliente (ID)',
+      when: 'Cuándo',
+      duration: '{{minutes}} min',
+      price: 'Precio',
+      payment: 'Pago',
+      paymentOnline: 'En línea por adelantado',
+      paymentOnsite: 'No requiere pago en línea',
+      created: 'Reservada el',
+      requirements: 'Datos que indicó el cliente',
+      noRequirements: 'El cliente no indicó datos adicionales.'
     },
     confirm: {
       cancelTitle: 'Cancelar cita',
-      cancelMessage: '¿Seguro que quieres cancelar esta cita?'
+      cancelMessage: '¿Seguro que quieres cancelar esta cita?',
+      completeTitle: 'Marcar como completada',
+      completeMessage: '¿Confirmas que la cita fue atendida? Esta acción no se puede deshacer.',
+      noShowTitle: 'Marcar como no asistió',
+      noShowMessage: '¿Confirmas que el cliente no se presentó? Esta acción no se puede deshacer.'
     },
     toast: {
       cancelled: 'Cita cancelada.',
-      rescheduled: 'Cita reprogramada.'
+      rescheduled: 'Cita reprogramada.',
+      completed: 'Cita marcada como completada.',
+      noShow: 'Cita marcada como no asistió.'
     },
     reschedule: {
       title: 'Reprogramar: {{service}}',
@@ -593,6 +653,8 @@ export const es = {
       documentType: 'Tipo de documento',
       documentNumber: 'Número de documento',
       documentNumberHint: 'Solo números, sin puntos ni guiones.',
+      documentNumberInvalid: 'Ingresa solo números, sin puntos ni guiones.',
+      phoneInvalid: 'Ingresa un teléfono válido.',
       fullName: 'Nombre completo',
       fullNameHint: 'Tal como aparece en tu documento de identidad.',
       email: 'Correo',
@@ -628,6 +690,7 @@ export const es = {
       userId: 'ID de usuario',
       copy: 'Copiar',
       copied: 'Copiado',
+      copyFailed: 'No se pudo copiar. Cópialo manualmente.',
       phone: 'Teléfono',
       phoneHint: 'Lo usamos para enviarte recordatorios de tus citas por SMS.',
       saved: 'Teléfono actualizado.'
@@ -662,6 +725,7 @@ export const es = {
     secretHint: 'Solo se guarda; no se vuelve a mostrar. Déjalo vacío para no cambiarla.',
     updatedAt: 'Actualizada el {{date}}',
     saved: 'Configuración guardada.',
+    enableNeedsConfig: 'Para activar los cobros completa la cuenta de comercio, la llave pública y ambos secretos.',
     delete: 'Eliminar configuración',
     deleted: 'Configuración eliminada.',
     deleteConfirm: {
@@ -697,6 +761,7 @@ export const es = {
       status: 'Estado',
       appointment: 'Cita',
       resume: 'Continuar pago',
+      showingLatest: 'mostrando los últimos {{count}}',
       statuses: {
         PENDING: 'Pendiente',
         PAID: 'Pagado',

@@ -27,6 +27,9 @@ export function PaymentsList({ title, loader, hideWhenEmpty = false }: Props) {
   const { t, i18n } = useTranslation(['payments', 'common']);
   const payments = useResource<Page<PaymentResponse>>(loader, []);
   const items = payments.data?.content ?? [];
+  const total = payments.data?.totalElements ?? items.length;
+  // El loader trae una ventana (p. ej. 50); si hay más, lo indicamos para no engañar con el conteo.
+  const truncated = total > items.length;
 
   if (hideWhenEmpty && !payments.loading && !payments.error && items.length === 0) return null;
 
@@ -34,7 +37,10 @@ export function PaymentsList({ title, loader, hideWhenEmpty = false }: Props) {
     <Card className="table-card">
       <div className="table-toolbar">
         <strong className="payments-list-title">{title ?? t('payments:history.title')}</strong>
-        <span className="table-toolbar-count">{t('common:pagination.items', { count: items.length })}</span>
+        <span className="table-toolbar-count">
+          {t('common:pagination.items', { count: total })}
+          {truncated ? ` · ${t('payments:history.showingLatest', { count: items.length })}` : ''}
+        </span>
       </div>
       <DataState
         loading={payments.loading}
@@ -57,8 +63,8 @@ export function PaymentsList({ title, loader, hideWhenEmpty = false }: Props) {
             <tbody>
               {items.map((p) => (
                 <tr key={p.id}>
-                  <td>{formatDateTime(p.createdAt, i18n.language)}</td>
-                  <td><strong>{formatMoney(p.amount, p.currency, i18n.language)}</strong></td>
+                  <td className="cell-nowrap">{formatDateTime(p.createdAt, i18n.language)}</td>
+                  <td className="cell-nowrap"><strong>{formatMoney(p.amount, p.currency, i18n.language)}</strong></td>
                   <td>
                     <Badge tone={TONE[p.status]}>{t(`payments:history.statuses.${p.status}`)}</Badge>
                   </td>

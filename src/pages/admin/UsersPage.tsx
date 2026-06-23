@@ -12,6 +12,7 @@ import { useConfirm } from '../../components/feedback/confirm';
 import { identityApi } from '../../api/services';
 import type { UserResponse } from '../../api/types';
 import { formatDate } from '../../lib/format';
+import { roleLabel } from '../../lib/roles';
 
 const matchUser = (u: UserResponse, q: string) =>
   u.username.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
@@ -47,7 +48,8 @@ export function UsersPage() {
   );
   const { paged, page, setPage, totalPages, total } = useClientTable(visible, {
     query,
-    match: useCallback(matchUser, [])
+    match: useCallback(matchUser, []),
+    resetKey: `${roleFilter}|${statusFilter}`
   });
 
   async function toggleLock(u: UserResponse) {
@@ -89,7 +91,7 @@ export function UsersPage() {
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
               placeholder={t('admin:users.allRoles')}
-              options={availableRoles.map((r) => ({ value: r, label: r }))}
+              options={availableRoles.map((r) => ({ value: r, label: roleLabel(t, r) }))}
             />
             <Select
               className="toolbar-filter"
@@ -108,7 +110,7 @@ export function UsersPage() {
         <DataState
           loading={users.loading}
           error={users.error}
-          empty={items.length === 0}
+          empty={total === 0}
           emptyMessage={t('admin:users.empty')}
           onRetry={users.reload}
         >
@@ -131,7 +133,7 @@ export function UsersPage() {
                   <td>{u.email}</td>
                   <td className="cell-chips">
                     {(u.roles ?? []).map((r) => (
-                      <Badge key={r} tone="info">{r}</Badge>
+                      <Badge key={r} tone="info">{roleLabel(t, r)}</Badge>
                     ))}
                   </td>
                   <td>
@@ -139,7 +141,7 @@ export function UsersPage() {
                       {u.locked ? t('admin:users.locked') : u.enabled ? t('admin:users.active') : t('admin:users.disabled')}
                     </Badge>
                   </td>
-                  <td>{formatDate(u.createdAt, i18n.language)}</td>
+                  <td className="cell-nowrap">{formatDate(u.createdAt, i18n.language)}</td>
                   <td className="row-actions">
                     <Button variant="ghost" size="sm" icon={<Pencil size={15} />} onClick={() => setEditing(u)}>
                       {t('common:actions.edit')}

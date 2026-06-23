@@ -31,7 +31,8 @@ export function OfferingsPage() {
   const visible = statusFilter ? items.filter((o) => (statusFilter === 'active' ? o.active : !o.active)) : items;
   const { paged, page, setPage, totalPages, total } = useClientTable(visible, {
     query,
-    match: useCallback(matchOffering, [])
+    match: useCallback(matchOffering, []),
+    resetKey: statusFilter
   });
 
   function openCreate() {
@@ -102,7 +103,7 @@ export function OfferingsPage() {
         <DataState
           loading={offerings.loading}
           error={offerings.error}
-          empty={items.length === 0}
+          empty={total === 0}
           emptyMessage={t('catalog:empty')}
           onRetry={offerings.reload}
         >

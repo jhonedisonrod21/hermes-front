@@ -31,7 +31,6 @@ export function AccountPage() {
 
   const userId = me.data?.id ?? sessionProfile?.user_id ?? sessionProfile?.sub ?? '';
   const email = me.data?.email ?? sessionProfile?.email ?? t('common:unavailable');
-  const roles = me.data?.roles ?? sessionProfile?.roles ?? [];
 
   async function copyUserId() {
     if (!userId) return;
@@ -40,7 +39,8 @@ export function AccountPage() {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1600);
     } catch {
-      /* el portapapeles puede requerir gesto del usuario */
+      // El portapapeles puede requerir gesto/permiso: avisamos en vez de fallar en silencio.
+      toast.error(t('account:profile.copyFailed'));
     }
   }
 
@@ -77,9 +77,6 @@ export function AccountPage() {
                   <Badge tone={kind === 'system-admin' ? 'accent' : kind === 'guest' ? 'warning' : 'info'}>
                     {t(`app:roles.${kind}`)}
                   </Badge>
-                  {roles.map((r) => (
-                    <Badge key={r} tone="info">{r}</Badge>
-                  ))}
                 </dd>
               </div>
               <div>

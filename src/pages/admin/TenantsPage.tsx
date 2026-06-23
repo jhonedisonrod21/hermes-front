@@ -14,14 +14,14 @@ import { tenantApi } from '../../api/services';
 import type { TenantResponse } from '../../api/types';
 import { formatDate } from '../../lib/format';
 
+// El backend solo maneja ACTIVE / INACTIVE (enum TenantStatus).
 const STATUS_TONE: Record<string, 'success' | 'warning' | 'danger' | 'info'> = {
   ACTIVE: 'success',
-  PENDING: 'warning',
-  SUSPENDED: 'danger'
+  INACTIVE: 'danger'
 };
 
-const NEXT_STATUS: Record<string, string> = { ACTIVE: 'SUSPENDED', SUSPENDED: 'ACTIVE', PENDING: 'ACTIVE' };
-const STATUSES = ['ACTIVE', 'PENDING', 'SUSPENDED'];
+const NEXT_STATUS: Record<string, string> = { ACTIVE: 'INACTIVE', INACTIVE: 'ACTIVE' };
+const STATUSES = ['ACTIVE', 'INACTIVE'];
 
 const matchTenant = (tn: TenantResponse, q: string) =>
   tn.name.toLowerCase().includes(q) || tn.slug.toLowerCase().includes(q) || (tn.city ?? '').toLowerCase().includes(q);
@@ -42,7 +42,8 @@ export function TenantsPage() {
   const visible = statusFilter ? items.filter((tn) => tn.status === statusFilter) : items;
   const { paged, page, setPage, totalPages, total } = useClientTable(visible, {
     query,
-    match: useCallback(matchTenant, [])
+    match: useCallback(matchTenant, []),
+    resetKey: statusFilter
   });
 
   function openCreate() {
@@ -56,7 +57,7 @@ export function TenantsPage() {
 
   async function cycleStatus(tn: TenantResponse) {
     const next = NEXT_STATUS[tn.status] ?? 'ACTIVE';
-    if (next === 'SUSPENDED') {
+    if (next === 'INACTIVE') {
       const ok = await confirm({
         title: t('admin:tenants.confirm.suspendTitle'),
         message: t('admin:tenants.confirm.suspendMessage', { name: tn.name }),
@@ -103,7 +104,7 @@ export function TenantsPage() {
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               placeholder={t('admin:tenants.allStatus')}
-              options={STATUSES.map((s) => ({ value: s, label: s }))}
+              options={STATUSES.map((s) => ({ value: s, label: t(`admin:tenants.statusValues.${s}`, s) }))}
             />
           </div>
           <span className="table-toolbar-count">{t('common:pagination.items', { count: total })}</span>
@@ -111,7 +112,7 @@ export function TenantsPage() {
         <DataState
           loading={tenants.loading}
           error={tenants.error}
-          empty={items.length === 0}
+          empty={total === 0}
           emptyMessage={t('admin:tenants.empty')}
           onRetry={tenants.reload}
         >
@@ -134,9 +135,9 @@ export function TenantsPage() {
                   <td><code>{tn.slug}</code></td>
                   <td>{[tn.city, tn.country].filter(Boolean).join(', ') || '—'}</td>
                   <td>
-                    <Badge tone={STATUS_TONE[tn.status] ?? 'info'}>{tn.status}</Badge>
+                    <Badge tone={STATUS_TONE[tn.status] ?? 'info'}>{t(`admin:tenants.statusValues.${tn.status}`, tn.status)}</Badge>
                   </td>
-                  <td>{formatDate(tn.createdAt, i18n.language)}</td>
+                  <td className="cell-nowrap">{formatDate(tn.createdAt, i18n.language)}</td>
                   <td className="row-actions">
                     <Button variant="ghost" size="sm" icon={<Pencil size={15} />} onClick={() => openEdit(tn)}>
                       {t('common:actions.edit')}

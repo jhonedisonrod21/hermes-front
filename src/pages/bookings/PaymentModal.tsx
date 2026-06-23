@@ -38,6 +38,7 @@ export function PaymentModal({ appointment, serviceName, onClose }: Props) {
     email: '',
     phone: ''
   });
+  const [errors, setErrors] = useState<Record<string, string | undefined>>({});
 
   // Prefill con los datos de sesión al abrir.
   const [lastId, setLastId] = useState<string | null>(null);
@@ -66,8 +67,20 @@ export function PaymentModal({ appointment, serviceName, onClose }: Props) {
     })
   );
 
-  const set = (k: keyof typeof form, v: string) => setForm((s) => ({ ...s, [k]: v }));
+  const set = (k: keyof typeof form, v: string) => {
+    setForm((s) => ({ ...s, [k]: v }));
+    setErrors((e) => ({ ...e, [k]: undefined }));
+  };
   const bankItems = banks.data ?? [];
+
+  function validate(): Record<string, string | undefined> {
+    const e: Record<string, string | undefined> = {};
+    if (!/^\d+$/.test(form.documentNumber.trim())) e.documentNumber = t('bookings:pay.documentNumberInvalid');
+    if (!form.fullName.trim()) e.fullName = t('common:validation.required');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) e.email = t('common:validation.email');
+    if (!/^[+\d][\d\s-]{6,}$/.test(form.phone.trim())) e.phone = t('bookings:pay.phoneInvalid');
+    return e;
+  }
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -75,6 +88,14 @@ export function PaymentModal({ appointment, serviceName, onClose }: Props) {
       toast.error(t('bookings:pay.pickBank'));
       return;
     }
+    const found = validate();
+    const firstBad = Object.keys(found).find((k) => found[k]);
+    if (firstBad) {
+      setErrors(found);
+      requestAnimationFrame(() => document.getElementById(`pay-${firstBad}`)?.focus());
+      return;
+    }
+    setErrors({});
     try {
       const res = await checkout.run();
       // Redirige a la pasarela PSE para completar el pago.
@@ -130,34 +151,40 @@ export function PaymentModal({ appointment, serviceName, onClose }: Props) {
             options={DOC_TYPES.map((v) => ({ value: v, label: v }))}
           />
           <TextField
+            id="pay-documentNumber"
             label={t('bookings:pay.documentNumber')}
             hint={t('bookings:pay.documentNumberHint')}
-            required
+            inputMode="numeric"
+            error={errors.documentNumber}
             value={form.documentNumber}
             onChange={(e) => set('documentNumber', e.target.value)}
           />
         </div>
 
         <TextField
+          id="pay-fullName"
           label={t('bookings:pay.fullName')}
           hint={t('bookings:pay.fullNameHint')}
-          required
+          error={errors.fullName}
           value={form.fullName}
           onChange={(e) => set('fullName', e.target.value)}
         />
         <div className="hc-form-row">
           <TextField
+            id="pay-email"
             label={t('bookings:pay.email')}
             hint={t('bookings:pay.emailHint')}
             type="email"
-            required
+            error={errors.email}
             value={form.email}
             onChange={(e) => set('email', e.target.value)}
           />
           <TextField
+            id="pay-phone"
             label={t('bookings:pay.phone')}
             hint={t('bookings:pay.phoneHint')}
-            required
+            inputMode="tel"
+            error={errors.phone}
             value={form.phone}
             onChange={(e) => set('phone', e.target.value)}
           />

@@ -5,6 +5,8 @@ type Options<T> = {
   query: string;
   /** Predicado de coincidencia para el texto de búsqueda (ya en minúsculas). */
   match: (item: T, q: string) => boolean;
+  /** Clave de los filtros externos (estado/rol/etc.): al cambiar, vuelve a la página 1. */
+  resetKey?: string;
 };
 
 type ClientTable<T> = {
@@ -19,7 +21,10 @@ type ClientTable<T> = {
  * Búsqueda y paginación en el cliente sobre una lista ya cargada. Útil cuando el endpoint
  * no ofrece filtro `q`: se carga una ventana del servidor y se filtra/pagina localmente.
  */
-export function useClientTable<T>(items: T[], { pageSize = 8, query, match }: Options<T>): ClientTable<T> {
+export function useClientTable<T>(
+  items: T[],
+  { pageSize = 8, query, match, resetKey }: Options<T>
+): ClientTable<T> {
   const [page, setPage] = useState(0);
   const normalized = query.trim().toLowerCase();
 
@@ -34,9 +39,10 @@ export function useClientTable<T>(items: T[], { pageSize = 8, query, match }: Op
   useEffect(() => {
     setPage((current) => Math.min(current, totalPages - 1));
   }, [totalPages]);
+  // Vuelve a la primera página al cambiar el texto de búsqueda o cualquier filtro externo.
   useEffect(() => {
     setPage(0);
-  }, [normalized]);
+  }, [normalized, resetKey]);
 
   const paged = useMemo(() => filtered.slice(page * pageSize, page * pageSize + pageSize), [filtered, page, pageSize]);
 

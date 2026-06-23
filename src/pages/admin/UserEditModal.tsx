@@ -13,22 +13,46 @@ type Props = {
   onSaved: () => void;
 };
 
+type FormErrors = Partial<Record<'username' | 'email', string>>;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export function UserEditModal({ user, onClose, onSaved }: Props) {
   const { t } = useTranslation(['admin', 'common']);
   const toast = useToast();
   const open = user !== null;
   const [form, setForm] = useState({ username: '', email: '' });
+  const [errors, setErrors] = useState<FormErrors>({});
   const save = useMutation(() => identityApi.updateUser(user!.id, { username: form.username.trim(), email: form.email.trim() }));
 
   const [lastId, setLastId] = useState<string | null>(null);
   if (user && user.id !== lastId) {
     setLastId(user.id);
     setForm({ username: user.username, email: user.email });
+    setErrors({});
     save.reset();
+  }
+
+  const set = (k: 'username' | 'email', v: string) => {
+    setForm((f) => ({ ...f, [k]: v }));
+    setErrors((e) => ({ ...e, [k]: undefined }));
+  };
+
+  function validate(): FormErrors {
+    const e: FormErrors = {};
+    if (!form.username.trim()) e.username = t('common:validation.required');
+    if (!form.email.trim()) e.email = t('common:validation.required');
+    else if (!EMAIL_RE.test(form.email.trim())) e.email = t('common:validation.email');
+    return e;
   }
 
   async function submit(e: FormEvent) {
     e.preventDefault();
+    const found = validate();
+    setErrors(found);
+    if (Object.keys(found).length > 0) {
+      toast.error(t('common:validation.fix'));
+      return;
+    }
     try {
       await save.run();
       toast.success(t('common:feedback.updated'));
@@ -55,21 +79,21 @@ export function UserEditModal({ user, onClose, onSaved }: Props) {
         </>
       }
     >
-      <form id="user-form" className="hc-form" onSubmit={submit}>
+      <form id="user-form" className="hc-form" onSubmit={submit} noValidate>
         <TextField
           label={t('admin:users.username')}
           hint={t('admin:users.usernameHint')}
-          required
           value={form.username}
-          onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))}
+          error={errors.username}
+          onChange={(e) => set('username', e.target.value)}
         />
         <TextField
           label={t('admin:users.email')}
           hint={t('admin:users.emailHint')}
           type="email"
-          required
           value={form.email}
-          onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+          error={errors.email}
+          onChange={(e) => set('email', e.target.value)}
         />
         {save.error ? <p className="login-error">{save.error.message}</p> : null}
       </form>

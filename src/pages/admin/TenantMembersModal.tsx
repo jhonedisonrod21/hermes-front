@@ -10,6 +10,8 @@ import { useToast } from '../../components/feedback/toast';
 import { useConfirm } from '../../components/feedback/confirm';
 import { identityApi, tenantApi } from '../../api/services';
 import type { TenantResponse, UserResponse } from '../../api/types';
+import { roleLabel } from '../../lib/roles';
+import { SYSTEM_ADMIN_ROLE } from '../../hermes-security/sessionStore';
 
 const ROLES = ['TENANT_ADMIN', 'TENANT_PARTNER'];
 
@@ -42,17 +44,23 @@ export function TenantMembersModal({ tenant, onClose }: Props) {
   const allUsers = useMemo(() => users.data?.content ?? [], [users.data]);
   const usersById = useMemo(() => new Map(allUsers.map((u) => [u.id, u])), [allUsers]);
 
-  // Roles de plataforma presentes entre los usuarios (para el filtro).
-  const availableRoles = useMemo(
-    () => Array.from(new Set(allUsers.flatMap((u) => u.roles ?? []))).sort(),
+  // Los administradores de plataforma no son candidatos a miembros de una organización.
+  const candidates = useMemo(
+    () => allUsers.filter((u) => !(u.roles ?? []).includes(SYSTEM_ADMIN_ROLE)),
     [allUsers]
+  );
+
+  // Roles presentes entre los candidatos (para el filtro): ya sin SYSTEM_ADMIN.
+  const availableRoles = useMemo(
+    () => Array.from(new Set(candidates.flatMap((u) => u.roles ?? []))).sort(),
+    [candidates]
   );
 
   // Excluye miembros actuales y aplica los filtros activos.
   const memberIds = useMemo(() => new Set(items.map((m) => m.userId)), [items]);
   const userOptions = useMemo(
     () =>
-      allUsers
+      candidates
         .filter((u) => !memberIds.has(u.id))
         .filter((u: UserResponse) => (hideLocked ? !u.locked : true))
         .filter((u: UserResponse) => (roleFilter ? (u.roles ?? []).includes(roleFilter) : true))
@@ -61,7 +69,7 @@ export function TenantMembersModal({ tenant, onClose }: Props) {
           label: u.username,
           sublabel: u.email && u.email !== u.username ? u.email : undefined
         })),
-    [allUsers, memberIds, hideLocked, roleFilter]
+    [candidates, memberIds, hideLocked, roleFilter]
   );
 
   async function submit(e: FormEvent) {
@@ -110,6 +118,7 @@ export function TenantMembersModal({ tenant, onClose }: Props) {
           hint={users.loading ? t('common:dataState.loading') : t('admin:members.pickHint')}
           emptyText={t('admin:members.searchEmpty')}
           clearLabel={t('admin:members.clear')}
+          moreText={t('admin:members.moreResults')}
         />
         {!form.userId ? (
           <div className="member-filters">
@@ -120,7 +129,7 @@ export function TenantMembersModal({ tenant, onClose }: Props) {
               onChange={(e) => setRoleFilter(e.target.value)}
               options={[
                 { value: '', label: t('admin:members.allRoles') },
-                ...availableRoles.map((r) => ({ value: r, label: r }))
+                ...availableRoles.map((r) => ({ value: r, label: roleLabel(t, r) }))
               ]}
             />
             <Checkbox
@@ -173,7 +182,9 @@ export function TenantMembersModal({ tenant, onClose }: Props) {
                     {m.roles.map((r) => (
                       <Badge key={r} tone="info">{t(`admin:members.roles.${r}`, r)}</Badge>
                     ))}
-                    <Badge tone={m.status === 'ACTIVE' ? 'success' : 'warning'}>{m.status}</Badge>
+                    <Badge tone={m.status === 'ACTIVE' ? 'success' : 'warning'}>
+                      {t(`common:statusValues.${m.status}`, m.status)}
+                    </Badge>
                   </div>
                   <button
                     className="hc-icon-button"

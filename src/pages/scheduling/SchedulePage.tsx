@@ -29,6 +29,7 @@ function buildRows(hours: BusinessHoursDto[] | null): Record<DayOfWeek, DayRow> 
 export function SchedulePage() {
   const { t, i18n } = useTranslation(['schedule', 'common']);
   const toast = useToast();
+  const confirm = useConfirm();
   const hours = useResource(() => schedulingApi.getHours(), []);
   const exceptions = useResource(() => schedulingApi.listExceptions({ size: 100, sort: 'date,asc' }), []);
 
@@ -40,7 +41,24 @@ export function SchedulePage() {
   const saveHours = useMutation((body: BusinessHoursDto[]) => schedulingApi.saveHours({ hours: body }));
 
   async function submitHours() {
-    const payload: BusinessHoursDto[] = DAYS.filter((d) => rows[d].enabled).map((d) => ({
+    const enabledDays = DAYS.filter((d) => rows[d].enabled);
+    // Validación: la hora de apertura debe ser anterior a la de cierre (comparación HH:MM segura).
+    const badDay = enabledDays.find((d) => rows[d].opensAt >= rows[d].closesAt);
+    if (badDay) {
+      toast.error(t('schedule:hours.invalidRange', { day: t(`common:days.${badDay}`) }));
+      return;
+    }
+    // Guardar 0 días deja la agenda totalmente cerrada: confirmar antes.
+    if (enabledDays.length === 0) {
+      const ok = await confirm({
+        title: t('schedule:hours.noneTitle'),
+        message: t('schedule:hours.noneMessage'),
+        confirmLabel: t('schedule:hours.save'),
+        danger: true
+      });
+      if (!ok) return;
+    }
+    const payload: BusinessHoursDto[] = enabledDays.map((d) => ({
       dayOfWeek: d,
       opensAt: rows[d].opensAt,
       closesAt: rows[d].closesAt
@@ -145,6 +163,11 @@ function ExceptionsPanel({
 
   async function submit(e: FormEvent) {
     e.preventDefault();
+    // En horario especial, la apertura debe ser anterior al cierre.
+    if (form.type === 'SPECIAL_HOURS' && form.opensAt >= form.closesAt) {
+      toast.error(t('schedule:exceptions.invalidRange'));
+      return;
+    }
     try {
       await create.run();
       toast.success(t('schedule:toast.exceptionAdded'));

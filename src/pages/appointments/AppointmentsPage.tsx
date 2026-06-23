@@ -1,9 +1,10 @@
 import { useCallback, useMemo, useState } from 'react';
-import { CalendarClock, XCircle } from 'lucide-react';
+import { CalendarClock, CheckCircle2, Eye, UserX, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '../../components/PageHeader';
 import { DataState } from '../../components/DataState';
 import { RescheduleModal } from './RescheduleModal';
+import { AppointmentDetailModal } from './AppointmentDetailModal';
 import { Badge, Button, Card, Pagination, SearchInput, Select } from '../../components/ui';
 import { useResource } from '../../hooks/useResource';
 import { useClientTable } from '../../hooks/useClientTable';
@@ -12,6 +13,18 @@ import { useConfirm } from '../../components/feedback/confirm';
 import { catalogApi, tenantAppointmentsApi } from '../../api/services';
 import type { AppointmentResponse, AppointmentStatus } from '../../api/types';
 import { formatDateTime, formatMoney } from '../../lib/format';
+
+type Scope = '' | 'today' | 'upcoming' | 'past';
+const SCOPES: Scope[] = ['', 'today', 'upcoming', 'past'];
+
+function isSameLocalDay(iso: string, ref: Date) {
+  const d = new Date(iso);
+  return (
+    d.getFullYear() === ref.getFullYear() &&
+    d.getMonth() === ref.getMonth() &&
+    d.getDate() === ref.getDate()
+  );
+}
 
 const STATUSES: AppointmentStatus[] = ['PENDING_PAYMENT', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'NO_SHOW', 'EXPIRED'];
 
@@ -35,22 +48,49 @@ export function AppointmentsPage() {
   const offerings = useResource(() => catalogApi.listOfferings({ size: 200 }), []);
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [scope, setScope] = useState<Scope>('');
   const [busyId, setBusyId] = useState<string | null>(null);
   const [rescheduleOf, setRescheduleOf] = useState<AppointmentResponse | null>(null);
+  const [detailOf, setDetailOf] = useState<AppointmentResponse | null>(null);
 
   const offeringName = useMemo(() => {
     const map = new Map((offerings.data?.content ?? []).map((o) => [o.id, o.name]));
     return (id: string) => map.get(id) ?? id.slice(0, 8);
   }, [offerings.data]);
 
+  // Etiqueta legible de cada requisito (offeringId -> key -> label) para el detalle.
+  const requirementLabel = useMemo(() => {
+    const byOffering = new Map(
+      (offerings.data?.content ?? []).map((o) => [o.id, new Map(o.requirements.map((r) => [r.key, r.label]))])
+    );
+    return (offeringId: string, key: string) => byOffering.get(offeringId)?.get(key) ?? key;
+  }, [offerings.data]);
+
   const items = appts.data?.content ?? [];
-  const visible = statusFilter ? items.filter((a) => a.status === statusFilter) : items;
+  // Filtro por estado + alcance temporal, y orden (próximas/hoy: lo más cercano primero).
+  const visible = useMemo(() => {
+    const now = new Date();
+    let list = statusFilter ? items.filter((a) => a.status === statusFilter) : items;
+    if (scope === 'today') list = list.filter((a) => isSameLocalDay(a.slotStart, now));
+    else if (scope === 'upcoming') list = list.filter((a) => new Date(a.slotStart).getTime() >= now.getTime());
+    else if (scope === 'past') list = list.filter((a) => new Date(a.slotStart).getTime() < now.getTime());
+    const asc = scope === 'today' || scope === 'upcoming';
+    return [...list].sort((a, b) =>
+      asc
+        ? new Date(a.slotStart).getTime() - new Date(b.slotStart).getTime()
+        : new Date(b.slotStart).getTime() - new Date(a.slotStart).getTime()
+    );
+  }, [items, statusFilter, scope]);
   const match = useCallback(
     (a: AppointmentResponse, q: string) =>
       offeringName(a.offeringId).toLowerCase().includes(q) || a.customerUserId.toLowerCase().includes(q),
     [offeringName]
   );
-  const { paged, page, setPage, totalPages, total } = useClientTable(visible, { query, match });
+  const { paged, page, setPage, totalPages, total } = useClientTable(visible, {
+    query,
+    match,
+    resetKey: `${statusFilter}|${scope}`
+  });
 
   async function cancel(a: AppointmentResponse) {
     const ok = await confirm({
@@ -72,6 +112,47 @@ export function AppointmentsPage() {
     }
   }
 
+  // Marca la cita como atendida (CONFIRMED -> COMPLETED). Estado terminal: confirma antes.
+  async function complete(a: AppointmentResponse) {
+    const ok = await confirm({
+      title: t('appointments:confirm.completeTitle'),
+      message: t('appointments:confirm.completeMessage'),
+      confirmLabel: t('appointments:actions.complete')
+    });
+    if (!ok) return;
+    setBusyId(a.id);
+    try {
+      await tenantAppointmentsApi.complete(a.id);
+      toast.success(t('appointments:toast.completed'));
+      appts.reload();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t('common:feedback.error'));
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  // Marca que el cliente no se presentó (CONFIRMED -> NO_SHOW). Terminal: pide confirmación.
+  async function markNoShow(a: AppointmentResponse) {
+    const ok = await confirm({
+      title: t('appointments:confirm.noShowTitle'),
+      message: t('appointments:confirm.noShowMessage'),
+      confirmLabel: t('appointments:actions.noShow'),
+      danger: true
+    });
+    if (!ok) return;
+    setBusyId(a.id);
+    try {
+      await tenantAppointmentsApi.noShow(a.id);
+      toast.success(t('appointments:toast.noShow'));
+      appts.reload();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t('common:feedback.error'));
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   return (
     <div className="page">
       <PageHeader eyebrow={t('appointments:eyebrow')} title={t('appointments:title')} description={t('appointments:listDescription')} />
@@ -80,6 +161,15 @@ export function AppointmentsPage() {
         <div className="table-toolbar">
           <div className="table-toolbar-filters">
             <SearchInput placeholder={t('appointments:searchPlaceholder')} value={query} onChange={(e) => setQuery(e.target.value)} />
+            <Select
+              className="toolbar-filter"
+              value={scope}
+              onChange={(e) => setScope(e.target.value as Scope)}
+              options={SCOPES.map((s) => ({
+                value: s,
+                label: s ? t(`appointments:scope.${s}`) : t('appointments:scope.all')
+              }))}
+            />
             <Select
               className="toolbar-filter"
               value={statusFilter}
@@ -93,7 +183,7 @@ export function AppointmentsPage() {
         <DataState
           loading={appts.loading}
           error={appts.error}
-          empty={items.length === 0}
+          empty={total === 0}
           emptyMessage={t('appointments:empty')}
           onRetry={appts.reload}
         >
@@ -112,28 +202,68 @@ export function AppointmentsPage() {
               <tbody>
                 {paged.map((a) => (
                   <tr key={a.id}>
-                    <td><strong>{offeringName(a.offeringId)}</strong></td>
+                    <td className="cell-clamp"><strong>{offeringName(a.offeringId)}</strong></td>
                     <td><code>{a.customerUserId.slice(0, 8)}</code></td>
-                    <td>{formatDateTime(a.slotStart, i18n.language)}</td>
+                    <td className="cell-nowrap">{formatDateTime(a.slotStart, i18n.language)}</td>
                     <td>
                       <Badge tone={STATUS_TONE[a.status]}>{t(`appointments:status.${a.status}`)}</Badge>
                     </td>
-                    <td>{a.priceAmount != null ? formatMoney(a.priceAmount, a.priceCurrency ?? 'USD', i18n.language) : '—'}</td>
-                    <td className="row-actions">
+                    <td className="cell-nowrap">{a.priceAmount != null ? formatMoney(a.priceAmount, a.priceCurrency ?? 'USD', i18n.language) : '—'}</td>
+                    <td className="row-actions row-actions-icons">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="row-icon"
+                        icon={<Eye size={16} />}
+                        aria-label={t('appointments:actions.view')}
+                        title={t('appointments:actions.view')}
+                        onClick={() => setDetailOf(a)}
+                      />
+                      {a.status === 'CONFIRMED' ? (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="row-icon appt-complete"
+                            icon={<CheckCircle2 size={16} />}
+                            aria-label={t('appointments:actions.complete')}
+                            title={t('appointments:actions.complete')}
+                            disabled={busyId === a.id}
+                            onClick={() => complete(a)}
+                          />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="row-icon appt-noshow"
+                            icon={<UserX size={16} />}
+                            aria-label={t('appointments:actions.noShow')}
+                            title={t('appointments:actions.noShow')}
+                            disabled={busyId === a.id}
+                            onClick={() => markNoShow(a)}
+                          />
+                        </>
+                      ) : null}
                       {ACTIVE.includes(a.status) ? (
                         <>
-                          <Button variant="ghost" size="sm" icon={<CalendarClock size={15} />} onClick={() => setRescheduleOf(a)}>
-                            {t('appointments:actions.reschedule')}
-                          </Button>
                           <Button
-                            variant="danger"
+                            variant="ghost"
                             size="sm"
-                            icon={<XCircle size={15} />}
+                            className="row-icon"
+                            icon={<CalendarClock size={16} />}
+                            aria-label={t('appointments:actions.reschedule')}
+                            title={t('appointments:actions.reschedule')}
+                            onClick={() => setRescheduleOf(a)}
+                          />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="row-icon appt-noshow"
+                            icon={<XCircle size={16} />}
+                            aria-label={t('appointments:actions.cancel')}
+                            title={t('appointments:actions.cancel')}
                             disabled={busyId === a.id}
                             onClick={() => cancel(a)}
-                          >
-                            {t('appointments:actions.cancel')}
-                          </Button>
+                          />
                         </>
                       ) : null}
                     </td>
@@ -152,6 +282,12 @@ export function AppointmentsPage() {
         reschedule={tenantAppointmentsApi.reschedule}
         onClose={() => setRescheduleOf(null)}
         onDone={appts.reload}
+      />
+      <AppointmentDetailModal
+        appointment={detailOf}
+        serviceName={offeringName}
+        requirementLabel={requirementLabel}
+        onClose={() => setDetailOf(null)}
       />
     </div>
   );

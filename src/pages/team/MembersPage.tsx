@@ -12,8 +12,14 @@ import { useConfirm } from '../../components/feedback/confirm';
 import { tenantApi } from '../../api/services';
 import type { MembershipResponse } from '../../api/types';
 import { formatDate } from '../../lib/format';
+import { roleLabel } from '../../lib/roles';
 
-const ROLES = ['TENANT_ADMIN', 'TENANT_PARTNER'];
+// Roles que pueden aparecer entre los miembros (para el filtro).
+const ALL_ROLES = ['TENANT_ADMIN', 'TENANT_PARTNER'];
+// El TENANT_ADMIN solo puede dar de alta Profesionales; el rol Administrador
+// lo concede únicamente el administrador del sistema (lo refleja el backend:
+// /me/members siempre crea un TENANT_PARTNER).
+const ADD_ROLE = 'TENANT_PARTNER';
 
 const matchMember = (m: MembershipResponse, q: string) =>
   m.userId.toLowerCase().includes(q) || m.roles.some((r) => r.toLowerCase().includes(q));
@@ -23,8 +29,9 @@ export function MembersPage() {
   const toast = useToast();
   const confirm = useConfirm();
   const members = useResource(() => tenantApi.listMyMembers({ size: 200 }), []);
-  const [form, setForm] = useState({ userId: '', role: ROLES[0] });
-  const add = useMutation(() => tenantApi.addMyMember({ userId: form.userId.trim(), role: form.role }));
+  const [form, setForm] = useState({ userId: '' });
+  const [userIdError, setUserIdError] = useState<string>();
+  const add = useMutation(() => tenantApi.addMyMember({ userId: form.userId.trim(), role: ADD_ROLE }));
   const [busyId, setBusyId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
@@ -33,15 +40,21 @@ export function MembersPage() {
   const visible = roleFilter ? items.filter((m) => m.roles.includes(roleFilter)) : items;
   const { paged, page, setPage, totalPages, total } = useClientTable(visible, {
     query,
-    match: useCallback(matchMember, [])
+    match: useCallback(matchMember, []),
+    resetKey: roleFilter
   });
 
   async function submit(e: FormEvent) {
     e.preventDefault();
+    // El backend espera un UUID exacto; validarlo evita un 400 sin detalle.
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(form.userId.trim())) {
+      setUserIdError(t('common:validation.uuid'));
+      return;
+    }
     try {
       await add.run();
       toast.success(t('team:toast.added'));
-      setForm({ userId: '', role: ROLES[0] });
+      setForm({ userId: '' });
       members.reload();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t('common:feedback.error'));
@@ -77,18 +90,15 @@ export function MembersPage() {
           <TextField
             label={t('team:fields.userId')}
             hint={t('team:fields.userIdHint')}
-            required
+            error={userIdError}
             value={form.userId}
-            onChange={(e) => setForm((f) => ({ ...f, userId: e.target.value }))}
+            onChange={(e) => {
+              setForm((f) => ({ ...f, userId: e.target.value }));
+              setUserIdError(undefined);
+            }}
           />
-          <div className="member-add-row">
-            <Select
-              label={t('team:fields.role')}
-              hint={t('team:fields.roleHint')}
-              value={form.role}
-              onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
-              options={ROLES.map((r) => ({ value: r, label: t(`team:roles.${r}`, r) }))}
-            />
+          <p className="account-hint member-add-note">{t('team:addAsPartner')}</p>
+          <div className="member-add-row member-add-row-single">
             <Button type="submit" icon={<UserPlus size={17} />} disabled={add.submitting || !form.userId.trim()}>
               {t('team:actions.add')}
             </Button>
@@ -109,7 +119,7 @@ export function MembersPage() {
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
               placeholder={t('team:allRoles')}
-              options={ROLES.map((r) => ({ value: r, label: t(`team:roles.${r}`, r) }))}
+              options={ALL_ROLES.map((r) => ({ value: r, label: roleLabel(t, r) }))}
             />
           </div>
           <span className="table-toolbar-count">{t('common:pagination.items', { count: total })}</span>
@@ -117,7 +127,7 @@ export function MembersPage() {
         <DataState
           loading={members.loading}
           error={members.error}
-          empty={items.length === 0}
+          empty={total === 0}
           emptyMessage={t('team:empty')}
           onRetry={members.reload}
         >
@@ -138,13 +148,15 @@ export function MembersPage() {
                   <td><code>{m.userId}</code></td>
                   <td className="cell-chips">
                     {m.roles.map((r) => (
-                      <Badge key={r} tone="info">{t(`team:roles.${r}`, r)}</Badge>
+                      <Badge key={r} tone="info">{roleLabel(t, r)}</Badge>
                     ))}
                   </td>
                   <td>
-                    <Badge tone={m.status === 'ACTIVE' ? 'success' : 'warning'}>{m.status}</Badge>
+                    <Badge tone={m.status === 'ACTIVE' ? 'success' : 'warning'}>
+                      {t(`common:statusValues.${m.status}`, m.status)}
+                    </Badge>
                   </td>
-                  <td>{formatDate(m.createdAt, i18n.language)}</td>
+                  <td className="cell-nowrap">{formatDate(m.createdAt, i18n.language)}</td>
                   <td className="row-actions">
                     <button
                       className="hc-icon-button"

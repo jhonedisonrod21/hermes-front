@@ -3,6 +3,19 @@ export const en = {
     appName: 'Hermes Calendar',
     unavailable: 'Unavailable',
     loadingSession: 'Preparing session...',
+    roleNames: {
+      SYSTEM_ADMIN: 'System administrator',
+      TENANT_ADMIN: 'Administrator',
+      TENANT_PARTNER: 'Professional',
+      TENANT_STAFF: 'Staff',
+      GUEST_USER: 'Client'
+    },
+    statusValues: {
+      ACTIVE: 'Active',
+      INACTIVE: 'Inactive',
+      SUSPENDED: 'Suspended',
+      PENDING: 'Pending'
+    },
     language: {
       label: 'Language',
       es: 'ES',
@@ -38,6 +51,8 @@ export const en = {
       required: 'This field is required.',
       maxLength: 'Maximum {{max}} characters.',
       country: 'Select a country (2-letter ISO code).',
+      email: 'Enter a valid email.',
+      uuid: 'Must be a valid UUID.',
       fix: 'Please review the highlighted fields.'
     },
     units: {
@@ -75,8 +90,8 @@ export const en = {
       title: 'Sign in',
       username: 'User',
       password: 'Password',
-      usernamePlaceholder: 'admin@hermes.local',
-      passwordPlaceholder: 'admin123',
+      usernamePlaceholder: 'you@example.com',
+      passwordPlaceholder: '••••••••',
       showPassword: 'Show password',
       hidePassword: 'Hide password',
       submit: 'Sign in',
@@ -239,6 +254,7 @@ export const en = {
       users: 'Manage users',
       explore: 'Explore services',
       appointments: 'Manage appointments',
+      payments: 'Set up payments',
       bookings: 'My bookings'
     }
   },
@@ -305,6 +321,10 @@ export const en = {
       currency: 'Currency you charge this service in.',
       description: 'Details that help the client decide.'
     },
+    payment: {
+      needsConfig: 'To charge upfront you must first set up and enable online payments.',
+      configure: 'Set up payments'
+    },
     modality: {
       IN_PERSON: 'In person',
       VIRTUAL: 'Virtual',
@@ -321,12 +341,16 @@ export const en = {
     description: 'Set the weekly hours and exceptions (closures or special days).',
     hours: {
       title: 'Weekly hours',
-      save: 'Save hours'
+      save: 'Save hours',
+      invalidRange: 'On {{day}}, the opening time must be earlier than the closing time.',
+      noneTitle: 'No open days',
+      noneMessage: 'You left no open days: clients won’t be able to book. Save anyway?'
     },
     exceptions: {
       title: 'Exceptions',
       add: 'Add exception',
       empty: 'No exceptions registered.',
+      invalidRange: 'The opening time must be earlier than the closing time.',
       date: 'Date',
       dateHint: 'A specific day that overrides your usual hours.',
       type: 'Type',
@@ -350,7 +374,8 @@ export const en = {
   team: {
     eyebrow: 'Team',
     title: 'Organization members',
-    description: 'Add or remove members and set their role in the organization.',
+    description: 'Add professionals to your organization or remove them.',
+    addAsPartner: 'Added as Professional. The Administrator role is granted only by the system administrator.',
     empty: 'No members besides you yet.',
     searchPlaceholder: 'Search by ID or role...',
     allRoles: 'All roles',
@@ -414,8 +439,12 @@ export const en = {
       slug: 'Slug',
       location: 'Location',
       status: 'Status',
+      statusValues: {
+        ACTIVE: 'Active',
+        INACTIVE: 'Inactive'
+      },
       created: 'Created',
-      suspend: 'Suspend',
+      suspend: 'Deactivate',
       activate: 'Activate',
       new: 'New organization',
       create: 'Create organization',
@@ -423,8 +452,8 @@ export const en = {
       editTitle: 'Edit organization',
       members: 'Members',
       confirm: {
-        suspendTitle: 'Suspend organization',
-        suspendMessage: 'Suspend "{{name}}"? Its members will lose access to operations.'
+        suspendTitle: 'Deactivate organization',
+        suspendMessage: 'Deactivate "{{name}}"? Its members will lose access to operations.'
       }
     },
     members: {
@@ -433,6 +462,7 @@ export const en = {
       pickPlaceholder: 'Search by username or email...',
       pickHint: 'Pick a registered user. As TENANT_ADMIN they will manage the organization.',
       searchEmpty: 'No users available to add.',
+      moreResults: 'More matches available; refine your search.',
       clear: 'Clear selection',
       filterRole: 'Filter by role',
       allRoles: 'All roles',
@@ -517,15 +547,45 @@ export const en = {
     },
     actions: {
       cancel: 'Cancel',
-      reschedule: 'Reschedule'
+      reschedule: 'Reschedule',
+      view: 'View',
+      complete: 'Completed',
+      noShow: 'No-show'
+    },
+    scope: {
+      label: 'When',
+      all: 'All',
+      today: 'Today',
+      upcoming: 'Upcoming',
+      past: 'Past'
+    },
+    detail: {
+      title: 'Appointment detail',
+      service: 'Service',
+      customer: 'Customer (ID)',
+      when: 'When',
+      duration: '{{minutes}} min',
+      price: 'Price',
+      payment: 'Payment',
+      paymentOnline: 'Online, upfront',
+      paymentOnsite: 'No online payment required',
+      created: 'Booked on',
+      requirements: 'Details provided by the customer',
+      noRequirements: 'The customer provided no extra details.'
     },
     confirm: {
       cancelTitle: 'Cancel appointment',
-      cancelMessage: 'Are you sure you want to cancel this appointment?'
+      cancelMessage: 'Are you sure you want to cancel this appointment?',
+      completeTitle: 'Mark as completed',
+      completeMessage: 'Confirm the appointment was attended? This cannot be undone.',
+      noShowTitle: 'Mark as no-show',
+      noShowMessage: 'Confirm the customer did not show up? This cannot be undone.'
     },
     toast: {
       cancelled: 'Appointment cancelled.',
-      rescheduled: 'Appointment rescheduled.'
+      rescheduled: 'Appointment rescheduled.',
+      completed: 'Appointment marked as completed.',
+      noShow: 'Appointment marked as no-show.'
     },
     reschedule: {
       title: 'Reschedule: {{service}}',
@@ -593,6 +653,8 @@ export const en = {
       documentType: 'Document type',
       documentNumber: 'Document number',
       documentNumberHint: 'Numbers only, no dots or dashes.',
+      documentNumberInvalid: 'Enter numbers only, no dots or dashes.',
+      phoneInvalid: 'Enter a valid phone number.',
       fullName: 'Full name',
       fullNameHint: 'As it appears on your ID document.',
       email: 'Email',
@@ -628,6 +690,7 @@ export const en = {
       userId: 'User ID',
       copy: 'Copy',
       copied: 'Copied',
+      copyFailed: 'Could not copy. Copy it manually.',
       phone: 'Phone',
       phoneHint: 'We use it to send you SMS reminders for your appointments.',
       saved: 'Phone updated.'
@@ -662,6 +725,7 @@ export const en = {
     secretHint: 'Stored only; never shown again. Leave empty to keep it unchanged.',
     updatedAt: 'Updated on {{date}}',
     saved: 'Settings saved.',
+    enableNeedsConfig: 'To enable payments, complete the merchant account, public key and both secrets.',
     delete: 'Delete configuration',
     deleted: 'Configuration deleted.',
     deleteConfirm: {
@@ -697,6 +761,7 @@ export const en = {
       status: 'Status',
       appointment: 'Appointment',
       resume: 'Continue payment',
+      showingLatest: 'showing the latest {{count}}',
       statuses: {
         PENDING: 'Pending',
         PAID: 'Paid',

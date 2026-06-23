@@ -1,4 +1,4 @@
-import { CheckCircle2, XCircle } from 'lucide-react';
+import { Clock, XCircle } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../../components/ui';
@@ -17,8 +17,8 @@ export function PaymentReturnPage() {
   return (
     <div className="page">
       <Card className="panel payment-return">
-        <span className={`payment-return-mark ${failed ? 'is-error' : 'is-ok'}`} aria-hidden="true">
-          {failed ? <XCircle size={34} /> : <CheckCircle2 size={34} />}
+        <span className={`payment-return-mark ${failed ? 'is-error' : 'is-pending'}`} aria-hidden="true">
+          {failed ? <XCircle size={34} /> : <Clock size={34} />}
         </span>
         <h1>{failed ? t('bookings:return.failedTitle') : t('bookings:return.title')}</h1>
         <p>{failed ? t('bookings:return.failedMessage') : t('bookings:return.message')}</p>

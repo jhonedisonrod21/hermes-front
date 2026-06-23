@@ -235,7 +235,22 @@
   border-bottom: 1px solid var(--hc-border);
   color: var(--hc-text);
   padding: 14px 18px;
-  vertical-align: middle;
+  /* Arriba: con contenido que envuelve, todas las columnas empiezan a la misma
+     altura y la fila se lee alineada. */
+  vertical-align: top;
+}
+
+/* Texto largo dentro de una celda: envuelve (incluidas palabras larguísimas) con
+   un ancho acotado, para no generar filas de una sola palabra por línea ni cortar. */
+.hc-table td.cell-clamp {
+  max-width: 240px;
+  min-width: 150px;
+  overflow-wrap: anywhere;
+}
+
+/* Columnas de dato corto (fechas, importes): en una sola línea, nunca envuelven. */
+.hc-table td.cell-nowrap {
+  white-space: nowrap;
 }
 
 .hc-table tbody tr:last-child td {
@@ -254,10 +269,26 @@
 }
 
 .row-actions {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   justify-content: flex-end;
+}
+
+/* Variante compacta: acciones como barra de iconos (tablas con muchas acciones).
+   Caben en una sola línea, manteniendo las filas bajas y alineadas. */
+.row-actions-icons {
+  flex-wrap: nowrap;
+  gap: 4px;
+}
+
+.hc-button.row-icon {
+  padding: 7px;
+}
+
+.hc-button.row-icon .hc-button-icon {
+  margin: 0;
 }
 
 .row-badge {
@@ -768,8 +799,18 @@
   width: 100%;
 }
 
-.hc-combobox-option:hover {
+.hc-combobox-option:hover,
+.hc-combobox-option.is-active {
   background: var(--hc-primary-soft);
+}
+
+/* Aviso de "hay más coincidencias" al pie de la lista del combobox */
+.hc-combobox-more {
+  border-top: 1px solid var(--hc-border);
+  color: var(--hc-text-muted);
+  font-size: 0.8rem;
+  padding: 8px 10px;
+  text-align: center;
 }
 
 .hc-combobox-option strong {
@@ -1395,6 +1436,7 @@ a:focus-visible {
 .login-shell {
   background:
     radial-gradient(120% 120% at 50% 0%, var(--hc-midnight-2), var(--hc-midnight) 70%);
+  overflow: hidden;
 }
 
 .login-shell .login-back {
@@ -1411,7 +1453,8 @@ a:focus-visible {
   z-index: 1;
 }
 
-/* Dial como marca de agua tenue del cielo nocturno del login */
+/* Dial del cielo nocturno del login (más visible para apreciar el segundero) */
+/* Dial como marca de agua tenue del cielo nocturno del login (estático) */
 .login-shell-dial {
   height: min(70vh, 620px);
   left: 50%;
@@ -1426,6 +1469,47 @@ a:focus-visible {
 .login-shell-dial .lp-dial-hand {
   animation: none;
   transform: rotate(58deg);
+}
+
+/* --- Animaciones de entrada del login (sutiles; el bloque prefers-reduced-motion las apaga) --- */
+@keyframes hc-login-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes hc-login-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  65% {
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Giro continuo del segundero del login */
+@keyframes hc-login-second {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.login-card {
+  animation: hc-login-card-in 640ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.login-card-brand {
+  animation: hc-login-pop 620ms cubic-bezier(0.34, 1.56, 0.64, 1) 320ms both;
 }
 
 /* ===========================================================================
@@ -1565,6 +1649,16 @@ a:focus-visible {
   .member-add-row {
     grid-template-columns: 1fr;
   }
+}
+
+/* Fila de alta con un solo control (sin selector de rol): botón a la derecha */
+.member-add-row-single {
+  grid-template-columns: auto;
+  justify-content: end;
+}
+
+.member-add-note {
+  margin: 0;
 }
 
 /* Glifo de reloj mínimo (legible a tamaños pequeños; trazo no escalable) */
@@ -1918,6 +2012,75 @@ a:focus-visible {
   opacity: 1;
 }
 
+/* Detalle de cita (vista del colaborador) */
+.appt-detail {
+  display: grid;
+  gap: 18px;
+}
+
+.appt-detail-muted {
+  color: var(--hc-text-muted);
+  font-size: 0.88rem;
+}
+
+.appt-detail-reqs {
+  border-top: 1px solid var(--hc-border);
+  display: grid;
+  gap: 10px;
+  padding-top: 16px;
+}
+
+.appt-detail-reqs .hc-field-label {
+  display: block;
+}
+
+/* Acciones de asistencia (vista del colaborador): verde = completada, rojo = no asistió */
+.hc-button.appt-complete {
+  color: var(--hc-success);
+}
+
+.hc-button.appt-complete:hover:not(:disabled) {
+  background: var(--hc-success-soft);
+  color: var(--hc-success);
+}
+
+.hc-button.appt-noshow {
+  color: var(--hc-danger);
+}
+
+.hc-button.appt-noshow:hover:not(:disabled) {
+  background: var(--hc-danger-soft);
+  color: var(--hc-danger);
+}
+
+/* Tarjetas-métrica clicables (overview): afordancia de enlace */
+.summary-card-wrap {
+  color: inherit;
+  display: block;
+  text-decoration: none;
+}
+
+.summary-card-link {
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.summary-card-wrap:hover .summary-card-link {
+  border-color: rgba(224, 170, 44, 0.5);
+  box-shadow: var(--hc-shadow-card);
+  transform: translateY(-3px);
+}
+
+/* Aviso de "configura pagos" bajo el checkbox de cobro por adelantado */
+.offering-payment-warn {
+  margin-top: -2px;
+}
+
+.offering-payment-warn a {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
 .booking-price {
   color: var(--hc-primary);
   font-weight: 800;
@@ -2093,7 +2256,10 @@ a:focus-visible {
 .explore-search-modality select {
   appearance: none;
   -webkit-appearance: none;
-  background: transparent;
+  /* Chevron propio (igual que .hc-select): el padding-right reservaba sitio para él. */
+  background: transparent
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237a8599' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+    no-repeat right 4px center;
   border: 0;
   color: var(--hc-text);
   cursor: pointer;
@@ -2296,6 +2462,12 @@ a:focus-visible {
 .payment-return-mark.is-ok {
   background: var(--hc-success-soft);
   color: var(--hc-success);
+}
+
+/* Pago en confirmación: tono neutro (no verde), el éxito real lo confirma el webhook */
+.payment-return-mark.is-pending {
+  background: var(--hc-primary-soft);
+  color: var(--hc-primary);
 }
 
 .payment-return-mark.is-error {
