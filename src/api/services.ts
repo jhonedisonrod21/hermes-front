@@ -89,7 +89,10 @@ export const tenantAppointmentsApi = {
   get: (id: string) => api.get<AppointmentResponse>(`/scheduling/me/appointments/${id}`),
   cancel: (id: string) => api.post<AppointmentResponse>(`/scheduling/me/appointments/${id}/cancel`),
   reschedule: (id: string, body: RescheduleRequest) =>
-    api.post<AppointmentResponse>(`/scheduling/me/appointments/${id}/reschedule`, body)
+    api.post<AppointmentResponse>(`/scheduling/me/appointments/${id}/reschedule`, body),
+  // Cierre de la cita por el establecimiento (solo desde CONFIRMED).
+  complete: (id: string) => api.post<AppointmentResponse>(`/scheduling/me/appointments/${id}/complete`),
+  noShow: (id: string) => api.post<AppointmentResponse>(`/scheduling/me/appointments/${id}/no-show`)
 };
 
 // ---- Tenant ----
