@@ -33,7 +33,10 @@ export function isPlatformScope(profile?: HermesProfile): boolean {
   return accountScopeOf(profile) === 'PLATFORM';
 }
 
+// Roles del modelo de 4 actores de Hermes (coinciden con los nombres del JWT y del gateway).
 export const SYSTEM_ADMIN_ROLE = 'SYSTEM_ADMIN';
+export const TENANT_ADMIN_ROLE = 'TENANT_ADMIN';
+export const TENANT_PARTNER_ROLE = 'TENANT_PARTNER';
 export const GUEST_USER_ROLE = 'GUEST_USER';
 
 export function hasRole(profile: HermesProfile | undefined, role: string): boolean {
@@ -45,17 +48,30 @@ export function isSystemAdmin(profile?: HermesProfile): boolean {
 }
 
 /**
- * Clasifica la cuenta por ACTOR (no por scope). `PLATFORM` agrupa a dos actores muy distintos:
- * el administrador del sistema y el invitado. Toda decisión de etiqueta/UI debe usar esto, no
- * `isPlatformScope` (que solo indica "sin tenant").
+ * Clasifica la cuenta por ACTOR (no por scope), segun el modelo de 4 actores:
+ * - `system-admin`: administrador de plataforma (rol SYSTEM_ADMIN).
+ * - `tenant-admin`: administra la organizacion (catalogo, agenda, reportes, equipo).
+ * - `tenant-partner`: opera la agenda (citas) dentro de una organizacion.
+ * - `guest`: invitado sin organizacion (busca, reserva, paga).
  */
-export type ActorKind = 'system-admin' | 'guest' | 'tenant';
+export type ActorKind = 'system-admin' | 'tenant-admin' | 'tenant-partner' | 'guest';
 
 export function actorKind(profile?: HermesProfile): ActorKind {
   if (isSystemAdmin(profile)) {
     return 'system-admin';
   }
-  return isPlatformScope(profile) ? 'guest' : 'tenant';
+  if (hasRole(profile, TENANT_ADMIN_ROLE)) {
+    return 'tenant-admin';
+  }
+  if (hasRole(profile, TENANT_PARTNER_ROLE)) {
+    return 'tenant-partner';
+  }
+  return 'guest';
+}
+
+/** Verdadero para los actores que pertenecen a una organizacion (admin o partner). */
+export function isTenantActor(kind: ActorKind): boolean {
+  return kind === 'tenant-admin' || kind === 'tenant-partner';
 }
 
 export function clearSession() {

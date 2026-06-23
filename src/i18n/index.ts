@@ -18,7 +18,7 @@ i18n
     fallbackLng: 'es',
     supportedLngs: supportedLanguages,
     defaultNS: 'common',
-    ns: ['common', 'auth', 'dashboard'],
+    ns: ['common', 'auth', 'dashboard', 'app', 'overview', 'catalog', 'schedule', 'team', 'organization', 'admin', 'explore', 'appointments', 'reports', 'bookings', 'account', 'landing'],
     interpolation: {
       escapeValue: false
     },

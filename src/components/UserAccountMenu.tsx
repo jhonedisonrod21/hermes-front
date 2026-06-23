@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown, LogOut, UserCircle, UserRound } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { actorKind, type HermesProfile } from '../hermes-security/sessionStore';
@@ -88,10 +89,10 @@ export function UserAccountMenu({ profile, onLogout }: UserAccountMenuProps) {
             </div>
           </div>
 
-          <a className="user-menu-item" href="/profile" role="menuitem">
+          <Link className="user-menu-item" to="/cuenta" role="menuitem" onClick={() => setOpen(false)}>
             <UserCircle size={18} />
             {t('dashboard:userMenu.profile')}
-          </a>
+          </Link>
 
           <div className="user-menu-language">
             <LanguageSwitcher />

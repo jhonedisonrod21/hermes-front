@@ -59,10 +59,34 @@ async function createServerSession(username: string, password: string) {
   }
 }
 
+export type RegistrationResult = { userId: string; email: string; role: string };
+
+async function registerUser(email: string, password: string): Promise<RegistrationResult> {
+  const response = await fetch(oauthEndpoints.register, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    if (response.status === 409) {
+      throw new Error(i18n.t('auth:register.errors.emailTaken'));
+    }
+    throw new Error(detail || `${i18n.t('auth:register.errors.failed')} (${response.status})`);
+  }
+
+  return (await response.json()) as RegistrationResult;
+}
+
 export const authService = {
   async login(username: string, password: string) {
     await createServerSession(username, password);
     window.location.assign(oauthEndpoints.bffLogin);
+  },
+
+  async register(email: string, password: string) {
+    return registerUser(email, password);
   },
 
   async getValidSession(): Promise<HermesSession | null> {

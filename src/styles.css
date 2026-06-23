@@ -24,6 +24,11 @@
   --hc-focus-ring: rgba(13, 52, 122, 0.15);
   --hc-shadow-card: 0 18px 42px rgba(23, 32, 51, 0.08);
   --hc-shadow-soft: 0 10px 30px rgba(13, 52, 122, 0.08);
+  --hc-midnight: #081633;
+  --hc-midnight-2: #0c1f47;
+  --hc-gold-soft: #f2d483;
+  --hc-font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --hc-font-mono: "Space Mono", ui-monospace, "SFMono-Regular", monospace;
   color: var(--hc-text);
   background: var(--hc-bg);
   font-family:

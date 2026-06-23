@@ -1,0 +1,1349 @@
+/* ===========================================================================
+   App shell con sidebar (Design System §3.4 - opción clara)
+   Complementa styles.css reutilizando los mismos tokens --hc-*.
+   =========================================================================== */
+.app-shell {
+  display: grid;
+  grid-template-columns: 256px 1fr;
+  min-height: 100vh;
+}
+
+.app-sidebar {
+  background: var(--hc-surface);
+  border-right: 1px solid var(--hc-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: 22px 16px;
+}
+
+.app-sidebar-brand {
+  padding: 6px 8px 16px;
+  border-bottom: 1px solid var(--hc-border);
+  margin-bottom: 8px;
+}
+
+.app-sidebar-nav {
+  display: grid;
+  gap: 4px;
+  flex: 1 1 auto;
+  align-content: start;
+}
+
+.app-sidebar-link {
+  align-items: center;
+  border-radius: 8px;
+  color: var(--hc-text-secondary);
+  display: flex;
+  font-size: 0.94rem;
+  font-weight: 800;
+  gap: 12px;
+  padding: 11px 12px;
+  text-decoration: none;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.app-sidebar-link:hover {
+  background: var(--hc-surface-alt);
+  color: var(--hc-text);
+}
+
+.app-sidebar-link-active,
+.app-sidebar-link-active:hover {
+  background: var(--hc-primary-soft);
+  color: var(--hc-primary);
+}
+
+.app-sidebar-footer {
+  border-top: 1px solid var(--hc-border);
+  display: grid;
+  gap: 3px;
+  padding: 14px 10px 4px;
+}
+
+.app-sidebar-role {
+  color: var(--hc-text-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.app-sidebar-footer strong {
+  color: var(--hc-text);
+  font-size: 0.92rem;
+  overflow-wrap: anywhere;
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.app-topbar {
+  align-items: center;
+  background: var(--hc-surface);
+  border-bottom: 1px solid var(--hc-border);
+  display: flex;
+  gap: 12px;
+  min-height: 68px;
+  padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-topbar-spacer {
+  flex: 1 1 auto;
+}
+
+.app-topbar-toggle {
+  display: none;
+}
+
+.app-content {
+  flex: 1 1 auto;
+  padding: 32px;
+  width: 100%;
+}
+
+.app-shell-scrim {
+  display: none;
+}
+
+/* Página: encabezado y rejillas */
+.page {
+  display: grid;
+  gap: 22px;
+  margin: 0 auto;
+  max-width: 1180px;
+  width: 100%;
+}
+
+.page-header {
+  align-items: flex-end;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+}
+
+.page-header h1 {
+  color: var(--hc-text);
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  margin: 0;
+}
+
+.page-header-description {
+  color: var(--hc-text-secondary);
+  margin: 8px 0 0;
+  max-width: 640px;
+}
+
+.page-header-actions {
+  flex: 0 0 auto;
+}
+
+.page-grid-2 {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.panel {
+  padding: 24px;
+}
+
+.form-panel {
+  max-width: 760px;
+}
+
+.panel-actions {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+.save-ok {
+  color: var(--hc-success);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.quicklinks-title {
+  color: var(--hc-text);
+  font-size: 1.05rem;
+  margin: 0 0 16px;
+}
+
+.quicklinks {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.quicklink {
+  align-items: center;
+  background: var(--hc-surface-alt);
+  border: 1px solid var(--hc-border);
+  border-radius: 8px;
+  color: var(--hc-primary);
+  display: flex;
+  font-weight: 800;
+  gap: 10px;
+  padding: 14px 16px;
+  text-decoration: none;
+  transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+}
+
+.quicklink:hover {
+  background: var(--hc-primary-soft);
+  border-color: var(--hc-border-strong);
+  transform: translateY(-1px);
+}
+
+/* Tablas */
+.table-card {
+  overflow: hidden;
+  padding: 0;
+}
+
+.hc-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.hc-table thead th {
+  background: var(--hc-surface-alt);
+  border-bottom: 1px solid var(--hc-border);
+  color: var(--hc-text-secondary);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  padding: 14px 18px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.hc-table tbody td {
+  border-bottom: 1px solid var(--hc-border);
+  color: var(--hc-text);
+  padding: 14px 18px;
+  vertical-align: middle;
+}
+
+.hc-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.hc-table tbody tr:hover {
+  background: var(--hc-surface-alt);
+}
+
+.hc-table code {
+  background: var(--hc-surface-alt);
+  border-radius: 4px;
+  font-size: 0.82rem;
+  padding: 2px 6px;
+}
+
+.row-actions {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.row-badge {
+  margin-left: 8px;
+}
+
+.cell-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Formularios */
+.hc-form {
+  display: grid;
+  gap: 16px;
+}
+
+.hc-form-row {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.hc-select,
+.hc-time {
+  background: transparent;
+  border: 0;
+  color: var(--hc-text);
+  flex: 1 1 auto;
+  font: inherit;
+  min-height: 46px;
+  outline: none;
+  padding: 0 14px;
+  width: 100%;
+}
+
+.hc-textarea {
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-border-strong);
+  border-radius: 6px;
+  color: var(--hc-text);
+  font: inherit;
+  outline: none;
+  padding: 12px 14px;
+  resize: vertical;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+  width: 100%;
+}
+
+.hc-textarea:focus {
+  border-color: var(--hc-primary);
+  box-shadow: 0 0 0 4px var(--hc-focus-ring);
+}
+
+.hc-checkbox {
+  align-items: center;
+  color: var(--hc-text);
+  cursor: pointer;
+  display: flex;
+  font-weight: 700;
+  gap: 10px;
+}
+
+.hc-checkbox input {
+  accent-color: var(--hc-primary);
+  height: 18px;
+  width: 18px;
+}
+
+.hc-time {
+  border: 1px solid var(--hc-border-strong);
+  border-radius: 6px;
+  min-height: 44px;
+  width: auto;
+}
+
+.hc-time:focus {
+  border-color: var(--hc-primary);
+  box-shadow: 0 0 0 3px var(--hc-focus-ring);
+}
+
+.member-form,
+.explore-form {
+  align-items: end;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr auto auto;
+}
+
+.explore-form {
+  grid-template-columns: 1fr 220px auto;
+}
+
+/* Modal */
+.hc-modal-overlay {
+  align-items: flex-start;
+  background: rgba(23, 32, 51, 0.45);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 48px 18px;
+  position: fixed;
+  z-index: 100;
+}
+
+.hc-modal {
+  background: var(--hc-surface);
+  border-radius: 10px;
+  box-shadow: var(--hc-shadow-card);
+  display: flex;
+  flex-direction: column;
+  max-width: 620px;
+  width: 100%;
+}
+
+.hc-modal-header {
+  align-items: center;
+  border-bottom: 1px solid var(--hc-border);
+  display: flex;
+  justify-content: space-between;
+  padding: 18px 22px;
+}
+
+.hc-modal-header h2 {
+  color: var(--hc-text);
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.hc-modal-body {
+  padding: 22px;
+}
+
+.hc-modal-footer {
+  border-top: 1px solid var(--hc-border);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 16px 22px;
+}
+
+/* Estados de datos */
+.data-state {
+  align-items: center;
+  color: var(--hc-text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: center;
+  padding: 56px 24px;
+  text-align: center;
+}
+
+.data-state svg {
+  color: var(--hc-text-muted);
+}
+
+.data-state-error {
+  color: var(--hc-danger);
+}
+
+.data-state-error svg {
+  color: var(--hc-danger);
+}
+
+.data-state-spin {
+  animation: hc-spin 900ms linear infinite;
+  color: var(--hc-primary);
+}
+
+@keyframes hc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Agenda */
+.hours-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.hours-row {
+  align-items: center;
+  border: 1px solid var(--hc-border);
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr auto auto auto;
+  padding: 8px 12px;
+}
+
+.hours-row-off {
+  background: var(--hc-surface-alt);
+  opacity: 0.75;
+}
+
+.hours-day {
+  font-weight: 800;
+}
+
+.hours-sep {
+  color: var(--hc-text-muted);
+}
+
+.exception-form {
+  border-bottom: 1px solid var(--hc-border);
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+}
+
+.exception-list {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.exception-list li {
+  align-items: center;
+  border: 1px solid var(--hc-border);
+  border-radius: 8px;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 10px 14px;
+}
+
+.exception-list li > div {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.exception-desc {
+  color: var(--hc-text-secondary);
+  font-size: 0.88rem;
+}
+
+.member-identity {
+  display: inline-grid;
+  gap: 1px;
+}
+
+.member-identity strong {
+  color: var(--hc-text);
+  font-size: 0.92rem;
+}
+
+.member-identity > span {
+  color: var(--hc-text-secondary);
+  font-size: 0.82rem;
+}
+
+/* Organización + tarjetas de exploración */
+.org-summary {
+  align-items: center;
+  border-bottom: 1px solid var(--hc-border);
+  display: flex;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+}
+
+.org-summary-mark {
+  align-items: center;
+  background: var(--hc-primary-soft);
+  border-radius: 10px;
+  color: var(--hc-primary);
+  display: inline-flex;
+  height: 46px;
+  justify-content: center;
+  width: 46px;
+}
+
+.org-summary > div {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 2px;
+}
+
+.org-summary strong {
+  color: var(--hc-text);
+  font-size: 1.05rem;
+}
+
+.org-slug {
+  color: var(--hc-text-muted);
+  font-size: 0.84rem;
+}
+
+.offering-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.offering-card {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+}
+
+.offering-card-head {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.offering-card-head h3 {
+  color: var(--hc-text);
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+.offering-tenant,
+.offering-desc {
+  color: var(--hc-text-secondary);
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.offering-tenant {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+.offering-card-foot {
+  align-items: center;
+  border-top: 1px solid var(--hc-border);
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  padding-top: 12px;
+}
+
+.offering-card-foot span {
+  align-items: center;
+  color: var(--hc-text-secondary);
+  display: flex;
+  font-size: 0.88rem;
+  gap: 6px;
+}
+
+.offering-card-foot strong {
+  color: var(--hc-primary);
+  font-size: 1.05rem;
+}
+
+/* Loading panel centrado */
+.loading-panel {
+  padding: 24px 32px;
+  font-weight: 700;
+  color: var(--hc-text-secondary);
+}
+
+/* Toasts */
+.hc-toasts {
+  bottom: 24px;
+  display: grid;
+  gap: 10px;
+  position: fixed;
+  right: 24px;
+  width: min(360px, calc(100vw - 32px));
+  z-index: 200;
+}
+
+.hc-toast {
+  align-items: center;
+  animation: hc-toast-in 180ms ease;
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-border);
+  border-left-width: 4px;
+  border-radius: 8px;
+  box-shadow: var(--hc-shadow-card);
+  color: var(--hc-text);
+  display: flex;
+  font-size: 0.9rem;
+  font-weight: 700;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+.hc-toast span {
+  flex: 1 1 auto;
+}
+
+.hc-toast-success {
+  border-left-color: var(--hc-success);
+}
+.hc-toast-success svg {
+  color: var(--hc-success);
+}
+.hc-toast-error {
+  border-left-color: var(--hc-danger);
+}
+.hc-toast-error svg {
+  color: var(--hc-danger);
+}
+.hc-toast-info {
+  border-left-color: var(--hc-info);
+}
+.hc-toast-info svg {
+  color: var(--hc-info);
+}
+
+.hc-toast-close {
+  background: transparent;
+  border: 0;
+  color: var(--hc-text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  padding: 2px;
+}
+
+.hc-toast-close:hover {
+  color: var(--hc-text);
+}
+
+@keyframes hc-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.confirm-message {
+  color: var(--hc-text-secondary);
+  margin: 0;
+}
+
+/* Barra de herramientas de tabla (busqueda + conteo) */
+.table-toolbar {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--hc-border);
+}
+
+.hc-search {
+  max-width: 320px;
+}
+
+.table-toolbar-count {
+  color: var(--hc-text-muted);
+  flex: 0 0 auto;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Paginacion */
+.hc-pagination {
+  align-items: center;
+  border-top: 1px solid var(--hc-border);
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+  padding: 12px 18px;
+}
+
+.hc-pagination-info {
+  color: var(--hc-text-secondary);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.hc-pagination-controls {
+  display: inline-flex;
+  gap: 4px;
+}
+
+/* Combobox (selector con busqueda) */
+.hc-combobox {
+  position: relative;
+}
+
+.hc-combobox-list {
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-border);
+  border-radius: 8px;
+  box-shadow: var(--hc-shadow-card);
+  display: grid;
+  left: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 6px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 60;
+}
+
+.hc-combobox-option {
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  text-align: left;
+  width: 100%;
+}
+
+.hc-combobox-option:hover {
+  background: var(--hc-primary-soft);
+}
+
+.hc-combobox-option strong {
+  color: var(--hc-text);
+  font-size: 0.92rem;
+}
+
+.hc-combobox-option span {
+  color: var(--hc-text-secondary);
+  font-size: 0.82rem;
+}
+
+.hc-combobox-empty {
+  color: var(--hc-text-muted);
+  font-size: 0.88rem;
+  padding: 12px 10px;
+  text-align: center;
+}
+
+.hc-combobox-selected {
+  align-items: center;
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-border-strong);
+  border-radius: 6px;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  min-height: 48px;
+  padding: 6px 8px 6px 14px;
+}
+
+.hc-combobox-selected > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.hc-combobox-selected strong {
+  color: var(--hc-text);
+  font-size: 0.92rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hc-combobox-selected span {
+  color: var(--hc-text-secondary);
+  font-size: 0.82rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Indicador de modulo pendiente en el sidebar */
+.app-sidebar-pending {
+  background: var(--hc-warning);
+  border-radius: 999px;
+  height: 8px;
+  margin-left: auto;
+  width: 8px;
+}
+
+/* Pantalla de modulo en construccion */
+.placeholder-panel {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  max-width: 720px;
+}
+
+.placeholder-mark {
+  align-items: center;
+  background: var(--hc-accent-soft);
+  border-radius: 12px;
+  color: var(--hc-accent-hover);
+  display: inline-flex;
+  height: 56px;
+  justify-content: center;
+  margin-bottom: 4px;
+  width: 56px;
+}
+
+.placeholder-panel h2 {
+  color: var(--hc-text);
+  font-size: 1.25rem;
+  margin: 4px 0 0;
+}
+
+.placeholder-service {
+  color: var(--hc-text-secondary);
+  margin: 0;
+}
+
+.placeholder-service code,
+.account-userid code {
+  background: var(--hc-surface-alt);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  padding: 2px 6px;
+}
+
+.placeholder-planned {
+  color: var(--hc-text);
+  font-weight: 800;
+  margin: 12px 0 0;
+}
+
+.placeholder-list {
+  color: var(--hc-text-secondary);
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+/* Cuenta */
+.account-userid {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.account-hint {
+  color: var(--hc-text-secondary);
+  font-size: 0.9rem;
+  margin: 14px 0 0;
+}
+
+/* Enlace de retorno al inicio desde el login */
+.login-back {
+  align-items: center;
+  color: var(--hc-text-secondary);
+  display: inline-flex;
+  font-size: 0.88rem;
+  font-weight: 800;
+  gap: 6px;
+  left: 32px;
+  position: absolute;
+  text-decoration: none;
+  top: 26px;
+  z-index: 1;
+}
+
+.login-back:hover {
+  color: var(--hc-primary);
+}
+
+@media (max-width: 900px) {
+  .login-back {
+    left: 18px;
+    top: 18px;
+  }
+}
+
+/* Cambio login / registro */
+.login-switch {
+  color: var(--hc-text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+  text-align: center;
+}
+
+.login-switch-link {
+  background: transparent;
+  border: 0;
+  color: var(--hc-primary);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  padding: 0;
+}
+
+.login-switch-link:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .app-sidebar {
+    height: 100vh;
+    left: 0;
+    position: fixed;
+    top: 0;
+    transform: translateX(-100%);
+    transition: transform 200ms ease;
+    width: 270px;
+    z-index: 40;
+  }
+
+  .app-shell-mobile-open .app-sidebar {
+    transform: translateX(0);
+  }
+
+  .app-shell-mobile-open .app-shell-scrim {
+    background: rgba(23, 32, 51, 0.4);
+    display: block;
+    inset: 0;
+    position: fixed;
+    z-index: 30;
+  }
+
+  .app-topbar-toggle {
+    display: inline-flex;
+  }
+
+  .app-content {
+    padding: 20px;
+  }
+
+  .page-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .member-form,
+  .explore-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===========================================================================
+   Usabilidad y accesibilidad
+   =========================================================================== */
+
+/* Flecha consistente en todos los <select> (oculta la nativa y dibuja la propia) */
+.hc-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237a8599' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  cursor: pointer;
+  padding-right: 36px;
+}
+
+/* Alturas de control consistentes (inputs, selects, time) */
+.hc-time {
+  min-height: 46px;
+}
+
+/* Anillos de foco visibles para elementos interactivos no-button (teclado) */
+.app-sidebar-link:focus-visible,
+.quicklink:focus-visible,
+.user-menu-item:focus-visible,
+.user-menu-trigger:focus-visible,
+.language-option:focus-visible,
+.hc-combobox-option:focus-visible,
+.hc-toast-close:focus-visible,
+.login-switch-link:focus-visible,
+.hc-pagination .hc-icon-button:focus-visible,
+a:focus-visible {
+  outline: none;
+  border-radius: 6px;
+  box-shadow: 0 0 0 3px var(--hc-focus-ring);
+}
+
+/* Realimentación táctil: botón presionado vuelve a su sitio */
+.hc-button:active {
+  transform: translateY(0);
+}
+
+/* Tablas: scroll horizontal en pantallas estrechas en vez de aplastar columnas */
+.hc-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hc-table-scroll .hc-table {
+  min-width: 600px;
+}
+
+/* La barra de búsqueda de tabla se reordena en pantallas pequeñas */
+.table-toolbar {
+  flex-wrap: wrap;
+}
+
+/* Scrollbars discretas en listas/popovers */
+.hc-combobox-list,
+.app-sidebar,
+.hc-table-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--hc-border-strong) transparent;
+}
+
+/* Respeta la preferencia de movimiento reducido del sistema */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .hc-button:hover,
+  .quicklink:hover {
+    transform: none;
+  }
+}
+
+/* Evita el zoom automático de iOS al enfocar inputs (fuente < 16px) */
+@media (max-width: 600px) {
+  .hc-input-shell input,
+  .hc-select,
+  .hc-textarea,
+  .app-nav-search input {
+    font-size: 16px;
+  }
+}
+
+/* ===========================================================================
+   Identidad "Cronógrafo de Hermes" aplicada a la app
+   Trae el carácter de la landing (Fraunces + mono + dorado) manteniendo el
+   dashboard claro y legible. Solo afecta titulares, etiquetas y acentos.
+   =========================================================================== */
+
+/* Titulares editoriales en Fraunces */
+.page-header h1,
+.panel-heading h2,
+.quicklinks-title,
+.dashboard-hero h1,
+.login-card-header h2,
+.hero-copy h1,
+.hc-modal-header h2,
+.org-summary strong,
+.status-panel h2 {
+  font-family: var(--hc-font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Números de métricas: serif grande, con presencia */
+.summary-card strong {
+  font-family: var(--hc-font-display);
+  font-weight: 600;
+  font-size: 2rem;
+}
+
+/* Etiquetas tipo "lectura de instrumento" en mono */
+.eyebrow,
+.app-sidebar-role,
+.summary-card span,
+.session-details dt,
+.hc-table thead th,
+.table-toolbar-count,
+.hc-pagination-info {
+  font-family: var(--hc-font-mono);
+  letter-spacing: 0.12em;
+}
+
+.eyebrow {
+  color: var(--hc-accent-hover);
+  letter-spacing: 0.22em;
+}
+
+.summary-card span {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.74rem;
+}
+
+.hc-table thead th {
+  font-weight: 700;
+}
+
+/* Marca de acento dorado bajo el encabezado de página */
+.page-header-copy {
+  border-left: 2px solid var(--hc-accent);
+  padding-left: 16px;
+}
+
+/* Hero del panel: cielo nocturno como la landing, con la firma del dial */
+.dashboard-hero {
+  background:
+    radial-gradient(120% 130% at 85% 20%, var(--hc-midnight-2), var(--hc-midnight) 65%);
+  border: 1px solid rgba(242, 212, 131, 0.18);
+  overflow: hidden;
+  position: relative;
+}
+
+.dashboard-hero h1 {
+  color: #fff;
+}
+
+.dashboard-hero-dial {
+  bottom: -38%;
+  height: 280px;
+  opacity: 0.5;
+  pointer-events: none;
+  position: absolute;
+  right: -6%;
+  width: 280px;
+}
+
+.dashboard-hero-dial .lp-dial-hand {
+  animation: none;
+  transform: rotate(58deg);
+}
+
+.dashboard-hero > div {
+  position: relative;
+  z-index: 1;
+}
+
+/* Acento dorado en el ítem activo del sidebar (barra lateral) */
+.app-sidebar-link-active {
+  box-shadow: inset 3px 0 0 var(--hc-accent);
+}
+
+/* Login sobre cielo nocturno, para enlazar con la landing */
+.login-shell {
+  background:
+    radial-gradient(120% 120% at 50% 0%, var(--hc-midnight-2), var(--hc-midnight) 70%);
+}
+
+.login-shell .login-back {
+  color: rgba(242, 212, 131, 0.85);
+}
+
+.login-shell .login-back:hover {
+  color: #fff;
+}
+
+.login-card {
+  box-shadow: 0 30px 80px rgba(1, 12, 35, 0.5);
+  position: relative;
+  z-index: 1;
+}
+
+/* Dial como marca de agua tenue del cielo nocturno del login */
+.login-shell-dial {
+  height: min(70vh, 620px);
+  left: 50%;
+  opacity: 0.07;
+  pointer-events: none;
+  position: absolute;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  width: min(70vh, 620px);
+}
+
+.login-shell-dial .lp-dial-hand {
+  animation: none;
+  transform: rotate(58deg);
+}
+
+/* ===========================================================================
+   El dial en toda la app + formularios más bonitos
+   =========================================================================== */
+
+/* El dial vive sobre un disco de cielo nocturno (sus colores son para fondo oscuro) */
+.hc-modal-dial,
+.data-state-dial,
+.placeholder-dial {
+  align-items: center;
+  background: radial-gradient(120% 120% at 70% 25%, var(--hc-midnight-2), var(--hc-midnight) 70%);
+  border: 1px solid rgba(242, 212, 131, 0.22);
+  border-radius: 50%;
+  display: inline-flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.hc-modal-dial {
+  height: 34px;
+  padding: 3px;
+  width: 34px;
+}
+
+.data-state-dial {
+  height: 60px;
+  padding: 6px;
+  width: 60px;
+}
+
+.placeholder-dial {
+  box-shadow: 0 18px 48px rgba(8, 22, 51, 0.28);
+  height: 132px;
+  margin-bottom: 8px;
+  padding: 12px;
+  width: 132px;
+}
+
+.hc-modal-dial .lp-dial,
+.data-state-dial .lp-dial,
+.placeholder-dial .lp-dial {
+  filter: none;
+  height: 100%;
+  width: 100%;
+}
+
+/* Spinner: la aguja gira en bucle */
+.hc-dial-spinner .lp-dial-hand {
+  animation: hc-dial-rotate 2s linear infinite;
+}
+
+@keyframes hc-dial-rotate {
+  to {
+    transform: rotate(418deg);
+  }
+}
+
+/* Modal: cabecera con el glifo + filo dorado */
+.hc-modal-title {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  min-width: 0;
+}
+
+.hc-modal-header {
+  box-shadow: inset 0 -1px 0 0 var(--hc-border), inset 0 -3px 0 -1px rgba(224, 170, 44, 0.35);
+}
+
+/* ---- Formularios bonitos ---- */
+.hc-field-label {
+  color: var(--hc-text-secondary);
+  font-family: var(--hc-font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hc-input-shell {
+  background: var(--hc-surface);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.hc-input-shell:hover:not(:focus-within) {
+  border-color: var(--hc-text-muted);
+}
+
+/* El icono guía se tiñe de azul al enfocar el campo */
+.hc-input-shell:focus-within .hc-input-icon {
+  color: var(--hc-primary);
+}
+
+/* Pista y error con un toque más fino */
+.hc-field-message {
+  letter-spacing: 0.01em;
+}
+
+/* Panel de formulario: filo dorado superior sutil */
+.form-panel {
+  border-top: 3px solid var(--hc-accent);
+}
+
+/* Tarjeta de tabla y paneles: encabezado de sección con acento */
+.panel-heading {
+  border-bottom: 1px solid var(--hc-border);
+  padding-bottom: 14px;
+}
+
+/* La rejilla de horas se ve como filas de instrumento */
+.hours-row {
+  transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.hours-row:not(.hours-row-off):hover {
+  border-color: var(--hc-border-strong);
+}

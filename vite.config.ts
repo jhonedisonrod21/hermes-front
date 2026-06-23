@@ -21,6 +21,12 @@ export default defineConfig(({ mode }) => {
           target: gatewayTarget,
           changeOrigin: true,
           secure: false
+        },
+        // Registro publico de invitados: /identity/users/register es permitAll en el gateway.
+        '/identity': {
+          target: gatewayTarget,
+          changeOrigin: true,
+          secure: false
         }
       }
     }
