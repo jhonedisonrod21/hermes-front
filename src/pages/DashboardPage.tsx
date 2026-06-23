@@ -12,7 +12,7 @@ export function DashboardPage() {
   const profile = session?.profile;
   const userLabel = profile?.email ?? profile?.preferred_username ?? profile?.sub ?? t('dashboard:fallback.user');
   const kind = actorKind(profile);
-  const isTenant = kind === 'tenant';
+  const isTenant = kind === 'tenant-admin' || kind === 'tenant-partner';
   const scopeLabel =
     kind === 'system-admin'
       ? t('dashboard:scope.platform')

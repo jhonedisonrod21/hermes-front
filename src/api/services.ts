@@ -1,16 +1,29 @@
 import { api, buildQuery, type Page } from './http';
 import type {
+  AppointmentBookingRequest,
+  AppointmentResponse,
+  AvailableSlot,
   BusinessHoursDto,
   BusinessScheduleRequest,
+  CheckoutRequest,
+  CheckoutResponse,
+  FinancialInstitution,
   MembershipCreateRequest,
   MembershipResponse,
   OfferingRequest,
   OfferingResponse,
   OfferingSearchResult,
+  OrganizationResponse,
+  PaymentResponse,
+  RescheduleRequest,
   ScheduleExceptionRequest,
   ScheduleExceptionResponse,
+  SelfProfileResponse,
+  SelfProfileUpdateRequest,
   TenantContactUpdateRequest,
   TenantCreateRequest,
+  TenantPaymentConfigRequest,
+  TenantPaymentConfigResponse,
   TenantResponse,
   TenantStatusUpdateRequest,
   TenantUpdateRequest,
@@ -27,6 +40,8 @@ const pageQuery = (p: PageParams = {}) => buildQuery({ page: p.page, size: p.siz
 export const catalogApi = {
   listOfferings: (p?: PageParams) => api.get<Page<OfferingResponse>>(`/catalog/offerings${pageQuery(p)}`),
   getOffering: (id: string) => api.get<OfferingResponse>(`/catalog/offerings/${id}`),
+  // Detalle público (cualquier usuario autenticado) para la pantalla de reserva.
+  getPublicOffering: (id: string) => api.get<OfferingResponse>(`/catalog/search/${id}`),
   createOffering: (body: OfferingRequest) => api.post<OfferingResponse>('/catalog/offerings', body),
   updateOffering: (id: string, body: OfferingRequest) => api.put<OfferingResponse>(`/catalog/offerings/${id}`, body),
   setActive: (id: string, active: boolean) => api.patch<OfferingResponse>(`/catalog/offerings/${id}/active`, { active }),
@@ -43,7 +58,7 @@ export const catalogApi = {
     )
 };
 
-// ---- Agenda ----
+// ---- Agenda: horario del tenant ----
 export const schedulingApi = {
   getHours: () => api.get<BusinessHoursDto[]>('/scheduling/hours'),
   saveHours: (body: BusinessScheduleRequest) => api.put<BusinessHoursDto[]>('/scheduling/hours', body),
@@ -54,10 +69,33 @@ export const schedulingApi = {
   deleteException: (id: string) => api.delete<void>(`/scheduling/exceptions/${id}`)
 };
 
+// ---- Citas: reserva y gestión del cliente (GUEST_USER) ----
+export const appointmentsApi = {
+  availability: (offeringId: string, date: string) =>
+    api.get<AvailableSlot[]>(`/scheduling/offerings/${offeringId}/availability${buildQuery({ date })}`),
+  book: (body: AppointmentBookingRequest) => api.post<AppointmentResponse>('/scheduling/appointments', body),
+  listMine: (p?: PageParams) => api.get<Page<AppointmentResponse>>(`/scheduling/appointments${pageQuery(p)}`),
+  get: (id: string) => api.get<AppointmentResponse>(`/scheduling/appointments/${id}`),
+  cancel: (id: string) => api.post<AppointmentResponse>(`/scheduling/appointments/${id}/cancel`),
+  reschedule: (id: string, body: RescheduleRequest) =>
+    api.post<AppointmentResponse>(`/scheduling/appointments/${id}/reschedule`, body)
+};
+
+// ---- Citas: gestión por el establecimiento (TENANT_ADMIN / TENANT_PARTNER) ----
+export const tenantAppointmentsApi = {
+  list: (p?: PageParams) => api.get<Page<AppointmentResponse>>(`/scheduling/me/appointments${pageQuery(p)}`),
+  get: (id: string) => api.get<AppointmentResponse>(`/scheduling/me/appointments/${id}`),
+  cancel: (id: string) => api.post<AppointmentResponse>(`/scheduling/me/appointments/${id}/cancel`),
+  reschedule: (id: string, body: RescheduleRequest) =>
+    api.post<AppointmentResponse>(`/scheduling/me/appointments/${id}/reschedule`, body)
+};
+
 // ---- Tenant ----
 export const tenantApi = {
   getMine: () => api.get<TenantResponse>('/tenant/me'),
   updateMine: (body: TenantContactUpdateRequest) => api.put<TenantResponse>('/tenant/me', body),
+  // Organizaciones a las que pertenezco (selector de tenant activo).
+  listMyOrganizations: () => api.get<OrganizationResponse[]>('/tenant/me/organizations'),
   listMyMembers: (p?: PageParams) => api.get<Page<MembershipResponse>>(`/tenant/me/members${pageQuery(p)}`),
   addMyMember: (body: MembershipCreateRequest) => api.post<MembershipResponse>('/tenant/me/members', body),
   removeMyMember: (userId: string) => api.delete<void>(`/tenant/me/members/${userId}`),
@@ -79,8 +117,29 @@ export const tenantApi = {
 
 // ---- Identidad ----
 export const identityApi = {
+  // Perfil propio del usuario autenticado (incluye teléfono para recordatorios SMS).
+  getMyProfile: () => api.get<SelfProfileResponse>('/identity/me'),
+  updateMyProfile: (body: SelfProfileUpdateRequest) => api.put<SelfProfileResponse>('/identity/me', body),
+  // Administración de plataforma (SYSTEM_ADMIN)
   listUsers: (p?: PageParams) => api.get<Page<UserResponse>>(`/identity/admin/users${pageQuery(p)}`),
   getUser: (id: string) => api.get<UserResponse>(`/identity/admin/users/${id}`),
   updateUser: (id: string, body: UserUpdateRequest) => api.put<UserResponse>(`/identity/admin/users/${id}`, body),
   setLock: (id: string, body: UserLockRequest) => api.patch<UserResponse>(`/identity/admin/users/${id}/lock`, body)
+};
+
+// ---- Pagos PSE (hermes-payment-service) ----
+export const paymentApi = {
+  // Configuración de cobro del tenant (solo TENANT_ADMIN). Las credenciales se guardan cifradas.
+  getMyConfig: () => api.get<TenantPaymentConfigResponse>('/payment/me/payment-config'),
+  saveMyConfig: (body: TenantPaymentConfigRequest) =>
+    api.put<TenantPaymentConfigResponse>('/payment/me/payment-config', body),
+  deleteMyConfig: () => api.delete<void>('/payment/me/payment-config'),
+  // Cobro de una cita por el cliente (PSE).
+  banks: (appointmentId: string) =>
+    api.get<FinancialInstitution[]>(`/payment/banks${buildQuery({ appointmentId })}`),
+  checkout: (body: CheckoutRequest) => api.post<CheckoutResponse>('/payment/checkout', body),
+  getPayment: (id: string) => api.get<PaymentResponse>(`/payment/payments/${id}`),
+  listMyPayments: (p?: PageParams) => api.get<Page<PaymentResponse>>(`/payment/payments${pageQuery(p)}`),
+  // Pagos recibidos por el establecimiento (solo TENANT_ADMIN).
+  listReceivedPayments: (p?: PageParams) => api.get<Page<PaymentResponse>>(`/payment/me/payments${pageQuery(p)}`)
 };

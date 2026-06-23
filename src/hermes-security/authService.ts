@@ -106,6 +106,23 @@ export const authService = {
     return user.authenticated === false ? null : toSession(user);
   },
 
+  /** Cambia la organización activa: el BFF re-emite y reemplaza el token; devuelve la sesión actualizada. */
+  async switchTenant(tenantId: string): Promise<HermesSession> {
+    const response = await fetch(oauthEndpoints.bffSwitchTenant, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tenantId }),
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(detail || `No se pudo cambiar de organización (${response.status})`);
+    }
+
+    return toSession((await response.json()) as BffSessionUser);
+  },
+
   async logout() {
     await fetch(oauthEndpoints.bffLogout, {
       method: 'POST',

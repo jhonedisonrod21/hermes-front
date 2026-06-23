@@ -12,6 +12,7 @@ export const oauthEndpoints = {
   sessionLogin: `${authConfig.authBaseUrl}/session/login`,
   bffLogin: `${authConfig.bffBaseUrl}/oauth2/authorization/${authConfig.bffClientRegistrationId}`,
   bffSession: `${authConfig.bffBaseUrl}/session/me`,
+  bffSwitchTenant: `${authConfig.bffBaseUrl}/session/switch-tenant`,
   bffLogout: `${authConfig.bffBaseUrl}/session/logout`,
   register: `${authConfig.identityBaseUrl}/users/register`
 };
