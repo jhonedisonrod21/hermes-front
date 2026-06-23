@@ -22,6 +22,7 @@ import type {
   ScheduleExceptionResponse,
   SelfProfileResponse,
   SelfProfileUpdateRequest,
+  UserCard,
   TenantContactUpdateRequest,
   TenantCreateRequest,
   TenantPaymentConfigRequest,
@@ -125,6 +126,11 @@ export const identityApi = {
   // Perfil propio del usuario autenticado (incluye teléfono para recordatorios SMS).
   getMyProfile: () => api.get<SelfProfileResponse>('/identity/me'),
   updateMyProfile: (body: SelfProfileUpdateRequest) => api.put<SelfProfileResponse>('/identity/me', body),
+  // Directorio: resolver id -> nombre/correo en pantallas de citas y pagos del establecimiento
+  // (TENANT_ADMIN / TENANT_PARTNER). 'resolveUsers' resuelve un lote para listados.
+  getUserCard: (id: string) => api.get<UserCard>(`/identity/directory/users/${id}`),
+  resolveUsers: (ids: string[]) =>
+    api.get<UserCard[]>(`/identity/directory/users${buildQuery({ ids: ids.join(',') })}`),
   // Cambio de contraseña por código al correo (endpoints públicos en el gateway).
   requestPasswordReset: (body: PasswordResetRequest) =>
     api.post<void>('/identity/users/password-reset/request', body),

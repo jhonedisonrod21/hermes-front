@@ -187,6 +187,9 @@ export type SelfProfileResponse = {
 
 export type SelfProfileUpdateRequest = { phone?: string };
 
+/** Ficha mínima de un usuario para resolver id -> nombre en pantallas de citas/pagos. */
+export type UserCard = { id: string; username: string; email: string };
+
 // ---- Cambio / recuperación de contraseña (público en el gateway) ----
 export type PasswordResetRequest = { email: string };
 export type PasswordResetConfirmRequest = { token: string; newPassword: string };
