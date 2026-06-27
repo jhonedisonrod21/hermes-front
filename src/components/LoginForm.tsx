@@ -8,7 +8,7 @@ import { Button, IconButton, TextField } from './ui';
 const INITIAL_USERNAME = import.meta.env.DEV ? 'admin@hermes.local' : '';
 const INITIAL_PASSWORD = import.meta.env.DEV ? 'admin123' : '';
 
-export function LoginForm() {
+export function LoginForm({ onForgot }: { onForgot?: () => void }) {
   const { login } = useAuth();
   const { t } = useTranslation('auth');
   const [username, setUsername] = useState(INITIAL_USERNAME);
@@ -69,6 +69,14 @@ export function LoginForm() {
         type={showPassword ? 'text' : 'password'}
         value={password}
       />
+
+      {onForgot ? (
+        <div className="login-forgot">
+          <button type="button" className="login-switch-link" onClick={onForgot}>
+            {t('login.forgot')}
+          </button>
+        </div>
+      ) : null}
 
       {error ? (
         <p className="login-error" role="alert">

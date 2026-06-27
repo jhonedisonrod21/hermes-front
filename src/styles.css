@@ -566,6 +566,49 @@ p {
   font-size: 0.88rem;
 }
 
+/* Recuperación de contraseña en la pantalla de acceso */
+.login-hint {
+  color: var(--hc-text-muted);
+  font-size: 0.88rem;
+  margin: -4px 0 0;
+}
+.login-note {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--hc-success-soft);
+  color: var(--hc-success);
+  font-size: 0.88rem;
+}
+.login-forgot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -10px;
+}
+.login-forgot .login-switch-link {
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+.login-resend {
+  justify-self: center;
+  font-size: 0.88rem;
+}
+.login-done {
+  align-items: center;
+  text-align: center;
+}
+.login-done-mark {
+  color: var(--hc-success);
+  display: inline-flex;
+}
+.login-done strong {
+  font-size: 1.1rem;
+}
+.login-done p {
+  color: var(--hc-text-secondary);
+  margin: 0;
+}
+
 .app-layout {
   background: var(--hc-bg);
   display: grid;

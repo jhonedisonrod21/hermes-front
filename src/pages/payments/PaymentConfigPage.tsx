@@ -10,7 +10,7 @@ import { useToast } from '../../components/feedback/toast';
 import { useConfirm } from '../../components/feedback/confirm';
 import { PaymentsList } from './PaymentsList';
 import { ApiError } from '../../api/http';
-import { paymentApi } from '../../api/services';
+import { paymentApi, reportsApi } from '../../api/services';
 import type { PaymentProvider, TenantPaymentConfigRequest, TenantPaymentConfigResponse } from '../../api/types';
 import { formatDate } from '../../lib/format';
 
@@ -188,6 +188,7 @@ export function PaymentConfigPage() {
       <PaymentsList
         title={t('payments:received.title')}
         loader={() => paymentApi.listReceivedPayments({ size: 50, sort: 'createdAt,desc' })}
+        receiptLoader={reportsApi.receiptBlob}
       />
     </div>
   );

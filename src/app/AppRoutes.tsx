@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { AppShell } from '../components/AppShell';
 import { LandingPage } from '../pages/landing/LandingPage';
 import { LoginPage } from '../pages/LoginPage';
+import { ResetPasswordPage } from '../pages/ResetPasswordPage';
 import { OverviewPage } from '../pages/OverviewPage';
 import { OfferingsPage } from '../pages/catalog/OfferingsPage';
 import { SchedulePage } from '../pages/scheduling/SchedulePage';
@@ -37,6 +38,7 @@ export function AppRoutes() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/acceso" element={<LoginPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );

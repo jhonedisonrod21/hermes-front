@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../../components/LanguageSwitcher';
 import { HermesDial } from '../../components/HermesDial';
+import { LandingServices } from './LandingServices';
 
 const PILLARS = ['catalog', 'schedule', 'team'] as const;
 const STEPS = ['reserved', 'paid', 'attended', 'completed'] as const;
@@ -77,6 +78,9 @@ export function LandingPage() {
           ))}
         </div>
       </section>
+
+      {/* Vitrina de servicios reales (solo si el catálogo público está disponible) */}
+      <LandingServices />
 
       {/* Ciclo de una cita — SÍ es una secuencia: el número codifica el orden real */}
       <section className="lp-lifecycle">

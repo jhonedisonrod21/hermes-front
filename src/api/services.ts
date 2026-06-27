@@ -1,4 +1,4 @@
-import { api, buildQuery, type Page } from './http';
+import { api, buildQuery, fetchBlob, type Page } from './http';
 import type {
   AppointmentBookingRequest,
   AppointmentResponse,
@@ -31,6 +31,7 @@ import type {
   TenantUpdateRequest,
   UserLockRequest,
   UserResponse,
+  UserCardResponse,
   UserUpdateRequest
 } from './types';
 
@@ -130,6 +131,14 @@ export const identityApi = {
     api.post<void>('/identity/users/password-reset/request', body),
   confirmPasswordReset: (body: PasswordResetConfirmRequest) =>
     api.post<void>('/identity/users/password-reset/confirm', body),
+  // Cambio de contraseña del usuario autenticado (exige la contraseña actual).
+  changePassword: (body: { currentPassword: string; newPassword: string }) =>
+    api.put<void>('/identity/me/password', body),
+  // Directorio para el personal del tenant: resuelve id de cliente -> nombre/correo (calendar:read).
+  getUserCard: (id: string) => api.get<UserCardResponse>(`/identity/directory/users/${id}`),
+  // El backend espera los ids separados por comas literales (no se debe codificar la coma).
+  getUserCards: (ids: string[]) =>
+    api.get<UserCardResponse[]>(`/identity/directory/users?ids=${ids.map(encodeURIComponent).join(',')}`),
   // Administración de plataforma (SYSTEM_ADMIN)
   listUsers: (p?: PageParams) => api.get<Page<UserResponse>>(`/identity/admin/users${pageQuery(p)}`),
   getUser: (id: string) => api.get<UserResponse>(`/identity/admin/users/${id}`),
@@ -152,4 +161,15 @@ export const paymentApi = {
   listMyPayments: (p?: PageParams) => api.get<Page<PaymentResponse>>(`/payment/payments${pageQuery(p)}`),
   // Pagos recibidos por el establecimiento (solo TENANT_ADMIN).
   listReceivedPayments: (p?: PageParams) => api.get<Page<PaymentResponse>>(`/payment/me/payments${pageQuery(p)}`)
+};
+
+// ---- Reportes en PDF (hermes-reports) — TENANT_ADMIN / TENANT_PARTNER ----
+// Las variantes *Blob traen el PDF para previsualizarlo embebido; downloadFile lo descarga directo.
+export const reportsApi = {
+  salesBlob: (from: string, to: string) => fetchBlob(`/reports/sales${buildQuery({ from, to })}`),
+  statisticsBlob: (from: string, to: string) => fetchBlob(`/reports/statistics${buildQuery({ from, to })}`),
+  // Comprobante de un pago. El backend valida la pertenencia: el dueño del pago (cliente) o su
+  // establecimiento (tenant). Misma ruta para ambos; el invitado solo accede a los suyos.
+  receiptBlob: (paymentId: string) => fetchBlob(`/reports/payments/${paymentId}/receipt`),
+  myReceiptBlob: (paymentId: string) => fetchBlob(`/reports/payments/${paymentId}/receipt`)
 };

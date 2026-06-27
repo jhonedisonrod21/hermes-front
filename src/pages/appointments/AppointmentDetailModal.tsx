@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Modal } from '../../components/Modal';
 import { Badge } from '../../components/ui';
-import type { AppointmentResponse, AppointmentStatus } from '../../api/types';
+import type { AppointmentResponse, AppointmentStatus, UserCardResponse } from '../../api/types';
 import { formatDateTime, formatMoney } from '../../lib/format';
 
 const STATUS_TONE: Record<AppointmentStatus, 'success' | 'warning' | 'danger' | 'info'> = {
@@ -18,10 +18,12 @@ type Props = {
   serviceName: (id: string) => string;
   /** Etiqueta legible de un requisito (key -> label de la oferta). */
   requirementLabel: (offeringId: string, key: string) => string;
+  /** Ficha del cliente (nombre/correo) resuelta desde el directorio; opcional. */
+  customer?: UserCardResponse;
   onClose: () => void;
 };
 
-export function AppointmentDetailModal({ appointment, serviceName, requirementLabel, onClose }: Props) {
+export function AppointmentDetailModal({ appointment, serviceName, requirementLabel, customer, onClose }: Props) {
   const { t, i18n } = useTranslation(['appointments', 'common']);
   const a = appointment;
 
@@ -67,7 +69,18 @@ export function AppointmentDetailModal({ appointment, serviceName, requirementLa
             </div>
             <div>
               <dt>{t('appointments:detail.customer')}</dt>
-              <dd><code>{a.customerUserId}</code></dd>
+              <dd>
+                {customer ? (
+                  <>
+                    {customer.email}
+                    {customer.username && customer.username !== customer.email ? (
+                      <span className="appt-detail-muted"> · {customer.username}</span>
+                    ) : null}
+                  </>
+                ) : (
+                  <code>{a.customerUserId}</code>
+                )}
+              </dd>
             </div>
             {a.createdAt ? (
               <div>

@@ -10,7 +10,7 @@ import { useResource } from '../../hooks/useResource';
 import { useClientTable } from '../../hooks/useClientTable';
 import { useToast } from '../../components/feedback/toast';
 import { useConfirm } from '../../components/feedback/confirm';
-import { catalogApi, tenantAppointmentsApi } from '../../api/services';
+import { catalogApi, identityApi, tenantAppointmentsApi } from '../../api/services';
 import type { AppointmentResponse, AppointmentStatus } from '../../api/types';
 import { formatDateTime, formatMoney } from '../../lib/format';
 
@@ -45,7 +45,6 @@ export function AppointmentsPage() {
   const toast = useToast();
   const confirm = useConfirm();
   const appts = useResource(() => tenantAppointmentsApi.list({ size: 200, sort: 'slotStart,desc' }), []);
-  const offerings = useResource(() => catalogApi.listOfferings({ size: 200 }), []);
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [scope, setScope] = useState<Scope>('');
@@ -53,20 +52,61 @@ export function AppointmentsPage() {
   const [rescheduleOf, setRescheduleOf] = useState<AppointmentResponse | null>(null);
   const [detailOf, setDetailOf] = useState<AppointmentResponse | null>(null);
 
+  const items = appts.data?.content ?? [];
+
+  // El nombre y los requisitos de cada servicio se resuelven por el detalle público de la oferta
+  // (/catalog/search/{id}), accesible tanto al TENANT_ADMIN como al TENANT_PARTNER. El listado
+  // administrativo del catálogo no está permitido al colaborador, por eso no se usa aquí.
+  const offeringIdsKey = useMemo(
+    () => [...new Set(items.map((a) => a.offeringId))].sort().join(','),
+    [items]
+  );
+  const offerings = useResource(
+    () =>
+      Promise.all(
+        (offeringIdsKey ? offeringIdsKey.split(',') : []).map((id) =>
+          catalogApi.getPublicOffering(id).catch(() => null)
+        )
+      ),
+    [offeringIdsKey]
+  );
   const offeringName = useMemo(() => {
-    const map = new Map((offerings.data?.content ?? []).map((o) => [o.id, o.name]));
+    const map = new Map((offerings.data ?? []).filter(Boolean).map((o) => [o!.id, o!.name]));
     return (id: string) => map.get(id) ?? id.slice(0, 8);
   }, [offerings.data]);
 
   // Etiqueta legible de cada requisito (offeringId -> key -> label) para el detalle.
   const requirementLabel = useMemo(() => {
     const byOffering = new Map(
-      (offerings.data?.content ?? []).map((o) => [o.id, new Map(o.requirements.map((r) => [r.key, r.label]))])
+      (offerings.data ?? [])
+        .filter(Boolean)
+        .map((o) => [o!.id, new Map((o!.requirements ?? []).map((r) => [r.key, r.label]))])
     );
     return (offeringId: string, key: string) => byOffering.get(offeringId)?.get(key) ?? key;
   }, [offerings.data]);
 
-  const items = appts.data?.content ?? [];
+  // Resuelve el contacto del cliente (id -> nombre/correo) en lote desde el directorio del tenant.
+  const customerIdsKey = useMemo(
+    () => [...new Set(items.map((a) => a.customerUserId))].sort().join(','),
+    [items]
+  );
+  const customers = useResource(
+    // El directorio resuelve hasta 100 ids por lote: acotamos para no exceder el límite del backend.
+    () => (customerIdsKey ? identityApi.getUserCards(customerIdsKey.split(',').slice(0, 100)) : Promise.resolve([])),
+    [customerIdsKey]
+  );
+  const customerCard = useMemo(() => {
+    const map = new Map((customers.data ?? []).map((c) => [c.id, c]));
+    return (id: string) => map.get(id);
+  }, [customers.data]);
+  const customerLabel = useCallback(
+    (a: AppointmentResponse) => {
+      const c = customerCard(a.customerUserId);
+      return c?.email || c?.username || `${a.customerUserId.slice(0, 8)}…`;
+    },
+    [customerCard]
+  );
+
   // Filtro por estado + alcance temporal, y orden (próximas/hoy: lo más cercano primero).
   const visible = useMemo(() => {
     const now = new Date();
@@ -83,8 +123,10 @@ export function AppointmentsPage() {
   }, [items, statusFilter, scope]);
   const match = useCallback(
     (a: AppointmentResponse, q: string) =>
-      offeringName(a.offeringId).toLowerCase().includes(q) || a.customerUserId.toLowerCase().includes(q),
-    [offeringName]
+      offeringName(a.offeringId).toLowerCase().includes(q) ||
+      customerLabel(a).toLowerCase().includes(q) ||
+      a.customerUserId.toLowerCase().includes(q),
+    [offeringName, customerLabel]
   );
   const { paged, page, setPage, totalPages, total } = useClientTable(visible, {
     query,
@@ -96,7 +138,8 @@ export function AppointmentsPage() {
     const ok = await confirm({
       title: t('appointments:confirm.cancelTitle'),
       message: t('appointments:confirm.cancelMessage'),
-      confirmLabel: t('appointments:actions.cancel'),
+      confirmLabel: t('appointments:confirm.cancelConfirm'),
+      cancelLabel: t('common:actions.back'),
       danger: true
     });
     if (!ok) return;
@@ -203,7 +246,7 @@ export function AppointmentsPage() {
                 {paged.map((a) => (
                   <tr key={a.id}>
                     <td className="cell-clamp"><strong>{offeringName(a.offeringId)}</strong></td>
-                    <td><code>{a.customerUserId.slice(0, 8)}</code></td>
+                    <td className="cell-clamp">{customerLabel(a)}</td>
                     <td className="cell-nowrap">{formatDateTime(a.slotStart, i18n.language)}</td>
                     <td>
                       <Badge tone={STATUS_TONE[a.status]}>{t(`appointments:status.${a.status}`)}</Badge>
@@ -287,6 +330,7 @@ export function AppointmentsPage() {
         appointment={detailOf}
         serviceName={offeringName}
         requirementLabel={requirementLabel}
+        customer={detailOf ? customerCard(detailOf.customerUserId) : undefined}
         onClose={() => setDetailOf(null)}
       />
     </div>

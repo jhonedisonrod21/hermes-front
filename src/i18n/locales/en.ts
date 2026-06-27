@@ -26,6 +26,7 @@ export const en = {
       save: 'Save',
       saving: 'Saving...',
       cancel: 'Cancel',
+      back: 'Back',
       confirm: 'Confirm',
       edit: 'Edit',
       delete: 'Delete',
@@ -95,7 +96,40 @@ export const en = {
       showPassword: 'Show password',
       hidePassword: 'Hide password',
       submit: 'Sign in',
-      submitting: 'Signing in...'
+      submitting: 'Signing in...',
+      forgot: 'Forgot your password?'
+    },
+    forgot: {
+      title: 'Recover password',
+      introRequest: 'We will send a link to your email to reset it.',
+      email: 'Email',
+      emailPlaceholder: 'you@example.com',
+      requestSubmit: 'Send me a link',
+      requesting: 'Sending...',
+      sentTitle: 'Check your email',
+      sentBody: 'If the account exists, we sent a link to create a new password. Open it from your email.',
+      resend: 'Resend link',
+      backToLogin: 'Back to sign in',
+      errors: {
+        emailRequired: 'Enter your email.',
+        failed: 'Could not process the request. Please try again.'
+      }
+    },
+    reset: {
+      title: 'New password',
+      intro: 'Create your new password to access your account.',
+      newPassword: 'New password',
+      newPasswordHint: 'At least {{min}} characters.',
+      confirm: 'Confirm password',
+      submit: 'Save password',
+      submitting: 'Saving...',
+      doneTitle: 'Password updated',
+      doneBody: 'You can now sign in with your new password.',
+      goToLogin: 'Go to sign in',
+      invalidLink: 'The link is not valid. Request a new one from "Forgot your password?".',
+      errors: {
+        failed: 'The link is invalid or has expired. Request a new one.'
+      }
     },
     register: {
       title: 'Create account',
@@ -152,12 +186,12 @@ export const en = {
       user: 'Hermes user',
       tenant: 'Local tenant',
       systemAdmin: 'System administration',
-      guest: 'Guest'
+      guest: 'Client'
     },
     scope: {
       platform: 'Platform',
       tenant: 'Organization',
-      guest: 'Guest'
+      guest: 'Client'
     },
     metrics: {
       todayAppointments: 'Appointments today',
@@ -203,7 +237,7 @@ export const en = {
       'system-admin': 'System administrator',
       'tenant-admin': 'Organization administrator',
       'tenant-partner': 'Partner',
-      guest: 'Guest'
+      guest: 'Client'
     },
     orgSwitcher: {
       label: 'Active organization'
@@ -218,7 +252,7 @@ export const en = {
       user: 'Hermes user',
       tenant: 'Your organization',
       systemAdmin: 'System administration',
-      guest: 'Guest'
+      guest: 'Client'
     },
     intro: {
       'system-admin': 'Manage organizations and users across the whole Hermes platform.',
@@ -236,6 +270,15 @@ export const en = {
       exploreCta: 'Explore services',
       upcoming: 'Upcoming appointments',
       pendingPayment: 'Pending payment'
+    },
+    partner: {
+      today: "Today's appointments",
+      upcoming: 'Upcoming confirmed',
+      pendingPayment: 'Pending payment',
+      next: 'Upcoming appointments',
+      viewAll: 'View all',
+      loading: 'Loading schedule...',
+      noUpcoming: 'No upcoming appointments. New bookings will show up here.'
     },
     tenant: {
       offerings: 'Services',
@@ -518,6 +561,12 @@ export const en = {
     onlinePayment: 'Online payment',
     anyModality: 'Any modality',
     noResults: 'No services found for your search.',
+    viewLabel: 'How to view services',
+    viewServices: 'Services',
+    viewByOrg: 'By organization',
+    orgsCount: '{{count}} organizations',
+    servicesCount: '{{count}} services',
+    unknownOrg: 'Other',
     fields: {
       query: 'Search',
       queryPlaceholder: 'e.g. consultation, advisory, haircut...'
@@ -562,7 +611,7 @@ export const en = {
     detail: {
       title: 'Appointment detail',
       service: 'Service',
-      customer: 'Customer (ID)',
+      customer: 'Customer',
       when: 'When',
       duration: '{{minutes}} min',
       price: 'Price',
@@ -576,6 +625,7 @@ export const en = {
     confirm: {
       cancelTitle: 'Cancel appointment',
       cancelMessage: 'Are you sure you want to cancel this appointment?',
+      cancelConfirm: 'Yes, cancel appointment',
       completeTitle: 'Mark as completed',
       completeMessage: 'Confirm the appointment was attended? This cannot be undone.',
       noShowTitle: 'Mark as no-show',
@@ -601,12 +651,16 @@ export const en = {
   reports: {
     eyebrow: 'Analytics',
     title: 'Reports',
-    description: 'Generate and view reports about your organization operation.',
-    capabilities: {
-      appointments: 'Appointment reports by state and period',
-      revenue: 'Revenue, payments and copays',
-      occupancy: 'Occupancy and service performance'
-    }
+    description: 'Download your organization reports as PDF.',
+    from: 'From',
+    to: 'To',
+    rangeHint: 'Report date range. Default: from the 1st of the month to today.',
+    invalidRange: '"From" cannot be later than "To".',
+    viewSales: 'View sales (PDF)',
+    viewStats: 'View statistics (PDF)',
+    generating: 'Generating...',
+    previewTitle: 'Report preview',
+    download: 'Download PDF'
   },
   bookings: {
     eyebrow: 'Bookings',
@@ -621,7 +675,8 @@ export const en = {
     loadMore: 'Load more ({{count}})',
     confirm: {
       cancelTitle: 'Cancel booking',
-      cancelMessage: 'Are you sure you want to cancel this booking?'
+      cancelMessage: 'Are you sure you want to cancel this booking?',
+      cancelConfirm: 'Yes, cancel booking'
     },
     book: {
       title: 'Book: {{service}}',
@@ -666,6 +721,8 @@ export const en = {
       unavailable: 'The payment service is unavailable right now. Please try again in a few minutes.'
     },
     return: {
+      paidTitle: 'Payment received',
+      paidMessage: 'Your payment was registered successfully. Your booking will be confirmed in a moment.',
       title: 'Payment in progress',
       message: 'We are confirming your payment. Your booking status will update as soon as we receive it.',
       failedTitle: 'Payment not completed',
@@ -697,7 +754,10 @@ export const en = {
     },
     password: {
       title: 'Change password',
-      intro: 'We send a code to your email; use it below to set a new password.',
+      intro: 'Enter your current password and set a new one.',
+      currentPassword: 'Current password',
+      currentPasswordHint: 'Your current sign-in password.',
+      currentRequired: 'Enter your current password.',
       request: 'Send code to my email',
       sending: 'Sending...',
       resend: 'Resend code',
@@ -710,6 +770,7 @@ export const en = {
       confirmPasswordHint: 'Repeat the same password to confirm.',
       submit: 'Change password',
       changed: 'Password updated.',
+      changeFailed: 'Could not change the password. Check that your current password is correct and the new one is different.',
       mismatch: 'Passwords do not match.',
       tooShort: 'Password must be at least {{min}} characters.'
     }
@@ -762,6 +823,11 @@ export const en = {
       appointment: 'Appointment',
       resume: 'Continue payment',
       showingLatest: 'showing the latest {{count}}',
+      receipt: 'Receipt',
+      receiptTitle: 'Payment receipt',
+      receiptError: 'The receipt is not available right now. Please try again later.',
+      generating: 'Generating...',
+      download: 'Download PDF',
       statuses: {
         PENDING: 'Pending',
         PAID: 'Paid',
@@ -806,6 +872,13 @@ export const en = {
         body: 'Add administrators and partners. Everyone sees and does exactly what they should.'
       }
     },
+    showcase: {
+      eyebrow: 'Available services',
+      title: 'Book in minutes, no phone calls',
+      lede: 'Browse some of the services you can already schedule on Hermes. Create your account and book in seconds.',
+      book: 'Book',
+      cta: 'See all services'
+    },
     lifecycle: {
       eyebrow: 'The life of an appointment',
       title: 'From booking to payment, without losing the thread',
@@ -831,7 +904,7 @@ export const en = {
         body: 'Operates the schedule: creates, changes and closes the day’s appointments.'
       },
       guest: {
-        title: 'Guest',
+        title: 'Client',
         body: 'Searches for services, books an hour and pays online.'
       }
     },

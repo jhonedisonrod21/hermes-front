@@ -85,6 +85,35 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return (text ? JSON.parse(text) : undefined) as T;
 }
 
+/** Trae un archivo binario (p. ej. PDF) como Blob, para previsualizarlo o descargarlo. */
+export async function fetchBlob(path: string): Promise<Blob> {
+  const response = await hermesFetch(path, {});
+  if (!response.ok) {
+    throw await parseError(response);
+  }
+  return response.blob();
+}
+
+/** Descarga un archivo binario (p. ej. PDF) y dispara la descarga en el navegador. */
+export async function downloadFile(path: string, fallbackName: string): Promise<void> {
+  const response = await hermesFetch(path, {});
+  if (!response.ok) {
+    throw await parseError(response);
+  }
+  const blob = await response.blob();
+  const disposition = response.headers.get('Content-Disposition') ?? '';
+  const match = /filename="?([^";]+)"?/i.exec(disposition);
+  const name = match?.[1] ?? fallbackName;
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = name;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 const jsonHeaders = { 'Content-Type': 'application/json' };
 
 export const api = {

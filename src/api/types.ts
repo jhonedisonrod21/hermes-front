@@ -172,6 +172,9 @@ export type UserResponse = {
   createdAt: string;
 };
 
+/** Ficha mínima de un usuario para resolver id -> nombre/correo (directorio del tenant). */
+export type UserCardResponse = { id: string; username: string; email: string };
+
 export type UserUpdateRequest = { username: string; email: string; phone?: string };
 
 export type UserLockRequest = { locked: boolean };

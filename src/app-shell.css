@@ -232,12 +232,18 @@
 }
 
 .hc-table tbody td {
-  border-bottom: 1px solid var(--hc-border);
   color: var(--hc-text);
   padding: 14px 18px;
   /* Arriba: con contenido que envuelve, todas las columnas empiezan a la misma
      altura y la fila se lee alineada. */
   vertical-align: top;
+}
+
+/* El separador de fila va en el <tr>, no en cada <td>: así la línea es continua
+   aunque alguna celda use display:flex (cell-chips, row-actions), que de otro modo
+   dibujaría el borde a la altura de su contenido y rompería la línea. */
+.hc-table tbody tr {
+  border-bottom: 1px solid var(--hc-border);
 }
 
 /* Texto largo dentro de una celda: envuelve (incluidas palabras larguísimas) con
@@ -253,7 +259,7 @@
   white-space: nowrap;
 }
 
-.hc-table tbody tr:last-child td {
+.hc-table tbody tr:last-child {
   border-bottom: 0;
 }
 
@@ -324,6 +330,99 @@
   outline: none;
   padding: 0 14px;
   width: 100%;
+}
+
+/* ---- Lista desplegable personalizada (Select) ---- */
+.hc-select-field {
+  position: relative;
+}
+
+/* El disparador es un botón con la misma apariencia que un input, con caret propio.
+   Se usa doble clase para ganar especificidad y anular el chevron de fondo de .hc-select. */
+.hc-select.hc-select-trigger {
+  align-items: center;
+  background-image: none;
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  padding-right: 14px;
+  text-align: left;
+}
+.hc-select-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.hc-select-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hc-select-trigger.is-placeholder .hc-select-value {
+  color: var(--hc-text-secondary);
+}
+.hc-select-caret {
+  color: var(--hc-text-secondary);
+  flex: none;
+  transition: transform 160ms ease;
+}
+.hc-select-trigger[aria-expanded='true'] .hc-select-caret {
+  transform: rotate(180deg);
+}
+
+.hc-select-menu {
+  animation: hc-select-pop 120ms ease;
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-border-strong);
+  border-radius: 10px;
+  box-shadow: 0 18px 40px -18px rgba(15, 28, 52, 0.5);
+  display: grid;
+  gap: 2px;
+  left: 0;
+  list-style: none;
+  margin: 6px 0 0;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 6px;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 60;
+}
+@keyframes hc-select-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+.hc-select-option {
+  align-items: center;
+  border-radius: 7px;
+  color: var(--hc-text);
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 9px 12px;
+}
+.hc-select-option-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hc-select-option.is-active {
+  background: var(--hc-primary-soft);
+  color: var(--hc-primary);
+}
+.hc-select-option.is-selected {
+  font-weight: 700;
+}
+.hc-select-option.is-placeholder .hc-select-option-label {
+  color: var(--hc-text-secondary);
+}
+.hc-select-option-check {
+  color: var(--hc-primary);
+  flex: none;
 }
 
 .hc-textarea {
@@ -1301,11 +1400,97 @@ a:focus-visible {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+/* --- Resumen del colaborador: métricas + próximas citas --- */
+.partner-board {
+  display: grid;
+  gap: 16px;
+}
+
+.partner-board .partner-metrics {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.partner-next-head {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.partner-next-head .quicklinks-title {
+  margin: 0;
+}
+
+.agenda-list {
+  display: grid;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.agenda-row {
+  align-items: center;
+  border-top: 1px solid var(--hc-border);
+  display: flex;
+  gap: 16px;
+  padding: 12px 0;
+}
+
+.agenda-row:first-child {
+  border-top: 0;
+}
+
+.agenda-when {
+  color: var(--hc-text-secondary);
+  flex: 0 0 auto;
+  font-family: var(--hc-font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  min-width: 140px;
+  white-space: nowrap;
+}
+
+.agenda-main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.agenda-main strong {
+  color: var(--hc-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agenda-customer {
+  color: var(--hc-text-muted);
+  font-size: 0.84rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .partner-board .partner-metrics {
+    grid-template-columns: 1fr;
+  }
+  .agenda-when {
+    min-width: 0;
+  }
+}
+
 .guest-next {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
   gap: 16px 20px;
+  /* La tarjeta base (.hc-card) no trae padding: lo añadimos para que el contenido
+     no quede pegado a los bordes, en línea con el resto de tarjetas (.panel). */
+  padding: 22px 24px;
 }
 
 /* Casilla de fecha: ancla visual navy+gold (día grande + mes) */
@@ -1436,7 +1621,6 @@ a:focus-visible {
 .login-shell {
   background:
     radial-gradient(120% 120% at 50% 0%, var(--hc-midnight-2), var(--hc-midnight) 70%);
-  overflow: hidden;
 }
 
 .login-shell .login-back {
@@ -1494,13 +1678,6 @@ a:focus-visible {
   100% {
     opacity: 1;
     transform: scale(1);
-  }
-}
-
-/* Giro continuo del segundero del login */
-@keyframes hc-login-second {
-  to {
-    transform: rotate(360deg);
   }
 }
 
@@ -1603,6 +1780,18 @@ a:focus-visible {
 /* El icono guía se tiñe de azul al enfocar el campo */
 .hc-input-shell:focus-within .hc-input-icon {
   color: var(--hc-primary);
+}
+
+/* Neutraliza el resaltado azul/amarillo del autocompletado del navegador (p. ej. contraseña
+   guardada) para que el campo conserve la estética del formulario en vez del fondo del sistema. */
+.hc-input-shell input:-webkit-autofill,
+.hc-input-shell input:-webkit-autofill:hover,
+.hc-input-shell input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--hc-text);
+  -webkit-box-shadow: 0 0 0 1000px var(--hc-surface) inset;
+  box-shadow: 0 0 0 1000px var(--hc-surface) inset;
+  caret-color: var(--hc-text);
+  transition: background-color 100000s ease-out 0s;
 }
 
 /* Pista y error con un toque más fino */
@@ -1894,6 +2083,11 @@ a:focus-visible {
 }
 
 /* Selector de organización activa (topbar, multi-tenant) */
+.org-switcher-wrap {
+  display: inline-flex;
+  position: relative;
+}
+
 .org-switcher {
   align-items: center;
   background: var(--hc-surface);
@@ -1901,11 +2095,12 @@ a:focus-visible {
   border-radius: 999px;
   cursor: pointer;
   display: inline-flex;
+  font: inherit;
   gap: 9px;
   max-width: 290px;
   min-height: 44px;
   padding: 4px 12px;
-  position: relative;
+  text-align: left;
   transition: border-color 140ms ease;
 }
 
@@ -1935,22 +2130,27 @@ a:focus-visible {
   text-transform: uppercase;
 }
 
-.org-switcher select {
-  appearance: none;
-  -webkit-appearance: none;
-  background: transparent;
-  border: 0;
+.org-switcher-current {
   color: var(--hc-text);
-  cursor: pointer;
-  font: inherit;
   font-size: 0.9rem;
   font-weight: 850;
   max-width: 200px;
-  outline: none;
   overflow: hidden;
-  padding: 0;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* El menú del selector de organización se alinea al borde derecho de la píldora. */
+.org-switcher-menu {
+  left: auto;
+  min-width: 220px;
+  right: 0;
+}
+
+/* Resaltado al pasar el ratón (complementa is-active del Select por teclado). */
+.hc-select-option:hover {
+  background: var(--hc-primary-soft);
+  color: var(--hc-primary);
 }
 
 .org-switcher-chevron {
@@ -2051,6 +2251,28 @@ a:focus-visible {
 .hc-button.appt-noshow:hover:not(:disabled) {
   background: var(--hc-danger-soft);
   color: var(--hc-danger);
+}
+
+/* Vista previa embebida del PDF de reportes */
+.report-preview-head {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.report-preview {
+  border: 1px solid var(--hc-border);
+  border-radius: 8px;
+  display: block;
+  height: 72vh;
+  width: 100%;
+}
+
+/* Dentro de un modal (comprobante) el visor es algo más bajo para encajar */
+.hc-modal .report-preview {
+  height: 60vh;
 }
 
 /* Tarjetas-métrica clicables (overview): afordancia de enlace */
@@ -2244,29 +2466,21 @@ a:focus-visible {
   width: 100%;
 }
 
-.explore-search-modality {
-  align-items: center;
-  background: #fff;
-  border-radius: 999px;
-  display: flex;
-  min-height: 52px;
-  padding: 0 6px 0 18px;
+/* Selector de modalidad en la barra de búsqueda: el Select adopta la forma de píldora blanca. */
+.explore-modality {
+  flex: 0 0 auto;
+  min-width: 210px;
 }
-
-.explore-search-modality select {
-  appearance: none;
-  -webkit-appearance: none;
-  /* Chevron propio (igual que .hc-select): el padding-right reservaba sitio para él. */
-  background: transparent
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237a8599' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
-    no-repeat right 4px center;
+.explore-modality .hc-input-shell {
+  background: #fff;
   border: 0;
-  color: var(--hc-text);
-  cursor: pointer;
-  font: inherit;
+  border-radius: 999px;
+  min-height: 52px;
+}
+.explore-modality .hc-select.hc-select-trigger {
   font-weight: 700;
-  outline: none;
-  padding-right: 30px;
+  min-height: 52px;
+  padding: 0 16px 0 18px;
 }
 
 .explore-count {
@@ -2274,7 +2488,92 @@ a:focus-visible {
   font-family: var(--hc-font-mono);
   font-size: 0.74rem;
   letter-spacing: 0.08em;
-  margin: 4px 2px;
+  margin: 0 2px;
+}
+
+/* Barra superior de Explorar: conteo + conmutador de vista */
+.explore-toolbar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  margin: 4px 0 14px;
+}
+
+/* Conmutador "Servicios / Por organización" (segmentado tipo píldora) */
+.explore-view-toggle {
+  background: var(--hc-surface-alt);
+  border: 1px solid var(--hc-border);
+  border-radius: 999px;
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+}
+
+.explore-view-toggle button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  color: var(--hc-text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.84rem;
+  font-weight: 700;
+  gap: 6px;
+  padding: 7px 14px;
+  transition: background 140ms ease, color 140ms ease;
+}
+
+.explore-view-toggle button.is-active {
+  background: var(--hc-primary);
+  color: #fff;
+}
+
+/* Vista por organización: secciones con cabecera + rejilla de servicios */
+.explore-orgs {
+  display: grid;
+  gap: 30px;
+}
+
+.explore-org-head {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.explore-org-avatar {
+  align-items: center;
+  background: linear-gradient(150deg, var(--hc-midnight), var(--hc-midnight-2));
+  border: 1px solid rgba(242, 212, 131, 0.25);
+  border-radius: 14px;
+  color: var(--lp-gold-soft);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-family: var(--hc-font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  height: 52px;
+  justify-content: center;
+  width: 52px;
+}
+
+.explore-org-info h2 {
+  color: var(--hc-text);
+  font-family: var(--hc-font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.explore-org-meta {
+  color: var(--hc-text-secondary);
+  font-family: var(--hc-font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 /* Tarjetas de servicio */
@@ -2395,7 +2694,7 @@ a:focus-visible {
 
 @media (max-width: 560px) {
   .explore-search-field,
-  .explore-search-modality,
+  .explore-modality,
   .explore-searchbar .hc-button {
     flex: 1 1 100%;
   }

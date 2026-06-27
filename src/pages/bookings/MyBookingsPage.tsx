@@ -11,7 +11,7 @@ import { Badge, Button } from '../../components/ui';
 import { useResource } from '../../hooks/useResource';
 import { useToast } from '../../components/feedback/toast';
 import { useConfirm } from '../../components/feedback/confirm';
-import { appointmentsApi, catalogApi, paymentApi } from '../../api/services';
+import { appointmentsApi, catalogApi, paymentApi, reportsApi } from '../../api/services';
 import type { AppointmentResponse, AppointmentStatus } from '../../api/types';
 import { formatDateTime, formatMoney } from '../../lib/format';
 
@@ -40,20 +40,30 @@ export function MyBookingsPage() {
   const [pastShown, setPastShown] = useState(PAGE);
 
   const items = useMemo(() => appts.data?.content ?? [], [appts.data]);
-  // Próximas (activas): la más cercana primero. Historial (resto): la más reciente primero.
+  // "Próximas" = citas activas cuya fecha aún no ha pasado (desde el inicio del día de hoy).
+  // Una cita activa con fecha pasada (p. ej. CONFIRMADA que el negocio aún no cerró) ya no
+  // es "próxima": se muestra en el historial para no confundir al cliente.
+  const startOfToday = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d.getTime();
+  }, []);
+  const isUpcoming = (a: AppointmentResponse) =>
+    ACTIVE.includes(a.status) && new Date(a.slotStart).getTime() >= startOfToday;
+  // Próximas: la más cercana primero. Historial (resto): la más reciente primero.
   const upcoming = useMemo(
     () =>
       items
-        .filter((a) => ACTIVE.includes(a.status))
+        .filter(isUpcoming)
         .sort((a, b) => new Date(a.slotStart).getTime() - new Date(b.slotStart).getTime()),
-    [items]
+    [items, startOfToday]
   );
   const past = useMemo(
     () =>
       items
-        .filter((a) => !ACTIVE.includes(a.status))
+        .filter((a) => !isUpcoming(a))
         .sort((a, b) => new Date(b.slotStart).getTime() - new Date(a.slotStart).getTime()),
-    [items]
+    [items, startOfToday]
   );
   const offeringIdsKey = useMemo(() => [...new Set(items.map((a) => a.offeringId))].sort().join(','), [items]);
   // El invitado resuelve el nombre del servicio por el detalle público de cada oferta.
@@ -75,7 +85,8 @@ export function MyBookingsPage() {
     const ok = await confirm({
       title: t('bookings:confirm.cancelTitle'),
       message: t('bookings:confirm.cancelMessage'),
-      confirmLabel: t('appointments:actions.cancel'),
+      confirmLabel: t('bookings:confirm.cancelConfirm'),
+      cancelLabel: t('common:actions.back'),
       danger: true
     });
     if (!ok) return;
@@ -203,7 +214,11 @@ export function MyBookingsPage() {
         </div>
       </DataState>
 
-      <PaymentsList loader={() => paymentApi.listMyPayments({ size: 50, sort: 'createdAt,desc' })} hideWhenEmpty />
+      <PaymentsList
+        loader={() => paymentApi.listMyPayments({ size: 50, sort: 'createdAt,desc' })}
+        receiptLoader={reportsApi.myReceiptBlob}
+        hideWhenEmpty
+      />
 
       <RescheduleModal
         appointment={rescheduleOf}

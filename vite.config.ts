@@ -27,6 +27,13 @@ export default defineConfig(({ mode }) => {
           target: gatewayTarget,
           changeOrigin: true,
           secure: false
+        },
+        // Catálogo público para la vitrina de la landing (sin sesión). Requiere que el gateway y el
+        // catalog-service permitan /catalog/search sin autenticación (cambio de backend).
+        '/catalog': {
+          target: gatewayTarget,
+          changeOrigin: true,
+          secure: false
         }
       }
     }

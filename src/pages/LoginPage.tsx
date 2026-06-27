@@ -4,11 +4,18 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LoginForm } from '../components/LoginForm';
 import { RegisterForm } from '../components/RegisterForm';
+import { ForgotPasswordForm } from '../components/ForgotPasswordForm';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { HermesDial } from '../components/HermesDial';
 import { BrandLogo, Card } from '../components/ui';
 
-type Mode = 'login' | 'register';
+type Mode = 'login' | 'register' | 'forgot';
+
+const TITLE_KEY: Record<Mode, string> = {
+  login: 'login.title',
+  register: 'register.title',
+  forgot: 'forgot.title'
+};
 
 export function LoginPage() {
   const { t } = useTranslation(['auth', 'common']);
@@ -30,18 +37,32 @@ export function LoginPage() {
           </div>
           <div className="login-card-header">
             <div>
-              <h2>{isLogin ? t('login.title') : t('register.title')}</h2>
+              <h2>{t(TITLE_KEY[mode])}</h2>
             </div>
           </div>
 
-          {isLogin ? <LoginForm /> : <RegisterForm />}
+          {mode === 'login' ? (
+            <LoginForm onForgot={() => setMode('forgot')} />
+          ) : mode === 'register' ? (
+            <RegisterForm />
+          ) : (
+            <ForgotPasswordForm onDone={() => setMode('login')} />
+          )}
 
-          <p className="login-switch">
-            {isLogin ? t('register.prompt') : t('register.haveAccount')}{' '}
-            <button type="button" className="login-switch-link" onClick={() => setMode(isLogin ? 'register' : 'login')}>
-              {isLogin ? t('register.switchToRegister') : t('register.switchToLogin')}
-            </button>
-          </p>
+          {mode === 'forgot' ? (
+            <p className="login-switch">
+              <button type="button" className="login-switch-link" onClick={() => setMode('login')}>
+                {t('forgot.backToLogin')}
+              </button>
+            </p>
+          ) : (
+            <p className="login-switch">
+              {isLogin ? t('register.prompt') : t('register.haveAccount')}{' '}
+              <button type="button" className="login-switch-link" onClick={() => setMode(isLogin ? 'register' : 'login')}>
+                {isLogin ? t('register.switchToRegister') : t('register.switchToLogin')}
+              </button>
+            </p>
+          )}
         </Card>
       </section>
     </main>

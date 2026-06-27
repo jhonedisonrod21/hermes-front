@@ -89,6 +89,30 @@ export const authService = {
     return registerUser(email, password);
   },
 
+  /** Solicita un código de restablecimiento al correo (público, sin sesión). */
+  async requestPasswordReset(email: string): Promise<void> {
+    const response = await fetch(oauthEndpoints.passwordResetRequest, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    if (!response.ok) {
+      throw new Error((await response.text()) || `${response.status}`);
+    }
+  },
+
+  /** Confirma el restablecimiento con el código recibido y la nueva contraseña (público). */
+  async confirmPasswordReset(token: string, newPassword: string): Promise<void> {
+    const response = await fetch(oauthEndpoints.passwordResetConfirm, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, newPassword })
+    });
+    if (!response.ok) {
+      throw new Error((await response.text()) || `${response.status}`);
+    }
+  },
+
   async getValidSession(): Promise<HermesSession | null> {
     const response = await fetch(oauthEndpoints.bffSession, {
       credentials: 'include'

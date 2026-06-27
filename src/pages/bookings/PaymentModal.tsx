@@ -44,11 +44,14 @@ export function PaymentModal({ appointment, serviceName, onClose }: Props) {
   const [lastId, setLastId] = useState<string | null>(null);
   if (appointment && appointment.id !== lastId) {
     setLastId(appointment.id);
+    // El "nombre completo" no debe rellenarse con un correo/usuario tipo email:
+    // solo se precarga si el usuario tiene un nombre de usuario que no parezca un correo.
+    const username = session?.profile?.preferred_username ?? '';
     setForm((f) => ({
       ...f,
       bank: '',
       email: session?.profile?.email ?? '',
-      fullName: session?.profile?.preferred_username ?? ''
+      fullName: username.includes('@') ? '' : username
     }));
   }
 

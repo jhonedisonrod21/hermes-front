@@ -29,4 +29,13 @@ i18n
     }
   });
 
+// Mantiene el atributo <html lang> sincronizado con el idioma activo (accesibilidad e i18n).
+function syncHtmlLang(lng: string) {
+  if (typeof document !== 'undefined') {
+    document.documentElement.lang = (lng || 'es').split('-')[0];
+  }
+}
+syncHtmlLang(i18n.language);
+i18n.on('languageChanged', syncHtmlLang);
+
 export { i18n };

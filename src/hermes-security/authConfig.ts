@@ -14,5 +14,8 @@ export const oauthEndpoints = {
   bffSession: `${authConfig.bffBaseUrl}/session/me`,
   bffSwitchTenant: `${authConfig.bffBaseUrl}/session/switch-tenant`,
   bffLogout: `${authConfig.bffBaseUrl}/session/logout`,
-  register: `${authConfig.identityBaseUrl}/users/register`
+  register: `${authConfig.identityBaseUrl}/users/register`,
+  // Restablecimiento de contraseña: público (usuario sin sesión), va directo al gateway (no por el BFF).
+  passwordResetRequest: `${authConfig.identityBaseUrl}/users/password-reset/request`,
+  passwordResetConfirm: `${authConfig.identityBaseUrl}/users/password-reset/confirm`
 };

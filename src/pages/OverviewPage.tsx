@@ -2,6 +2,7 @@ import { useMemo, type ReactNode } from 'react';
 import {
   Building2,
   CalendarCheck,
+  CalendarClock,
   CalendarRange,
   Clock,
   Compass,
@@ -18,8 +19,9 @@ import { HermesDial } from '../components/HermesDial';
 import { useResource } from '../hooks/useResource';
 import { useAuth } from '../hermes-security/useAuth';
 import { actorKind, type ActorKind, type HermesProfile } from '../hermes-security/sessionStore';
-import { appointmentsApi, catalogApi, identityApi, tenantApi } from '../api/services';
+import { appointmentsApi, catalogApi, identityApi, tenantApi, tenantAppointmentsApi } from '../api/services';
 import type { AppointmentStatus } from '../api/types';
+import { formatDateTime } from '../lib/format';
 
 function MetricCard({ icon, label, value, to }: { icon: ReactNode; label: string; value: ReactNode; to?: string }) {
   const card = (
@@ -162,6 +164,89 @@ function GuestOverview() {
   );
 }
 
+const ACTIVE_STATUSES: AppointmentStatus[] = ['PENDING_PAYMENT', 'CONFIRMED'];
+
+function isLocalToday(iso: string, ref: Date) {
+  const d = new Date(iso);
+  return d.getFullYear() === ref.getFullYear() && d.getMonth() === ref.getMonth() && d.getDate() === ref.getDate();
+}
+
+/** Resumen operativo del colaborador: métricas del día + próximas citas del establecimiento. */
+function PartnerOverview() {
+  const { t, i18n } = useTranslation(['overview', 'appointments']);
+  const appts = useResource(() => tenantAppointmentsApi.list({ size: 200, sort: 'slotStart,asc' }), []);
+  const offerings = useResource(() => catalogApi.listOfferings({ size: 200 }), []);
+  const items = useMemo(() => appts.data?.content ?? [], [appts.data]);
+
+  const offeringName = useMemo(() => {
+    const map = new Map((offerings.data?.content ?? []).map((o) => [o.id, o.name]));
+    return (id: string) => map.get(id) ?? id.slice(0, 8);
+  }, [offerings.data]);
+
+  // Resuelve el correo del cliente (id -> ficha) en lote desde el directorio del tenant.
+  const customerIdsKey = useMemo(() => [...new Set(items.map((a) => a.customerUserId))].sort().join(','), [items]);
+  const customers = useResource(
+    () => (customerIdsKey ? identityApi.getUserCards(customerIdsKey.split(',').slice(0, 100)) : Promise.resolve([])),
+    [customerIdsKey]
+  );
+  const customerLabel = useMemo(() => {
+    const map = new Map((customers.data ?? []).map((c) => [c.id, c]));
+    return (id: string) => map.get(id)?.email || map.get(id)?.username || `${id.slice(0, 8)}…`;
+  }, [customers.data]);
+
+  const now = new Date();
+  const todayCount = useMemo(
+    () => items.filter((a) => ACTIVE_STATUSES.includes(a.status) && isLocalToday(a.slotStart, now)).length,
+    [items, now]
+  );
+  const upcoming = useMemo(
+    () =>
+      items
+        .filter((a) => a.status === 'CONFIRMED' && new Date(a.slotStart).getTime() >= now.getTime())
+        .sort((a, b) => new Date(a.slotStart).getTime() - new Date(b.slotStart).getTime()),
+    [items, now]
+  );
+  const pendingPay = useMemo(() => items.filter((a) => a.status === 'PENDING_PAYMENT').length, [items]);
+  const nextFew = upcoming.slice(0, 5);
+
+  return (
+    <section className="partner-board">
+      <div className="summary-grid partner-metrics">
+        <MetricCard icon={<CalendarClock size={22} />} label={t('overview:partner.today')} value={dash(appts.loading, todayCount)} to="/citas" />
+        <MetricCard icon={<CalendarCheck size={22} />} label={t('overview:partner.upcoming')} value={dash(appts.loading, upcoming.length)} to="/citas" />
+        <MetricCard icon={<CreditCard size={22} />} label={t('overview:partner.pendingPayment')} value={dash(appts.loading, pendingPay)} to="/citas" />
+      </div>
+
+      <Card className="panel">
+        <div className="partner-next-head">
+          <h2 className="quicklinks-title">{t('overview:partner.next')}</h2>
+          <Link to="/citas" className="hc-button hc-button-ghost hc-button-sm">
+            <span>{t('overview:partner.viewAll')}</span>
+          </Link>
+        </div>
+        {appts.loading ? (
+          <p className="account-hint">{t('overview:partner.loading')}</p>
+        ) : nextFew.length > 0 ? (
+          <ul className="agenda-list">
+            {nextFew.map((a) => (
+              <li className="agenda-row" key={a.id}>
+                <span className="agenda-when">{formatDateTime(a.slotStart, i18n.language)}</span>
+                <div className="agenda-main">
+                  <strong>{offeringName(a.offeringId)}</strong>
+                  <span className="agenda-customer">{customerLabel(a.customerUserId)}</span>
+                </div>
+                <Badge tone={GUEST_TONE[a.status]}>{t(`appointments:status.${a.status}`)}</Badge>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="account-hint">{t('overview:partner.noUpcoming')}</p>
+        )}
+      </Card>
+    </section>
+  );
+}
+
 /** Nombre amable a partir del perfil: prioriza usuario, luego la parte local del correo. */
 function displayName(profile: HermesProfile | undefined, fallback: string) {
   const raw = profile?.preferred_username || profile?.email || profile?.sub || fallback;
@@ -215,6 +300,7 @@ export function OverviewPage() {
       </Card>
 
       {kind === 'tenant-admin' ? <TenantOverview /> : null}
+      {kind === 'tenant-partner' ? <PartnerOverview /> : null}
       {kind === 'system-admin' ? <AdminOverview /> : null}
       {kind === 'guest' ? <GuestOverview /> : null}
 

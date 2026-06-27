@@ -26,6 +26,7 @@ export const es = {
       save: 'Guardar',
       saving: 'Guardando...',
       cancel: 'Cancelar',
+      back: 'Volver',
       confirm: 'Confirmar',
       edit: 'Editar',
       delete: 'Eliminar',
@@ -95,7 +96,40 @@ export const es = {
       showPassword: 'Mostrar password',
       hidePassword: 'Ocultar password',
       submit: 'Iniciar sesion',
-      submitting: 'Iniciando sesion...'
+      submitting: 'Iniciando sesion...',
+      forgot: '¿Olvidaste tu contraseña?'
+    },
+    forgot: {
+      title: 'Recuperar contraseña',
+      introRequest: 'Te enviaremos un enlace a tu correo para restablecerla.',
+      email: 'Correo',
+      emailPlaceholder: 'tu@correo.com',
+      requestSubmit: 'Enviarme un enlace',
+      requesting: 'Enviando...',
+      sentTitle: 'Revisa tu correo',
+      sentBody: 'Si la cuenta existe, te enviamos un enlace para crear una nueva contraseña. Ábrelo desde tu correo.',
+      resend: 'Reenviar enlace',
+      backToLogin: 'Volver a iniciar sesión',
+      errors: {
+        emailRequired: 'Indica tu correo.',
+        failed: 'No fue posible procesar la solicitud. Inténtalo de nuevo.'
+      }
+    },
+    reset: {
+      title: 'Nueva contraseña',
+      intro: 'Crea tu nueva contraseña para acceder a tu cuenta.',
+      newPassword: 'Nueva contraseña',
+      newPasswordHint: 'Mínimo {{min}} caracteres.',
+      confirm: 'Confirmar contraseña',
+      submit: 'Guardar contraseña',
+      submitting: 'Guardando...',
+      doneTitle: 'Contraseña actualizada',
+      doneBody: 'Ya puedes iniciar sesión con tu nueva contraseña.',
+      goToLogin: 'Ir a iniciar sesión',
+      invalidLink: 'El enlace no es válido. Vuelve a solicitarlo desde «¿Olvidaste tu contraseña?».',
+      errors: {
+        failed: 'El enlace no es válido o ha caducado. Solicita uno nuevo.'
+      }
     },
     register: {
       title: 'Crear cuenta',
@@ -152,12 +186,12 @@ export const es = {
       user: 'Usuario Hermes',
       tenant: 'Tenant local',
       systemAdmin: 'Administracion del sistema',
-      guest: 'Invitado'
+      guest: 'Cliente'
     },
     scope: {
       platform: 'Plataforma',
       tenant: 'Organizacion',
-      guest: 'Invitado'
+      guest: 'Cliente'
     },
     metrics: {
       todayAppointments: 'Citas de hoy',
@@ -203,7 +237,7 @@ export const es = {
       'system-admin': 'Administrador del sistema',
       'tenant-admin': 'Administrador de organización',
       'tenant-partner': 'Colaborador',
-      guest: 'Invitado'
+      guest: 'Cliente'
     },
     orgSwitcher: {
       label: 'Organización activa'
@@ -218,7 +252,7 @@ export const es = {
       user: 'Usuario Hermes',
       tenant: 'Tu organización',
       systemAdmin: 'Administración del sistema',
-      guest: 'Invitado'
+      guest: 'Cliente'
     },
     intro: {
       'system-admin': 'Gestiona organizaciones y usuarios de toda la plataforma Hermes.',
@@ -236,6 +270,15 @@ export const es = {
       exploreCta: 'Explorar servicios',
       upcoming: 'Próximas citas',
       pendingPayment: 'Pendientes de pago'
+    },
+    partner: {
+      today: 'Citas de hoy',
+      upcoming: 'Próximas confirmadas',
+      pendingPayment: 'Pendientes de pago',
+      next: 'Próximas citas',
+      viewAll: 'Ver todas',
+      loading: 'Cargando agenda...',
+      noUpcoming: 'No tienes citas próximas. Las nuevas reservas aparecerán aquí.'
     },
     tenant: {
       offerings: 'Servicios',
@@ -518,6 +561,12 @@ export const es = {
     onlinePayment: 'Pago en línea',
     anyModality: 'Cualquier modalidad',
     noResults: 'No se encontraron servicios para tu búsqueda.',
+    viewLabel: 'Cómo ver los servicios',
+    viewServices: 'Servicios',
+    viewByOrg: 'Por organización',
+    orgsCount: '{{count}} organizaciones',
+    servicesCount: '{{count}} servicios',
+    unknownOrg: 'Otras',
     fields: {
       query: 'Búsqueda',
       queryPlaceholder: 'Ej. consulta, asesoría, corte...'
@@ -562,7 +611,7 @@ export const es = {
     detail: {
       title: 'Detalle de la cita',
       service: 'Servicio',
-      customer: 'Cliente (ID)',
+      customer: 'Cliente',
       when: 'Cuándo',
       duration: '{{minutes}} min',
       price: 'Precio',
@@ -576,6 +625,7 @@ export const es = {
     confirm: {
       cancelTitle: 'Cancelar cita',
       cancelMessage: '¿Seguro que quieres cancelar esta cita?',
+      cancelConfirm: 'Sí, cancelar la cita',
       completeTitle: 'Marcar como completada',
       completeMessage: '¿Confirmas que la cita fue atendida? Esta acción no se puede deshacer.',
       noShowTitle: 'Marcar como no asistió',
@@ -601,12 +651,16 @@ export const es = {
   reports: {
     eyebrow: 'Análisis',
     title: 'Reportes',
-    description: 'Genera y visualiza reportes de la operación de tu organización.',
-    capabilities: {
-      appointments: 'Reportes de citas por estado y periodo',
-      revenue: 'Ingresos, pagos y copagos',
-      occupancy: 'Ocupación y rendimiento de servicios'
-    }
+    description: 'Descarga los reportes de tu organización en PDF.',
+    from: 'Desde',
+    to: 'Hasta',
+    rangeHint: 'Rango de fechas del reporte. Por defecto: del 1º del mes a hoy.',
+    invalidRange: 'La fecha "Desde" no puede ser posterior a "Hasta".',
+    viewSales: 'Ver ventas (PDF)',
+    viewStats: 'Ver estadísticas (PDF)',
+    generating: 'Generando...',
+    previewTitle: 'Vista previa del reporte',
+    download: 'Descargar PDF'
   },
   bookings: {
     eyebrow: 'Reservas',
@@ -621,7 +675,8 @@ export const es = {
     loadMore: 'Cargar más ({{count}})',
     confirm: {
       cancelTitle: 'Cancelar reserva',
-      cancelMessage: '¿Seguro que quieres cancelar esta reserva?'
+      cancelMessage: '¿Seguro que quieres cancelar esta reserva?',
+      cancelConfirm: 'Sí, cancelar la reserva'
     },
     book: {
       title: 'Reservar: {{service}}',
@@ -666,6 +721,8 @@ export const es = {
       unavailable: 'El servicio de pago no está disponible ahora. Inténtalo de nuevo en unos minutos.'
     },
     return: {
+      paidTitle: 'Pago recibido',
+      paidMessage: 'Tu pago se registró correctamente. Tu reserva quedará confirmada en unos instantes.',
       title: 'Pago en proceso',
       message: 'Estamos confirmando tu pago. El estado de tu reserva se actualizará en cuanto lo recibamos.',
       failedTitle: 'El pago no se completó',
@@ -697,7 +754,10 @@ export const es = {
     },
     password: {
       title: 'Cambiar contraseña',
-      intro: 'Te enviamos un código a tu correo; úsalo abajo para definir una nueva contraseña.',
+      intro: 'Introduce tu contraseña actual y define la nueva.',
+      currentPassword: 'Contraseña actual',
+      currentPasswordHint: 'Tu contraseña de acceso actual.',
+      currentRequired: 'Indica tu contraseña actual.',
       request: 'Enviar código a mi correo',
       sending: 'Enviando...',
       resend: 'Reenviar código',
@@ -710,6 +770,7 @@ export const es = {
       confirmPasswordHint: 'Repite la misma contraseña para confirmar.',
       submit: 'Cambiar contraseña',
       changed: 'Contraseña actualizada.',
+      changeFailed: 'No se pudo cambiar la contraseña. Verifica que la contraseña actual sea correcta y que la nueva sea distinta.',
       mismatch: 'Las contraseñas no coinciden.',
       tooShort: 'La contraseña debe tener al menos {{min}} caracteres.'
     }
@@ -762,6 +823,11 @@ export const es = {
       appointment: 'Cita',
       resume: 'Continuar pago',
       showingLatest: 'mostrando los últimos {{count}}',
+      receipt: 'Comprobante',
+      receiptTitle: 'Comprobante de pago',
+      receiptError: 'El comprobante no está disponible por ahora. Inténtalo de nuevo más tarde.',
+      generating: 'Generando...',
+      download: 'Descargar PDF',
       statuses: {
         PENDING: 'Pendiente',
         PAID: 'Pagado',
@@ -806,6 +872,13 @@ export const es = {
         body: 'Suma administradores y colaboradores. Cada persona ve y hace exactamente lo que le toca.'
       }
     },
+    showcase: {
+      eyebrow: 'Servicios disponibles',
+      title: 'Reserva en minutos, sin llamadas',
+      lede: 'Explora algunos de los servicios que ya puedes agendar en Hermes. Crea tu cuenta y reserva en segundos.',
+      book: 'Reservar',
+      cta: 'Ver todos los servicios'
+    },
     lifecycle: {
       eyebrow: 'El ciclo de una cita',
       title: 'De la reserva al cobro, sin perder el hilo',
@@ -831,7 +904,7 @@ export const es = {
         body: 'Opera la agenda: crea, cambia y cierra las citas del día.'
       },
       guest: {
-        title: 'Invitado',
+        title: 'Cliente',
         body: 'Busca servicios, reserva una hora y paga en línea.'
       }
     },

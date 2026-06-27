@@ -43,8 +43,9 @@ export function Combobox({
     function onDocClick(e: MouseEvent) {
       if (!ref.current?.contains(e.target as Node)) setOpen(false);
     }
-    document.addEventListener('mousedown', onDocClick);
-    return () => document.removeEventListener('mousedown', onDocClick);
+    // Captura: dentro de un Modal el contenedor hace stopPropagation() del mousedown.
+    document.addEventListener('mousedown', onDocClick, true);
+    return () => document.removeEventListener('mousedown', onDocClick, true);
   }, [open]);
 
   if (selected) {

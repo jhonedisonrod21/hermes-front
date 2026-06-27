@@ -637,3 +637,96 @@
     transform: scaleX(1);
   }
 }
+
+/* ---- Vitrina de servicios (landing pública) ---- */
+.lp-showcase {
+  padding: clamp(64px, 9vw, 120px) clamp(20px, 5vw, 64px);
+}
+.lp-showcase-lede {
+  color: var(--lp-ink-soft);
+  margin: 10px 0 0;
+  max-width: 560px;
+}
+.lp-showcase-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  margin: 36px auto 0;
+  max-width: 1080px;
+}
+.lp-showcase-card {
+  background: #fff;
+  border: 1px solid var(--lp-paper-line);
+  border-radius: 12px;
+  color: var(--lp-ink);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px;
+  text-decoration: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+.lp-showcase-card:hover {
+  border-color: var(--lp-gold);
+  box-shadow: 0 20px 44px -26px rgba(14, 26, 48, 0.55);
+  transform: translateY(-3px);
+}
+.lp-showcase-card-head {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.lp-showcase-modality {
+  color: var(--lp-ink-soft);
+  font-family: var(--lp-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.lp-showcase-price {
+  color: var(--lp-marine);
+  font-weight: 800;
+  white-space: nowrap;
+}
+.lp-showcase-name {
+  font-family: var(--lp-display);
+  font-size: 1.18rem;
+  line-height: 1.25;
+  margin: 0;
+}
+.lp-showcase-org {
+  align-items: center;
+  color: var(--lp-ink-soft);
+  display: flex;
+  font-size: 0.84rem;
+  gap: 5px;
+  margin: 0;
+}
+.lp-showcase-foot {
+  align-items: center;
+  border-top: 1px solid var(--lp-paper-line);
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 12px;
+}
+.lp-showcase-duration {
+  align-items: center;
+  color: var(--lp-ink-soft);
+  display: flex;
+  font-size: 0.84rem;
+  gap: 5px;
+}
+.lp-showcase-book {
+  align-items: center;
+  color: var(--lp-gold);
+  display: flex;
+  font-weight: 700;
+  gap: 4px;
+}
+.lp-showcase-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 36px;
+}
