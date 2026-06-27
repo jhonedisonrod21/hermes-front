@@ -193,6 +193,8 @@ export type SelfProfileUpdateRequest = { phone?: string };
 // ---- Cambio / recuperación de contraseña (público en el gateway) ----
 export type PasswordResetRequest = { email: string };
 export type PasswordResetConfirmRequest = { token: string; newPassword: string };
+/** Cambio de contraseña del usuario autenticado (verifica la actual). RF-03. */
+export type PasswordChangeRequest = { currentPassword: string; newPassword: string };
 
 // ---- Organizaciones del usuario / cambio de tenant activo (multi-tenant) ----
 export type OrganizationResponse = {
