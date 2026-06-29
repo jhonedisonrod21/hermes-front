@@ -1,7 +1,6 @@
 import { useEffect, type ReactNode } from 'react';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { HermesDial } from './HermesDial';
 
 type ModalProps = {
   open: boolean;
@@ -9,9 +8,11 @@ type ModalProps = {
   onClose: () => void;
   children: ReactNode;
   footer?: ReactNode;
+  /** Clase extra para el diálogo (p. ej. 'hc-modal-wide' para visores de PDF). */
+  className?: string;
 };
 
-export function Modal({ open, title, onClose, children, footer }: ModalProps) {
+export function Modal({ open, title, onClose, children, footer, className = '' }: ModalProps) {
   const { t } = useTranslation('common');
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
   return (
     <div className="hc-modal-overlay" role="presentation" onMouseDown={onClose}>
       <div
-        className="hc-modal"
+        className={`hc-modal ${className}`.trim()}
         role="dialog"
         aria-modal="true"
         aria-label={title}
@@ -36,9 +37,7 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
       >
         <header className="hc-modal-header">
           <div className="hc-modal-title">
-            <span className="hc-modal-dial" aria-hidden="true">
-              <HermesDial minimal />
-            </span>
+            <img className="hc-modal-mark" src="/brand/hermes-logo-app-icon.svg" alt="" aria-hidden="true" />
             <h2>{title}</h2>
           </div>
           <button className="hc-icon-button" type="button" onClick={onClose} aria-label={t('actions.close')}>

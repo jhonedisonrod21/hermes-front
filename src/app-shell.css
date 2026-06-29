@@ -8,6 +8,633 @@
   min-height: 100vh;
 }
 
+/* ===== Shell público (landing + usuario invitado): sin sidebar, una sola top-bar ===== */
+.public-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.public-topbar {
+  align-items: center;
+  background: #081633;
+  box-shadow: 0 6px 24px -16px rgba(0, 0, 0, 0.7);
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 18px clamp(20px, 5vw, 64px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.public-topbar-wordmark {
+  align-items: center;
+  color: #fff;
+  display: inline-flex;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.public-topbar-wordmark img {
+  height: 40px;
+  width: 40px;
+}
+
+.public-topbar-wordmark span {
+  display: grid;
+  line-height: 1;
+}
+
+.public-topbar-wordmark strong {
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.public-topbar-wordmark em {
+  color: #f2d483;
+  font-size: 0.68rem;
+  font-style: normal;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+}
+
+.public-topbar-actions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 16px;
+}
+
+.public-topbar-wordmark {
+  flex: 0 0 auto;
+}
+
+.public-topbar-link {
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.public-topbar-link:hover {
+  color: #f2d483;
+}
+
+/* Botón "Crear cuenta" del top-bar: texto en blanco. */
+.public-topbar .hc-button-accent {
+  color: #fff;
+}
+
+/* Barra de búsqueda de servicios: fondo blanco, píldora, borde dorado (color app) y un segundo
+   campo claro con el dorado como único acento (marco + lupa + foco). */
+.public-search {
+  align-items: center;
+  background: #fff;
+  border: 1.5px solid var(--hc-accent);
+  border-radius: 999px;
+  box-shadow: 0 6px 16px -10px rgba(0, 0, 0, 0.55);
+  color: var(--hc-text-muted);
+  display: flex;
+  flex: 1 1 auto;
+  gap: 10px;
+  margin: 0 auto;
+  max-width: 520px;
+  padding: 9px 18px;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.public-search:focus-within {
+  border-color: var(--hc-accent-hover);
+  box-shadow: 0 0 0 3px var(--hc-accent-soft);
+}
+
+.public-search input {
+  background: transparent;
+  border: 0;
+  color: var(--hc-text);
+  flex: 1 1 auto;
+  font: inherit;
+  min-width: 0;
+  outline: none;
+}
+
+/* Botón de la lupa a la derecha: el dorado como color de acción. */
+.public-search-btn {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--hc-accent);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  padding: 0;
+}
+
+.public-search-btn:hover {
+  color: var(--hc-accent-hover);
+}
+
+/* Panel central: columna de bloques a todo el ancho, sin padding superior/inferior. */
+.public-panel {
+  align-items: stretch;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0;
+  width: 100%;
+}
+
+/* Bloque en blanco (maquetación): superficie clara a la espera de contenido. */
+.public-block {
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-border);
+  min-height: 320px;
+  width: 100%;
+}
+
+/* ===== Sección corporativa: gestión de calendario + reportes/comprobantes ===== */
+.lp-corporate {
+  background: var(--hc-surface);
+  border-top: 1px solid var(--hc-border);
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  padding: clamp(48px, 7vw, 88px) clamp(20px, 4vw, 48px);
+  width: 100%;
+}
+
+.lp-corporate-head {
+  margin: 0 auto;
+  max-width: 680px;
+  text-align: center;
+}
+
+.lp-corporate-head h2 {
+  color: var(--hc-text);
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  margin: 0 0 8px;
+}
+
+.lp-corporate-head p {
+  color: var(--hc-text-secondary);
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+.lp-corporate-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0 auto;
+  max-width: 900px;
+  width: 100%;
+}
+
+.lp-feature {
+  align-items: center;
+  background: var(--hc-bg, #f6f8fc);
+  border: 1px solid var(--hc-border);
+  border-radius: 18px;
+  display: flex;
+  gap: 20px;
+  padding: 28px;
+}
+
+.lp-feature-icon {
+  align-items: center;
+  background: var(--hc-primary-soft);
+  border-radius: 16px;
+  color: var(--hc-primary);
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 72px;
+  justify-content: center;
+  width: 72px;
+}
+
+.lp-feature-text h3 {
+  color: var(--hc-text);
+  font-size: 1.15rem;
+  margin: 0 0 6px;
+}
+
+.lp-feature-text p {
+  color: var(--hc-text-secondary);
+  font-size: 0.96rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+@media (max-width: 720px) {
+  .lp-corporate-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== Sección de productos: fondo azul de la app + mosaico de calendarios en azul claro ===== */
+.lp-products {
+  align-items: center;
+  background-color: #081633;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64' fill='none' stroke='%236f9bdc' stroke-opacity='0.03' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='20' y='22' width='24' height='22' rx='3'/%3E%3Cpath d='M37 18v8'/%3E%3Cpath d='M27 18v8'/%3E%3Cpath d='M20 31h24'/%3E%3C/svg%3E");
+  background-size: 64px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: clamp(40px, 6vw, 64px) clamp(20px, 4vw, 48px);
+  width: 100%;
+}
+
+.lp-products-head {
+  max-width: 640px;
+  text-align: center;
+}
+
+.lp-products-head h2 {
+  color: #fff;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  margin: 0 0 8px;
+}
+
+.lp-products-head p {
+  color: #c3d3ee;
+  margin: 0;
+}
+
+.lp-product-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  width: 100%;
+}
+
+.lp-product-card {
+  align-items: center;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 26px 22px;
+  text-align: center;
+  width: 210px;
+}
+
+.lp-product-icon {
+  align-items: center;
+  background: var(--hc-accent-soft);
+  border-radius: 14px;
+  color: var(--hc-accent);
+  display: inline-flex;
+  height: 52px;
+  justify-content: center;
+  margin-bottom: 4px;
+  width: 52px;
+}
+
+.lp-product-card h3 {
+  color: var(--hc-text);
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+.lp-product-cat {
+  color: var(--hc-text-secondary);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.lp-product-price {
+  color: var(--hc-primary);
+  font-weight: 800;
+  margin-top: 4px;
+}
+
+/* Carrusel + sección de productos llenan el alto restante (proporción 60/40 de la pantalla). */
+.lp-fold {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: calc(100svh - 80px);
+}
+
+.lp-fold .lp-carousel {
+  flex: 3 1 0;
+  min-height: 0;
+}
+
+.lp-fold .lp-products {
+  flex: 2 1 0;
+  justify-content: center;
+  min-height: 0;
+}
+
+/* ===== Carrusel del landing (figura humaaans + mensaje) ===== */
+.lp-carousel {
+  align-items: stretch;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  max-width: none;
+  position: relative;
+  width: 100%;
+}
+
+.lp-carousel-viewport {
+  border: 1px solid var(--hc-border);
+  background: var(--hc-surface);
+  height: 100%;
+  overflow: hidden;
+}
+
+.lp-carousel-track {
+  display: flex;
+  height: 100%;
+  transition: transform 480ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.lp-slide {
+  align-items: stretch;
+  display: grid;
+  flex: 0 0 100%;
+  gap: 28px;
+  /* Figura 60% / mensaje 40% del ancho. */
+  grid-template-columns: 3fr 2fr;
+  min-width: 0;
+  padding: 11px clamp(24px, 4vw, 48px);
+}
+
+.lp-slide-figure {
+  align-items: flex-end;
+  background: var(--hc-primary-soft);
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  padding: 16px 16px 0;
+  position: relative;
+}
+
+/* Solo la persona (hijo directo); el logo flotante vive dentro de .lp-slide-decor y no debe heredar esto. */
+.lp-slide-figure > img {
+  display: block;
+  /* Sombra que sigue la silueta (los SVG son transparentes) para dar profundidad a la escena. */
+  filter: drop-shadow(7px 12px 12px rgba(8, 22, 51, 0.28));
+  height: 300px;
+  position: relative;
+  transform-origin: bottom center;
+  width: auto;
+  z-index: 2;
+}
+
+/* La persona crece gradualmente y se inclina un poco mientras su tarjeta está expuesta. */
+.lp-slide.is-active .lp-slide-figure > img {
+  animation: lpFigureZoom 6000ms ease-out forwards;
+}
+
+@keyframes lpFigureZoom {
+  0% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.10) rotate(1.6deg); }
+  100% { transform: scale(1.18) rotate(-1.4deg); }
+}
+
+/* Capa de adornos: siempre detrás del humano (z-index menor que la imagen) y recortada por la figura. */
+.lp-slide-decor {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+
+/* Cada icono recibe su trayectoria/giro por variables CSS (aleatorias, inline desde el componente). */
+.lp-float {
+  animation-duration: 16s;
+  animation-iteration-count: infinite;
+  animation-name: lpFloat;
+  animation-timing-function: linear;
+  color: var(--hc-accent);
+  opacity: 0.7;
+  position: absolute;
+}
+
+/* El logo de Hermes flota igual que los iconos, pero a opacidad plena para que resalte. */
+.lp-float-logo {
+  height: auto;
+  opacity: 1;
+}
+
+@keyframes lpFloat {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(var(--x1, 24px), var(--y1, 30px)) rotate(var(--r1, 90deg)); }
+  50% { transform: translate(var(--x2, -20px), var(--y2, 48px)) rotate(var(--r2, 180deg)); }
+  75% { transform: translate(var(--x3, 30px), var(--y3, 18px)) rotate(var(--r3, 270deg)); }
+  100% { transform: translate(0, 0) rotate(var(--rend, 360deg)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-slide.is-active .lp-slide-figure img,
+  .lp-float {
+    animation: none;
+  }
+}
+
+.lp-slide-msg {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.lp-slide-msg h2 {
+  color: var(--hc-text);
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  margin: 0 0 12px;
+  text-shadow: 0 3px 10px rgba(8, 22, 51, 0.22);
+}
+
+.lp-slide-msg p {
+  color: var(--hc-text-secondary);
+  font-size: 1.02rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.lp-slide-note {
+  border-top: 1px solid var(--hc-border);
+  color: var(--hc-text-muted);
+  font-size: 0.92rem;
+  margin-top: 14px;
+  padding-top: 12px;
+}
+
+.lp-carousel-nav {
+  align-items: center;
+  align-self: center;
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-border);
+  border-radius: 999px;
+  color: var(--hc-primary);
+  cursor: pointer;
+  display: inline-flex;
+  height: 44px;
+  justify-content: center;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+  width: 44px;
+}
+
+.lp-carousel-nav:hover {
+  background: var(--hc-primary);
+  border-color: var(--hc-primary);
+  color: #fff;
+}
+
+/* Puntos superpuestos sobre la tarjeta, discretos (no ocupan una fila propia). */
+.lp-carousel-dots {
+  bottom: 14px;
+  display: flex;
+  gap: 7px;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+  z-index: 3;
+}
+
+.lp-carousel-dots button {
+  background: rgba(13, 52, 122, 0.28);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  height: 7px;
+  padding: 0;
+  transition: background-color 140ms ease, width 140ms ease;
+  width: 7px;
+}
+
+.lp-carousel-dots button.is-active {
+  background: var(--hc-accent);
+  width: 22px;
+}
+
+@media (max-width: 720px) {
+  .lp-slide {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .lp-slide-figure > img {
+    height: 230px;
+  }
+
+  .lp-carousel-nav {
+    display: none;
+  }
+}
+
+/* ===== Footer común estilo sitio web ===== */
+.site-footer {
+  background: #081633;
+  color: var(--hc-surface);
+  margin-top: auto;
+}
+
+.site-footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: 1100px;
+  padding: 48px clamp(20px, 5vw, 64px) 32px;
+}
+
+.site-footer-brand {
+  max-width: 320px;
+}
+
+.site-footer-wordmark {
+  align-items: center;
+  color: #fff;
+  display: inline-flex;
+  gap: 12px;
+}
+
+.site-footer-wordmark img {
+  height: 36px;
+  width: 36px;
+}
+
+.site-footer-wordmark span {
+  display: grid;
+  line-height: 1;
+}
+
+.site-footer-wordmark strong {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.site-footer-wordmark em {
+  color: #f2d483;
+  font-size: 0.64rem;
+  font-style: normal;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+}
+
+.site-footer-brand p {
+  color: #9fb0ce;
+  font-size: 0.92rem;
+  margin: 14px 0 0;
+}
+
+.site-footer-cols {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 48px;
+}
+
+.site-footer-col {
+  display: grid;
+  gap: 10px;
+}
+
+.site-footer-col h4 {
+  color: #fff;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+}
+
+.site-footer-link {
+  color: #9fb0ce;
+  font-size: 0.92rem;
+  text-decoration: none;
+}
+
+.site-footer-link:hover {
+  color: #fff;
+}
+
+.site-footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: #9fb0ce;
+  font-size: 0.85rem;
+  padding: 18px clamp(20px, 5vw, 64px);
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .public-search {
+    max-width: none;
+  }
+}
+
 .app-sidebar {
   background: var(--hc-surface);
   border-right: 1px solid var(--hc-border);
@@ -35,6 +662,7 @@
 
 .app-sidebar-link {
   align-items: center;
+  background: none;
   border-radius: 8px;
   color: var(--hc-text-secondary);
   display: flex;
@@ -55,6 +683,61 @@
 .app-sidebar-link-active:hover {
   background: var(--hc-primary-soft);
   color: var(--hc-primary);
+}
+
+/* Grupo desplegable del sidebar (p. ej. Organización) */
+.app-sidebar-group {
+  display: grid;
+  gap: 2px;
+}
+
+.app-sidebar-group-toggle {
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  text-align: left;
+  width: 100%;
+}
+
+.app-sidebar-group-toggle > span {
+  flex: 1 1 auto;
+}
+
+.app-sidebar-chevron {
+  color: var(--hc-text-muted);
+  flex: 0 0 auto;
+  transition: transform 160ms ease;
+}
+
+.app-sidebar-chevron-open {
+  transform: rotate(180deg);
+}
+
+.app-sidebar-submenu {
+  border-left: 1px solid var(--hc-border);
+  display: grid;
+  gap: 2px;
+  margin: 2px 0 4px 15px;
+  padding-left: 12px;
+}
+
+.app-sidebar-sublink {
+  align-items: center;
+  border-radius: 8px;
+  color: var(--hc-text-secondary);
+  display: flex;
+  font-size: 0.88rem;
+  font-weight: 700;
+  gap: 10px;
+  padding: 9px 10px;
+  text-decoration: none;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.app-sidebar-sublink:hover {
+  background: var(--hc-surface-alt);
+  color: var(--hc-text);
 }
 
 .app-sidebar-footer {
@@ -86,8 +769,8 @@
 
 .app-topbar {
   align-items: center;
-  background: var(--hc-surface);
-  border-bottom: 1px solid var(--hc-border);
+  background: var(--hc-primary-soft);
+  border-bottom: 1px solid rgba(13, 52, 122, 0.12);
   display: flex;
   gap: 12px;
   min-height: 68px;
@@ -115,13 +798,99 @@
   display: none;
 }
 
-/* Página: encabezado y rejillas */
+/* Página: encabezado y rejillas. Ocupa todo el ancho disponible de .app-content
+   (el gutter lo aporta el padding de .app-content), sin centrar ni limitar a 1180px. */
 .page {
   display: grid;
-  gap: 22px;
-  margin: 0 auto;
-  max-width: 1180px;
+  gap: 18px;
   width: 100%;
+}
+
+/* Barra superior compacta: miga de pan (router) + acciones. Sustituye al encabezado voluminoso. */
+.page-bar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  justify-content: space-between;
+  min-height: 30px;
+}
+
+.breadcrumbs {
+  align-items: center;
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+/* Herramientas de la página (búsqueda + filtros + conteo + acciones) alineadas a la derecha. */
+.page-bar-tools {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.page-bar-tools .hc-search {
+  max-width: 240px;
+}
+
+.page-bar-tools .table-toolbar-count {
+  white-space: nowrap;
+}
+
+.breadcrumb-item {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+}
+
+.breadcrumb-link {
+  color: var(--hc-text-secondary);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.breadcrumb-link:hover {
+  color: var(--hc-primary);
+  text-decoration: underline;
+}
+
+.breadcrumb-sep {
+  color: var(--hc-text-muted);
+  font-size: 0.85rem;
+}
+
+.breadcrumb-current {
+  color: var(--hc-text);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.page-bar-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+/* En pantallas estrechas, las herramientas bajan a una fila propia bajo la miga y la búsqueda crece. */
+@media (max-width: 720px) {
+  .page-bar-tools {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+  }
+
+  .page-bar-tools .hc-search {
+    flex: 1 1 auto;
+    max-width: none;
+  }
 }
 
 .page-header {
@@ -239,6 +1008,17 @@
   vertical-align: top;
 }
 
+/* Catálogo de servicios: las celdas se centran verticalmente (filas de poca altura) */
+.catalog-table tbody td {
+  vertical-align: middle;
+}
+
+/* Texto enmascarado en mayúscula sostenida (nombre, categoría, modalidad) */
+.cell-upper {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
 /* El separador de fila va en el <tr>, no en cada <td>: así la línea es continua
    aunque alguna celda use display:flex (cell-chips, row-actions), que de otro modo
    dibujaría el borde a la altura de su contenido y rompería la línea. */
@@ -319,6 +1099,66 @@
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }
 
+/* Selector de ubicación en mapa (Leaflet + OSM) */
+.hc-map-field {
+  display: grid;
+  gap: 8px;
+}
+
+.hc-map-search {
+  align-items: stretch;
+  display: flex;
+  gap: 8px;
+}
+
+.hc-map-search .hc-search {
+  flex: 1 1 auto;
+}
+
+.hc-map-results {
+  border: 1px solid var(--hc-border-strong);
+  border-radius: 8px;
+  display: grid;
+  list-style: none;
+  margin: 0;
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.hc-map-results button {
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: var(--hc-text);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 8px 10px;
+  text-align: left;
+  width: 100%;
+}
+
+.hc-map-results button:hover {
+  background: var(--hc-primary-soft);
+  color: var(--hc-primary);
+}
+
+/* El contenedor necesita altura explícita (si no, Leaflet renderiza 0px). z-index:0 + position
+   relative crean un stacking context propio para que el mapa no tape overlays de la página. */
+.hc-map-picker {
+  border: 1px solid var(--hc-border-strong);
+  border-radius: 8px;
+  height: 320px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  z-index: 0;
+}
+
+.hc-map-caption {
+  margin: 0;
+}
+
 .hc-select,
 .hc-time {
   background: transparent;
@@ -326,7 +1166,7 @@
   color: var(--hc-text);
   flex: 1 1 auto;
   font: inherit;
-  min-height: 46px;
+  min-height: 48px;
   outline: none;
   padding: 0 14px;
   width: 100%;
@@ -382,6 +1222,7 @@
   list-style: none;
   margin: 6px 0 0;
   max-height: 280px;
+  overflow-x: hidden;
   overflow-y: auto;
   padding: 6px;
   position: absolute;
@@ -406,6 +1247,7 @@
   padding: 9px 12px;
 }
 .hc-select-option-label {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -461,7 +1303,7 @@
 .hc-time {
   border: 1px solid var(--hc-border-strong);
   border-radius: 6px;
-  min-height: 44px;
+  min-height: 48px;
   width: auto;
 }
 
@@ -484,15 +1326,63 @@
 
 /* Modal */
 .hc-modal-overlay {
-  align-items: flex-start;
+  align-items: center;
   background: rgba(23, 32, 51, 0.45);
   display: flex;
   inset: 0;
   justify-content: center;
   overflow-y: auto;
-  padding: 48px 18px;
+  padding: 24px;
   position: fixed;
   z-index: 100;
+}
+
+/* Diálogo bloqueante de sesión expirada: por encima de TODO (modales, toasts) y sin descarte. */
+.session-expired-overlay {
+  align-items: center;
+  backdrop-filter: blur(3px);
+  background: rgba(13, 22, 41, 0.62);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 24px;
+  position: fixed;
+  z-index: 1000;
+}
+
+.session-expired-card {
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-border);
+  border-radius: 14px;
+  box-shadow: 0 30px 80px rgba(1, 12, 35, 0.45);
+  max-width: 420px;
+  padding: 28px 26px;
+  text-align: center;
+  width: 100%;
+}
+
+.session-expired-icon {
+  align-items: center;
+  background: var(--hc-warning-soft, #fff6df);
+  border-radius: 50%;
+  color: var(--hc-warning, #d98e04);
+  display: inline-flex;
+  height: 56px;
+  justify-content: center;
+  margin-bottom: 14px;
+  width: 56px;
+}
+
+.session-expired-card h2 {
+  color: var(--hc-text);
+  font-size: 1.25rem;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.session-expired-card p {
+  color: var(--hc-text-secondary);
+  margin: 0 0 20px;
 }
 
 .hc-modal {
@@ -501,8 +1391,9 @@
   box-shadow: var(--hc-shadow-card);
   display: flex;
   flex-direction: column;
-  max-width: 620px;
-  width: 100%;
+  /* Tamaño relativo al viewport, con un tope cómodo en pantallas grandes. */
+  width: min(680px, 92vw);
+  max-height: 90vh;
 }
 
 .hc-modal-header {
@@ -517,10 +1408,20 @@
   color: var(--hc-text);
   font-size: 1.2rem;
   margin: 0;
+  text-transform: uppercase;
 }
 
 .hc-modal-body {
   padding: 22px;
+  /* El cuerpo crece y hace scroll si el contenido excede la altura del diálogo (que está limitada a
+     90vh), manteniendo cabecera y pie siempre visibles y el diálogo centrado. */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  /* Legibilidad del texto de los diálogos */
+  color: var(--hc-text);
+  font-size: 1rem;
+  line-height: 1.55;
 }
 
 .hc-modal-footer {
@@ -567,32 +1468,165 @@
 }
 
 /* Agenda */
+/* Baldosas del horario semanal: una cuadrada por día, con una o varias franjas */
 .hours-grid {
   display: grid;
-  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px;
 }
 
-.hours-row {
-  align-items: center;
+.hours-tile {
+  aspect-ratio: 1 / 1;
+  background: var(--hc-surface);
   border: 1px solid var(--hc-border);
-  border-radius: 8px;
-  display: grid;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
-  grid-template-columns: 1fr auto auto auto;
-  padding: 8px 12px;
+  overflow: hidden;
+  padding: 14px;
 }
 
-.hours-row-off {
+/* Día activo: resaltado en azul de la marca */
+.hours-tile:not(.is-off) {
+  background: var(--hc-primary-soft);
+  border-color: var(--hc-primary);
+}
+
+/* Día inactivo: neutro */
+.hours-tile.is-off {
   background: var(--hc-surface-alt);
-  opacity: 0.75;
 }
 
-.hours-day {
+.hours-tile-head {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
   font-weight: 800;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.hours-tile-day {
+  text-transform: capitalize;
+}
+
+/* Checkbox en la esquina superior derecha de la baldosa */
+.hours-tile-check {
+  cursor: pointer;
+  flex: 0 0 auto;
+  height: 18px;
+  width: 18px;
+  accent-color: var(--hc-primary);
+}
+
+/* Franjas mostradas como texto dentro de la baldosa (una línea por franja) */
+.hours-tile-slots {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: center;
+}
+
+.hours-line {
+  align-items: center;
+  color: var(--hc-text);
+  display: inline-flex;
+  font-size: 0.95rem;
+  font-weight: 700;
+  gap: 6px;
+}
+
+.hours-line svg {
+  color: var(--hc-primary);
+}
+
+.hours-tile.is-off .hours-line {
+  color: var(--hc-text-muted);
+  font-weight: 600;
+}
+
+.hours-tile.is-off .hours-line svg {
+  color: var(--hc-text-muted);
+}
+
+/* Botón "Modificar horario" al pie de la baldosa */
+.hours-modify {
+  align-self: stretch;
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-primary);
+  border-radius: 8px;
+  color: var(--hc-primary);
+  cursor: pointer;
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 7px 10px;
+}
+
+.hours-modify:hover {
+  background: #fff;
+}
+
+/* Franjas: ocupan el espacio central de la baldosa; scroll si hubiera muchas */
+.hours-slots {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.hours-slot {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+}
+
+.hours-slot .hc-time {
+  background: var(--hc-surface);
+  flex: 1 1 0;
+  min-height: 40px;
+  min-width: 0;
+  padding: 4px 6px;
+  width: 100%;
+}
+
+.hours-slot-remove {
+  flex: 0 0 auto;
+  height: 26px;
+  width: 26px;
 }
 
 .hours-sep {
   color: var(--hc-text-muted);
+  flex: 0 0 auto;
+}
+
+/* Botón "Añadir franja" (discreto, punteado), anclado al fondo de la baldosa */
+.hours-add {
+  align-items: center;
+  background: none;
+  border: 1px dashed var(--hc-border-strong);
+  border-radius: 8px;
+  color: var(--hc-primary);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  gap: 6px;
+  justify-content: center;
+  padding: 6px 8px;
+}
+
+.hours-add:hover {
+  background: #fff;
+  border-color: var(--hc-primary);
 }
 
 .exception-form {
@@ -647,13 +1681,16 @@
 }
 
 /* Organización + tarjetas de exploración */
+/* Mini tarjeta de presentación de la organización (datos que solo edita el administrador del sistema) */
 .org-summary {
   align-items: center;
-  border-bottom: 1px solid var(--hc-border);
   display: flex;
-  gap: 14px;
-  margin-bottom: 22px;
-  padding-bottom: 18px;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 18px 20px;
+  background: var(--hc-primary-soft);
+  border: 1px solid var(--hc-border);
+  border-radius: 12px;
 }
 
 .org-summary-mark {
@@ -675,12 +1712,75 @@
 
 .org-summary strong {
   color: var(--hc-text);
-  font-size: 1.05rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .org-slug {
   color: var(--hc-text-muted);
   font-size: 0.84rem;
+}
+
+/* Fila compacta bajo el nombre: ciudad/país + indicadores */
+.org-summary-meta {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Cobros en línea: misma disposición que la tarjeta de Perfil — icono a la izquierda (centrado) y a su
+   derecha el cuerpo en columna: título con su indicador, subtítulo y el checkbox "Activar pagos en línea". */
+.pse-card .pse-card-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.pse-title {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+/* Indicadores de la tarjeta de presentación: solo el ícono sobre un círculo
+   (verde = activo/configurado, rojo = inactivo/sin configurar). */
+.org-indicators {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.org-dot {
+  align-items: center;
+  border-radius: 50%;
+  color: #fff;
+  display: inline-flex;
+  height: 26px;
+  justify-content: center;
+  width: 26px;
+}
+
+.org-dot.is-on {
+  background: var(--hc-success);
+}
+
+.org-dot.is-off {
+  background: var(--hc-danger);
+}
+
+/* Fila del nombre con su botón de edición al lado */
+.org-summary-name {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+.org-summary-edit {
+  flex: 0 0 auto;
 }
 
 .offering-grid {
@@ -752,12 +1852,13 @@
 
 /* Toasts */
 .hc-toasts {
-  bottom: 24px;
+  /* Justo debajo del topbar (sticky, min-height 68px), alineadas a la derecha. */
+  top: 84px;
   display: grid;
-  gap: 10px;
+  gap: 12px;
   position: fixed;
   right: 24px;
-  width: min(360px, calc(100vw - 32px));
+  width: min(440px, calc(100vw - 32px));
   z-index: 200;
 }
 
@@ -766,15 +1867,15 @@
   animation: hc-toast-in 180ms ease;
   background: var(--hc-surface);
   border: 1px solid var(--hc-border);
-  border-left-width: 4px;
-  border-radius: 8px;
+  border-left-width: 5px;
+  border-radius: 10px;
   box-shadow: var(--hc-shadow-card);
   color: var(--hc-text);
   display: flex;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 700;
-  gap: 10px;
-  padding: 12px 14px;
+  gap: 12px;
+  padding: 16px 18px;
 }
 
 .hc-toast span {
@@ -817,12 +1918,14 @@
 @keyframes hc-toast-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(-8px);
   }
 }
 
 .confirm-message {
-  color: var(--hc-text-secondary);
+  color: var(--hc-text);
+  font-size: 1rem;
+  line-height: 1.55;
   margin: 0;
 }
 
@@ -845,6 +1948,19 @@
   flex: 0 0 auto;
   font-size: 0.85rem;
   font-weight: 700;
+}
+
+/* Aviso de que un filtro client-side solo afecta a la página actual (paginación de servidor). */
+.table-toolbar-hint {
+  background: var(--hc-warning-soft, #fff6df);
+  border-radius: 6px;
+  color: var(--hc-warning, #d98e04);
+  cursor: help;
+  flex: 0 0 auto;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  white-space: nowrap;
 }
 
 /* Paginacion */
@@ -882,6 +1998,7 @@
   gap: 2px;
   margin-top: 6px;
   max-height: 240px;
+  overflow-x: hidden;
   overflow-y: auto;
   padding: 6px;
 }
@@ -1210,9 +2327,9 @@
   padding-right: 36px;
 }
 
-/* Alturas de control consistentes (inputs, selects, time) */
+/* Alturas de control consistentes (inputs, selects, time): 48px en todos. */
 .hc-time {
-  min-height: 46px;
+  min-height: 48px;
 }
 
 /* Anillos de foco visibles para elementos interactivos no-button (teclado) */
@@ -1289,11 +2406,11 @@ a:focus-visible {
 
 /* ===========================================================================
    Identidad "Cronógrafo de Hermes" aplicada a la app
-   Trae el carácter de la landing (Fraunces + mono + dorado) manteniendo el
-   dashboard claro y legible. Solo afecta titulares, etiquetas y acentos.
+   Tipografía unificada (una sola familia, Inter) con jerarquía por peso/tracking
+   y acentos dorados. Solo afecta titulares, etiquetas y acentos.
    =========================================================================== */
 
-/* Titulares editoriales en Fraunces */
+/* Titulares (familia base unificada, peso 600 para presencia) */
 .page-header h1,
 .panel-heading h2,
 .quicklinks-title,
@@ -1301,7 +2418,6 @@ a:focus-visible {
 .login-card-header h2,
 .hero-copy h1,
 .hc-modal-header h2,
-.org-summary strong,
 .status-panel h2 {
   font-family: var(--hc-font-display);
   font-weight: 600;
@@ -1315,7 +2431,7 @@ a:focus-visible {
   font-size: 2rem;
 }
 
-/* Etiquetas tipo "lectura de instrumento" en mono */
+/* Etiquetas tipo "lectura de instrumento" (familia base, con tracking amplio) */
 .eyebrow,
 .app-sidebar-role,
 .summary-card span,
@@ -1754,6 +2870,14 @@ a:focus-visible {
   min-width: 0;
 }
 
+/* Marca del diálogo: el logotipo de Hermes (mismo que el login), a color */
+.hc-modal-mark {
+  flex: 0 0 auto;
+  height: 30px;
+  width: 30px;
+  object-fit: contain;
+}
+
 .hc-modal-header {
   box-shadow: inset 0 -1px 0 0 var(--hc-border), inset 0 -3px 0 -1px rgba(224, 170, 44, 0.35);
 }
@@ -1822,32 +2946,69 @@ a:focus-visible {
 /* ===========================================================================
    Formulario de "agregar miembro": buscador a ancho completo + fila rol/botón
    =========================================================================== */
-.member-add-form {
-  display: grid;
-  gap: 18px;
+/* Diálogo "Agregar miembro": campo de correo + botón Buscar en una fila */
+.member-search-row {
+  align-items: flex-end;
+  display: flex;
+  gap: 10px;
 }
 
-.member-add-row {
-  align-items: end;
-  display: grid;
-  gap: 14px;
-  grid-template-columns: 1fr auto;
+.member-search-row > *:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
-@media (max-width: 560px) {
-  .member-add-row {
-    grid-template-columns: 1fr;
-  }
+/* Ficha del usuario encontrado por correo */
+.member-found {
+  background: var(--hc-primary-soft);
+  border: 1px solid var(--hc-border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 14px;
+  padding: 12px 14px;
 }
 
-/* Fila de alta con un solo control (sin selector de rol): botón a la derecha */
-.member-add-row-single {
-  grid-template-columns: auto;
-  justify-content: end;
+/* Correo bajo el nombre en la lista de miembros */
+.member-email {
+  color: var(--hc-text-muted);
+  display: block;
+  font-size: 0.85rem;
 }
 
-.member-add-note {
-  margin: 0;
+/* Tarjeta de presentación de la cuenta: nombre/correo arriba, rol + organización al pie */
+.account-card .account-card-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.account-card-info {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+/* El badge del rol mantiene su pastilla pero alinea el texto a la izquierda
+   con el nombre/correo/organización (compensa su padding horizontal). */
+.account-card-info .hc-badge {
+  margin-left: -10px;
+}
+
+/* Indicador (no interactivo) en miembros que son administradores: no se pueden dar de baja aquí */
+.member-locked {
+  align-items: center;
+  color: var(--hc-text-muted);
+  cursor: help;
+  display: inline-flex;
+  justify-content: center;
+  height: 36px;
+  width: 36px;
 }
 
 /* Glifo de reloj mínimo (legible a tamaños pequeños; trazo no escalable) */
@@ -1998,9 +3159,10 @@ a:focus-visible {
   color: #fff;
 }
 
-/* Un toque cálido en la topbar para enlazar con el riel oscuro */
+/* Sombra inferior ligera para separar la topbar (sticky) del contenido. El contraste principal
+   lo aporta el fondo azul tenue (--hc-primary-soft). */
 .app-topbar {
-  box-shadow: inset 0 -3px 0 -2px rgba(224, 170, 44, 0.25);
+  box-shadow: 0 4px 12px -6px rgba(15, 28, 52, 0.16);
 }
 
 /* ===========================================================================
@@ -2097,7 +3259,8 @@ a:focus-visible {
   display: inline-flex;
   font: inherit;
   gap: 9px;
-  max-width: 290px;
+  /* La píldora se adapta al ancho del nombre, con un tope cómodo; más allá, elipsis. */
+  max-width: 360px;
   min-height: 44px;
   padding: 4px 12px;
   text-align: left;
@@ -2134,10 +3297,11 @@ a:focus-visible {
   color: var(--hc-text);
   font-size: 0.9rem;
   font-weight: 850;
-  max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 /* El menú del selector de organización se alinea al borde derecho de la píldora. */
@@ -2145,6 +3309,13 @@ a:focus-visible {
   left: auto;
   min-width: 220px;
   right: 0;
+}
+
+/* Nombres de las organizaciones listadas en mayúscula sostenida */
+.org-switcher-menu .hc-select-option-label {
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-weight: 600;
 }
 
 /* Resaltado al pasar el ratón (complementa is-active del Select por teclado). */
@@ -2212,10 +3383,91 @@ a:focus-visible {
   opacity: 1;
 }
 
+/* Input de archivo (anexos FILE en la reserva) */
+.hc-file-input {
+  background: var(--hc-surface);
+  border: 1px dashed var(--hc-border);
+  border-radius: 10px;
+  color: var(--hc-text);
+  font: inherit;
+  padding: 10px 12px;
+  width: 100%;
+}
+
+.hc-file-input::file-selector-button {
+  background: var(--hc-surface-2, #eef1f6);
+  border: 1px solid var(--hc-border);
+  border-radius: 8px;
+  color: var(--hc-text);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  margin-right: 10px;
+  padding: 6px 12px;
+}
+
+.hc-file-input:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
 /* Detalle de cita (vista del colaborador) */
 .appt-detail {
   display: grid;
   gap: 18px;
+}
+
+/* Acciones del detalle como botones de solo icono (con tooltip) en el pie del diálogo. */
+.appt-detail-actions {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+/* Botones de acción: color sólido, cuadrados con esquinas redondeadas. */
+.appt-detail-actions .hc-button.appt-action {
+  align-items: center;
+  border: 0;
+  border-radius: 10px;
+  color: #fff;
+  height: 40px;
+  justify-content: center;
+  padding: 0;
+  width: 40px;
+}
+
+.appt-detail-actions .hc-button.appt-action:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.appt-detail-actions .hc-button.appt-action:disabled {
+  opacity: 0.5;
+}
+
+.appt-detail-actions .appt-action.is-success { background: var(--hc-success); }
+.appt-detail-actions .appt-action.is-danger { background: var(--hc-danger); }
+.appt-detail-actions .appt-action.is-info { background: var(--hc-info); }
+.appt-detail-actions .appt-action.is-primary { background: var(--hc-primary); }
+
+/* Rejilla compacta de 2 columnas para aprovechar el ancho del diálogo. */
+.session-details.appt-detail-grid {
+  gap: 12px 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.session-details.appt-detail-grid div {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.session-details.appt-detail-grid .appt-detail-wide {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 540px) {
+  .session-details.appt-detail-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .appt-detail-muted {
@@ -2254,25 +3506,86 @@ a:focus-visible {
 }
 
 /* Vista previa embebida del PDF de reportes */
-.report-preview-head {
-  align-items: center;
-  display: flex;
-  gap: 12px;
-  justify-content: space-between;
-  margin-bottom: 12px;
+/* ===== Reportes: baldosas ===== */
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
 }
 
-.report-preview {
+.report-tile {
+  aspect-ratio: 1 / 1;
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-border);
+  border-radius: 16px;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font: inherit;
+  gap: 10px;
+  padding: 20px;
+  text-align: left;
+  transition: border-color 0.12s ease, background-color 0.12s ease, transform 0.12s ease;
+}
+
+.report-tile:hover:not(:disabled) {
+  background: var(--hc-primary-soft);
+  border-color: var(--hc-primary);
+  transform: translateY(-2px);
+}
+
+.report-tile:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.report-tile-icon {
+  align-items: center;
+  background: var(--hc-primary-soft);
+  border-radius: 12px;
+  color: var(--hc-primary);
+  display: inline-flex;
+  height: 48px;
+  justify-content: center;
+  width: 48px;
+}
+
+.report-tile strong {
+  font-size: 1.05rem;
+  margin-top: auto;
+}
+
+.report-tile-desc {
+  color: var(--hc-text-secondary);
+  font-size: 0.85rem;
+}
+
+/* ===== Reportes: diálogo del visor de PDF ===== */
+.hc-modal.hc-modal-wide {
+  width: min(980px, 95vw);
+}
+
+.report-range {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.report-loading {
+  color: var(--hc-text-secondary);
+  padding: 24px 0;
+  text-align: center;
+}
+
+.report-viewer {
   border: 1px solid var(--hc-border);
   border-radius: 8px;
   display: block;
-  height: 72vh;
+  height: 68vh;
   width: 100%;
-}
-
-/* Dentro de un modal (comprobante) el visor es algo más bajo para encajar */
-.hc-modal .report-preview {
-  height: 60vh;
 }
 
 /* Tarjetas-métrica clicables (overview): afordancia de enlace */
@@ -2387,6 +3700,134 @@ a:focus-visible {
 /* ===========================================================================
    Explorar (vista del invitado): marketplace vistoso
    =========================================================================== */
+/* La exploración ocupa todo el ancho y el alto restante de la pantalla (el footer queda bajo el
+   pliegue): sin padding y llenando el viewport menos la barra superior. */
+.app-content:has(.explore-page) {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100svh - 76px);
+  padding: 0;
+}
+
+/* Inicio del invitado = misma landing (full-width, sin padding del contenedor) que el anónimo. */
+.app-content:has(.public-panel) {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.explore-page {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Filtros (izquierda, ancho según contenido) + resultados (derecha), ambos al 100% de la altura del
+   layout y separados por una línea vertical a toda la altura. */
+.explore-layout {
+  align-items: stretch;
+  display: grid;
+  flex: 1 1 auto;
+  gap: 0;
+  grid-template-columns: auto minmax(0, 1fr);
+  min-height: 0;
+}
+
+.explore-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 28px;
+  position: relative;
+}
+
+/* Separador vertical a toda la altura, en color sólido. */
+.explore-filters::after {
+  background: rgba(13, 52, 122, 0.22);
+  bottom: 0;
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 2px;
+}
+
+.explore-filters-head {
+  align-items: center;
+  color: var(--hc-text);
+  display: flex;
+  gap: 8px;
+}
+
+.explore-filters-head strong {
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.explore-radio-group {
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+.explore-radio-group legend {
+  color: var(--hc-text-muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+  padding: 0;
+  text-transform: uppercase;
+}
+
+.explore-radio {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.95rem;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.explore-radio input {
+  accent-color: var(--hc-primary);
+}
+
+.explore-results {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 24px 28px;
+}
+
+/* Estado vacío/cargando/error: llena el alto de la sección y centra el mensaje (no queda arriba). */
+.explore-results > .data-state {
+  flex: 1 1 auto;
+}
+
+.explore-results .hc-pagination {
+  margin-top: 24px;
+}
+
+@media (max-width: 760px) {
+  .explore-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .explore-filters {
+    border-bottom: 1px solid var(--hc-border);
+  }
+
+  .explore-filters::after {
+    display: none;
+  }
+}
+
 .explore-hero {
   background: radial-gradient(120% 150% at 92% 8%, var(--hc-midnight-2), var(--hc-midnight) 66%);
   border: 1px solid rgba(242, 212, 131, 0.18);
@@ -2668,6 +4109,49 @@ a:focus-visible {
   gap: 10px;
   justify-content: space-between;
   padding: 11px 18px;
+}
+
+/* Acciones de la tarjeta: reservar (crece) + ver. */
+.svc-card-actions {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr auto;
+  padding: 0 16px 16px;
+}
+
+/* Diálogo "Ver": datos del producto + establecimiento + mapa. */
+.svc-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.svc-detail-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.svc-detail-desc {
+  color: var(--hc-text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.svc-detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.svc-detail-reqs {
+  color: var(--hc-text-secondary);
+  margin: 0;
+  padding-left: 18px;
+}
+
+.svc-detail-map .hc-map-picker {
+  height: 280px;
 }
 
 .svc-duration {

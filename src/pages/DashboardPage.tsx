@@ -10,7 +10,7 @@ export function DashboardPage() {
   const { logout, session } = useAuth();
   const { t } = useTranslation(['common', 'dashboard']);
   const profile = session?.profile;
-  const userLabel = profile?.email ?? profile?.preferred_username ?? profile?.sub ?? t('dashboard:fallback.user');
+  const userLabel = profile?.name ?? profile?.email ?? profile?.preferred_username ?? profile?.sub ?? t('dashboard:fallback.user');
   const kind = actorKind(profile);
   const isTenant = kind === 'tenant-admin' || kind === 'tenant-partner';
   const scopeLabel =

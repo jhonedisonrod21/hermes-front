@@ -1,44 +1,56 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Building2, CalendarPlus, Clock, LayoutGrid, MapPin, Search, Tag } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { CalendarPlus, Clock, Eye, MapPin, SlidersHorizontal, Tag } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { DataState } from '../../components/DataState';
-import { HermesDial } from '../../components/HermesDial';
-import { Button, Select } from '../../components/ui';
+import { Badge, Button, Pagination } from '../../components/ui';
 import { BookingModal } from './BookingModal';
+import { OfferingDetailModal } from './OfferingDetailModal';
 import { catalogApi } from '../../api/services';
+import { useAuth } from '../../hermes-security/useAuth';
 import type { OfferingSearchResult } from '../../api/types';
 import { formatDuration, formatMoney } from '../../lib/format';
 
-const MODALITIES = ['', 'IN_PERSON', 'VIRTUAL', 'BOTH'];
-type View = 'grid' | 'tenant';
+const PAGE_SIZE = 12;
 
-/** Iniciales de la organización para el avatar (hasta 2 letras). */
-function orgInitials(name: string) {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join('')
-    .toUpperCase();
-}
+/** Opciones de modalidad para los radio buttons del panel de filtros. */
+const MODALITY_OPTIONS = [
+  { value: '', labelKey: 'explore:anyModality' },
+  { value: 'IN_PERSON', labelKey: 'catalog:modality.IN_PERSON' },
+  { value: 'VIRTUAL', labelKey: 'catalog:modality.VIRTUAL' },
+  { value: 'BOTH', labelKey: 'catalog:modality.BOTH' }
+];
 
 export function ExplorePage() {
   const { t, i18n } = useTranslation(['explore', 'catalog', 'common']);
-  const [q, setQ] = useState('');
+  const { authenticated } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialQ = searchParams.get('q') ?? '';
+  const [q, setQ] = useState(initialQ);
   const [modality, setModality] = useState('');
-  const [view, setView] = useState<View>('grid');
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
   const [items, setItems] = useState<OfferingSearchResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [booking, setBooking] = useState<OfferingSearchResult | null>(null);
+  const [detail, setDetail] = useState<OfferingSearchResult | null>(null);
 
-  const runSearch = useCallback(async (text: string, mod: string) => {
+  const runSearch = useCallback(async (text: string, mod: string, pageNum: number) => {
     setLoading(true);
     setError(null);
     try {
-      const page = await catalogApi.search({ q: text || undefined, modality: mod || undefined, size: 60 });
-      setItems(page.content);
+      const result = await catalogApi.searchPublic({
+        q: text || undefined,
+        modality: mod || undefined,
+        page: pageNum,
+        size: PAGE_SIZE
+      });
+      setItems(result.content);
+      setTotalPages(result.totalPages);
+      setTotalElements(result.totalElements);
     } catch (err) {
       setError(err instanceof Error ? err : new Error(String(err)));
     } finally {
@@ -46,33 +58,42 @@ export function ExplorePage() {
     }
   }, []);
 
-  // Muestra servicios desde el primer momento (sin pantalla en blanco).
+  // Nueva búsqueda desde el top-bar (?q=): reinicia modalidad y vuelve a la primera página.
   useEffect(() => {
-    runSearch('', '');
-  }, [runSearch]);
+    setQ(initialQ);
+    setModality('');
+    setPage(0);
+    runSearch(initialQ, '', 0);
+  }, [runSearch, initialQ]);
 
-  // Agrupa los servicios por organización (para la vista "Por organización").
-  const groups = useMemo(() => {
-    const map = new Map<string, { name: string; items: OfferingSearchResult[] }>();
-    for (const o of items) {
-      const key = o.tenantId || o.tenantName || 'sin-org';
-      const entry = map.get(key) ?? { name: o.tenantName || t('explore:unknownOrg'), items: [] };
-      entry.items.push(o);
-      map.set(key, entry);
-    }
-    return [...map.values()].sort((a, b) => a.name.localeCompare(b.name));
-  }, [items, t]);
+  function changeModality(value: string) {
+    setModality(value);
+    setPage(0);
+    runSearch(q, value, 0);
+  }
+  function changePage(value: number) {
+    setPage(value);
+    runSearch(q, modality, value);
+  }
 
-  function renderCard(o: OfferingSearchResult, showTenant: boolean) {
+  // Reservar exige sesión: un visitante sin cuenta va primero a acceder.
+  function book(o: OfferingSearchResult) {
+    if (authenticated) setBooking(o);
+    else navigate('/acceso');
+  }
+
+  function renderCard(o: OfferingSearchResult) {
     return (
       <article className="svc-card" key={o.id}>
         <div className="svc-card-band">
-          <span className="svc-modality">{t(`catalog:modality.${o.modality}`, o.modality)}</span>
-          <span className="svc-price">{formatMoney(o.priceAmount, o.priceCurrency, i18n.language)}</span>
+          <Badge tone="info">{t(`catalog:modality.${o.modality}`, o.modality)}</Badge>
+          {o.priceAmount != null && o.priceAmount > 0 ? (
+            <span className="svc-price">{formatMoney(o.priceAmount, o.priceCurrency, i18n.language)}</span>
+          ) : null}
         </div>
         <div className="svc-card-body">
           <h3>{o.name}</h3>
-          {showTenant && o.tenantName ? (
+          {o.tenantName ? (
             <p className="svc-tenant">
               <MapPin size={14} /> {o.tenantName}
             </p>
@@ -82,7 +103,6 @@ export function ExplorePage() {
               <Tag size={13} /> {o.category}
             </p>
           ) : null}
-          {o.description ? <p className="svc-desc">{o.description}</p> : null}
         </div>
         <div className="svc-card-foot">
           <span className="svc-duration">
@@ -90,100 +110,60 @@ export function ExplorePage() {
           </span>
           {o.requiresOnlinePayment ? <span className="svc-pay">{t('explore:onlinePayment')}</span> : null}
         </div>
-        <Button variant="accent" fullWidth icon={<CalendarPlus size={17} />} onClick={() => setBooking(o)}>
-          {t('explore:book')}
-        </Button>
+        <div className="svc-card-actions">
+          <Button variant="accent" icon={<CalendarPlus size={16} />} onClick={() => book(o)}>
+            {t('explore:book')}
+          </Button>
+          <Button variant="secondary" icon={<Eye size={16} />} onClick={() => setDetail(o)}>
+            {t('explore:view')}
+          </Button>
+        </div>
       </article>
     );
   }
 
   return (
     <div className="page explore-page">
-      <header className="explore-hero">
-        <HermesDial className="explore-hero-dial" labels={false} />
-        <div className="explore-hero-copy">
-          <p className="eyebrow">{t('explore:eyebrow')}</p>
-          <h1>{t('explore:heroTitle')}</h1>
-          <p>{t('explore:heroSubtitle')}</p>
-        </div>
-        <form
-          className="explore-searchbar"
-          onSubmit={(e) => {
-            e.preventDefault();
-            runSearch(q, modality);
-          }}
-        >
-          <span className="explore-search-field">
-            <Search size={18} />
-            <input
-              type="search"
-              placeholder={t('explore:fields.queryPlaceholder')}
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              aria-label={t('explore:fields.query')}
-            />
-          </span>
-          <Select
-            className="explore-modality"
-            aria-label={t('catalog:fields.modality')}
-            value={modality}
-            onChange={(e) => setModality(e.target.value)}
-            placeholder={t('explore:anyModality')}
-            options={MODALITIES.filter(Boolean).map((m) => ({ value: m, label: t(`catalog:modality.${m}`) }))}
-          />
-          <Button type="submit" icon={<Search size={17} />}>
-            {t('explore:search')}
-          </Button>
-        </form>
-      </header>
-
-      <DataState loading={loading} error={error} empty={items.length === 0} emptyMessage={t('explore:noResults')} onRetry={() => runSearch(q, modality)}>
-        <div className="explore-toolbar">
-          <p className="explore-count">
-            {t('common:pagination.items', { count: items.length })}
-            {view === 'tenant' ? ` · ${t('explore:orgsCount', { count: groups.length })}` : ''}
-          </p>
-          <div className="explore-view-toggle" role="group" aria-label={t('explore:viewLabel')}>
-            <button
-              type="button"
-              className={view === 'grid' ? 'is-active' : ''}
-              aria-pressed={view === 'grid'}
-              onClick={() => setView('grid')}
-            >
-              <LayoutGrid size={15} /> {t('explore:viewServices')}
-            </button>
-            <button
-              type="button"
-              className={view === 'tenant' ? 'is-active' : ''}
-              aria-pressed={view === 'tenant'}
-              onClick={() => setView('tenant')}
-            >
-              <Building2 size={15} /> {t('explore:viewByOrg')}
-            </button>
+      <div className="explore-layout">
+        {/* Sección izquierda: filtros (se adapta al ancho de su contenido). */}
+        <aside className="explore-filters">
+          <div className="explore-filters-head">
+            <SlidersHorizontal size={16} />
+            <strong>{t('explore:filtersTitle')}</strong>
           </div>
-        </div>
-
-        {view === 'grid' ? (
-          <div className="svc-grid">{items.map((o) => renderCard(o, true))}</div>
-        ) : (
-          <div className="explore-orgs">
-            {groups.map((g) => (
-              <section className="explore-org" key={g.name}>
-                <div className="explore-org-head">
-                  <span className="explore-org-avatar" aria-hidden="true">{orgInitials(g.name)}</span>
-                  <div className="explore-org-info">
-                    <h2>{g.name}</h2>
-                    <span className="explore-org-meta">{t('explore:servicesCount', { count: g.items.length })}</span>
-                  </div>
-                </div>
-                <div className="svc-grid">{g.items.map((o) => renderCard(o, false))}</div>
-              </section>
+          <fieldset className="explore-radio-group">
+            <legend>{t('catalog:fields.modality')}</legend>
+            {MODALITY_OPTIONS.map((opt) => (
+              <label className="explore-radio" key={opt.value || 'any'}>
+                <input
+                  type="radio"
+                  name="modality"
+                  checked={modality === opt.value}
+                  onChange={() => changeModality(opt.value)}
+                />
+                <span>{t(opt.labelKey)}</span>
+              </label>
             ))}
-          </div>
-        )}
-      </DataState>
+          </fieldset>
+        </aside>
+
+        {/* Sección derecha: resultados en tarjetas + paginación. */}
+        <div className="explore-results">
+          <DataState
+            loading={loading}
+            error={error}
+            empty={items.length === 0}
+            emptyMessage={t('explore:noResults')}
+            onRetry={() => runSearch(q, modality, page)}
+          >
+            <div className="svc-grid">{items.map((o) => renderCard(o))}</div>
+            <Pagination page={page} totalPages={totalPages} totalElements={totalElements} onChange={changePage} />
+          </DataState>
+        </div>
+      </div>
 
       <BookingModal offering={booking} onClose={() => setBooking(null)} />
+      <OfferingDetailModal offering={detail} onClose={() => setDetail(null)} onBook={book} />
     </div>
   );
 }

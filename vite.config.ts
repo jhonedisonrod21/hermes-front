@@ -30,7 +30,15 @@ export default defineConfig(({ mode }) => {
         },
         // Catálogo público para la vitrina de la landing (sin sesión). Requiere que el gateway y el
         // catalog-service permitan /catalog/search sin autenticación (cambio de backend).
-        '/catalog': {
+        // Regex anclada a /catalog/ para NO capturar la ruta del SPA /catalogo (Vite hace match por prefijo).
+        '^/catalog/': {
+          target: gatewayTarget,
+          changeOrigin: true,
+          secure: false
+        },
+        // Info pública de establecimientos (/tenant/public/** es permitAll en el gateway). Solo se usa
+        // para la exploración sin sesión; el resto de /tenant va por el BFF autenticado (/bff/api/tenant).
+        '/tenant': {
           target: gatewayTarget,
           changeOrigin: true,
           secure: false

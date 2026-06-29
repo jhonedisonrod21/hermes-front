@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pencil, Plus, UsersRound } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '../../components/PageHeader';
@@ -6,8 +6,7 @@ import { DataState } from '../../components/DataState';
 import { Badge, Button, Card, Pagination, SearchInput, Select } from '../../components/ui';
 import { TenantFormModal } from './TenantFormModal';
 import { TenantMembersModal } from './TenantMembersModal';
-import { useResource } from '../../hooks/useResource';
-import { useClientTable } from '../../hooks/useClientTable';
+import { useServerTable } from '../../hooks/useServerTable';
 import { useToast } from '../../components/feedback/toast';
 import { useConfirm } from '../../components/feedback/confirm';
 import { tenantApi } from '../../api/services';
@@ -30,7 +29,7 @@ export function TenantsPage() {
   const { t, i18n } = useTranslation(['admin', 'common']);
   const toast = useToast();
   const confirm = useConfirm();
-  const tenants = useResource(() => tenantApi.listTenants({ size: 200, sort: 'createdAt,desc' }), []);
+  const table = useServerTable((p) => tenantApi.listTenants({ ...p, sort: 'createdAt,desc' }), { size: 12 });
   const [busyId, setBusyId] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [formEditing, setFormEditing] = useState<TenantResponse | null>(null);
@@ -38,13 +37,16 @@ export function TenantsPage() {
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  const items = tenants.data?.content ?? [];
-  const visible = statusFilter ? items.filter((tn) => tn.status === statusFilter) : items;
-  const { paged, page, setPage, totalPages, total } = useClientTable(visible, {
-    query,
-    match: useCallback(matchTenant, []),
-    resetKey: statusFilter
-  });
+  // El endpoint no acepta búsqueda; el filtro/búsqueda se aplica sobre la página cargada (se avisa).
+  const q = query.trim().toLowerCase();
+  const clientFiltered = useMemo(
+    () =>
+      table.items
+        .filter((tn) => (statusFilter ? tn.status === statusFilter : true))
+        .filter((tn) => (q ? matchTenant(tn, q) : true)),
+    [table.items, statusFilter, q]
+  );
+  const pageFilterActive = Boolean(q || statusFilter);
 
   function openCreate() {
     setFormEditing(null);
@@ -70,7 +72,7 @@ export function TenantsPage() {
     try {
       await tenantApi.setTenantStatus(tn.id, { status: next });
       toast.success(t('common:feedback.updated'));
-      tenants.reload();
+      table.reload();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t('common:feedback.error'));
     } finally {
@@ -89,11 +91,8 @@ export function TenantsPage() {
             {t('admin:tenants.new')}
           </Button>
         }
-      />
-
-      <Card className="table-card">
-        <div className="table-toolbar">
-          <div className="table-toolbar-filters">
+        tools={
+          <>
             <SearchInput
               placeholder={t('admin:tenants.searchPlaceholder')}
               value={query}
@@ -106,22 +105,29 @@ export function TenantsPage() {
               placeholder={t('admin:tenants.allStatus')}
               options={STATUSES.map((s) => ({ value: s, label: t(`admin:tenants.statusValues.${s}`, s) }))}
             />
-          </div>
-          <span className="table-toolbar-count">{t('common:pagination.items', { count: total })}</span>
-        </div>
+            <span className="table-toolbar-count">{t('common:pagination.items', { count: table.totalElements })}</span>
+            {pageFilterActive ? (
+              <span className="table-toolbar-hint" title={t('common:pagination.currentPageFilterHint')}>
+                {t('common:pagination.currentPageFilter')}
+              </span>
+            ) : null}
+          </>
+        }
+      />
+
+      <Card className="table-card">
         <DataState
-          loading={tenants.loading}
-          error={tenants.error}
-          empty={total === 0}
+          loading={table.loading}
+          error={table.error}
+          empty={clientFiltered.length === 0}
           emptyMessage={t('admin:tenants.empty')}
-          onRetry={tenants.reload}
+          onRetry={table.reload}
         >
           <div className="hc-table-scroll">
           <table className="hc-table">
             <thead>
               <tr>
                 <th>{t('admin:tenants.name')}</th>
-                <th>{t('admin:tenants.slug')}</th>
                 <th>{t('admin:tenants.location')}</th>
                 <th>{t('admin:tenants.status')}</th>
                 <th>{t('admin:tenants.created')}</th>
@@ -129,11 +135,10 @@ export function TenantsPage() {
               </tr>
             </thead>
             <tbody>
-              {paged.map((tn) => (
+              {clientFiltered.map((tn) => (
                 <tr key={tn.id}>
-                  <td><strong>{tn.name}</strong></td>
-                  <td><code>{tn.slug}</code></td>
-                  <td>{[tn.city, tn.country].filter(Boolean).join(', ') || '—'}</td>
+                  <td><strong className="cell-upper">{tn.name}</strong></td>
+                  <td className="cell-upper">{[tn.city, tn.country].filter(Boolean).join(', ') || '—'}</td>
                   <td>
                     <Badge tone={STATUS_TONE[tn.status] ?? 'info'}>{t(`admin:tenants.statusValues.${tn.status}`, tn.status)}</Badge>
                   </td>
@@ -159,11 +164,16 @@ export function TenantsPage() {
             </tbody>
           </table>
           </div>
-          <Pagination page={page} totalPages={totalPages} totalElements={total} onChange={setPage} />
+          <Pagination
+            page={table.page}
+            totalPages={table.totalPages}
+            totalElements={table.totalElements}
+            onChange={table.setPage}
+          />
         </DataState>
       </Card>
 
-      <TenantFormModal open={formOpen} editing={formEditing} onClose={() => setFormOpen(false)} onSaved={() => tenants.reload()} />
+      <TenantFormModal open={formOpen} editing={formEditing} onClose={() => setFormOpen(false)} onSaved={() => table.reload()} />
       <TenantMembersModal tenant={membersOf} onClose={() => setMembersOf(null)} />
     </div>
   );

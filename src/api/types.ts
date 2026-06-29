@@ -99,6 +99,18 @@ export type ScheduleExceptionResponse = {
 // ---- Tenant (hermes-tenant-service) ----
 export type GeoPointDto = { latitude: number; longitude: number };
 
+/** Datos públicos de un establecimiento (vitrina/exploración, sin sesión). */
+export type PublicOrganizationResponse = {
+  id: string;
+  slug: string;
+  name: string;
+  country?: string;
+  city?: string;
+  address?: string;
+  description?: string;
+  location?: GeoPointDto;
+};
+
 export type TenantStatus = 'ACTIVE' | 'SUSPENDED' | 'PENDING' | string;
 
 export type TenantResponse = {
@@ -143,6 +155,7 @@ export type TenantStatusUpdateRequest = { status: string };
 /** Campos que el TENANT_ADMIN puede modificar de su propio establecimiento vía `/tenant/me`. */
 export type TenantContactUpdateRequest = {
   taxId: string;
+  city?: string;
   address?: string;
   description?: string;
   timeZone?: string;
@@ -166,6 +179,7 @@ export type UserResponse = {
   id: string;
   username: string;
   email: string;
+  name?: string;
   enabled: boolean;
   locked: boolean;
   roles: string[];
@@ -173,9 +187,9 @@ export type UserResponse = {
 };
 
 /** Ficha mínima de un usuario para resolver id -> nombre/correo (directorio del tenant). */
-export type UserCardResponse = { id: string; username: string; email: string };
+export type UserCardResponse = { id: string; username: string; email: string; name?: string };
 
-export type UserUpdateRequest = { username: string; email: string; phone?: string };
+export type UserUpdateRequest = { name: string; username: string; email: string; phone?: string };
 
 export type UserLockRequest = { locked: boolean };
 
@@ -184,6 +198,7 @@ export type SelfProfileResponse = {
   id: string;
   username: string;
   email: string;
+  name?: string;
   phone?: string;
   roles: string[];
 };
@@ -232,6 +247,14 @@ export type AppointmentBookingRequest = {
 };
 
 export type RescheduleRequest = { newSlotStart: string };
+
+/** Anexo de archivo subido antes de reservar; su `fileId` se envía como valor del requisito FILE. */
+export type RequirementFileResponse = {
+  fileId: string;
+  filename: string;
+  contentType: string;
+  size: number;
+};
 
 export type AppointmentResponse = {
   id: string;

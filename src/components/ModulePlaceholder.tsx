@@ -29,20 +29,7 @@ export function ModulePlaceholder({ eyebrow, title, description, service, capabi
         </div>
         <Badge tone="warning">{t('placeholder.pending')}</Badge>
         <h2>{t('placeholder.title')}</h2>
-        <p className="placeholder-service">
-          {t('placeholder.service')}: <code>{service}</code>
-        </p>
-        {capabilities?.length ? (
-          <>
-            <p className="placeholder-planned">{t('placeholder.planned')}</p>
-            <ul className="placeholder-list">
-              {capabilities.map((c) => (
-                <li key={c}>{c}</li>
-              ))}
-            </ul>
-          </>
-        ) : null}
-        {children}
+        
       </Card>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronDown, LogOut, UserCircle, UserRound } from 'lucide-react';
+import { CalendarCheck, ChevronDown, KeyRound, LogOut, UserCircle, UserRound } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -92,6 +92,18 @@ export function UserAccountMenu({ profile, onLogout }: UserAccountMenuProps) {
           <Link className="user-menu-item" to="/cuenta" role="menuitem" onClick={() => setOpen(false)}>
             <UserCircle size={18} />
             {t('dashboard:userMenu.profile')}
+          </Link>
+
+          {kind === 'guest' ? (
+            <Link className="user-menu-item" to="/mis-reservas" role="menuitem" onClick={() => setOpen(false)}>
+              <CalendarCheck size={18} />
+              {t('dashboard:userMenu.bookings')}
+            </Link>
+          ) : null}
+
+          <Link className="user-menu-item" to="/cuenta/contrasena" role="menuitem" onClick={() => setOpen(false)}>
+            <KeyRound size={18} />
+            {t('dashboard:userMenu.changePassword')}
           </Link>
 
           <div className="user-menu-language">

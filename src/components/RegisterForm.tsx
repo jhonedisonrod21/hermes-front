@@ -1,5 +1,5 @@
 import { FormEvent, useState } from 'react';
-import { Eye, EyeOff, LockKeyhole, Mail, UserPlus } from 'lucide-react';
+import { Eye, EyeOff, LockKeyhole, Mail, User, UserPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hermes-security/useAuth';
 import { authService } from '../hermes-security/authService';
@@ -10,6 +10,7 @@ const MIN_PASSWORD = 8;
 export function RegisterForm() {
   const { login } = useAuth();
   const { t } = useTranslation('auth');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -30,10 +31,14 @@ export function RegisterForm() {
       setError(t('register.errors.passwordMismatch'));
       return;
     }
+    if (!name.trim()) {
+      setError(t('register.errors.nameRequired'));
+      return;
+    }
 
     setSubmitting(true);
     try {
-      await authService.register(email.trim().toLowerCase(), password);
+      await authService.register(name.trim(), email.trim().toLowerCase(), password);
       // Registro correcto: iniciamos sesión enseguida (login() redirige al flujo OAuth del BFF).
       await login(email.trim().toLowerCase(), password);
     } catch (exception) {
@@ -45,6 +50,18 @@ export function RegisterForm() {
 
   return (
     <form className="login-form" onSubmit={handleSubmit}>
+      <TextField
+        autoComplete="name"
+        label={t('register.name')}
+        leadingIcon={<User size={18} />}
+        name="name"
+        onChange={(event) => setName(event.target.value)}
+        placeholder={t('register.namePlaceholder')}
+        required
+        maxLength={120}
+        value={name}
+      />
+
       <TextField
         autoComplete="email"
         label={t('register.email')}

@@ -33,12 +33,14 @@
   --lp-midnight-2: #0c1f47;
   --lp-gold: #e0aa2c;
   --lp-gold-soft: #f2d483;
-  --hc-font-display: "Fraunces", Georgia, "Times New Roman", serif;
-  --hc-font-mono: "Space Mono", ui-monospace, "SFMono-Regular", monospace;
+  /* Tipografía unificada: una sola familia en toda la aplicación (Inter). Las variables -display y
+     -mono se conservan para no reescribir decenas de reglas, pero resuelven a la fuente base. */
+  --hc-font-base: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --hc-font-display: var(--hc-font-base);
+  --hc-font-mono: var(--hc-font-base);
   color: var(--hc-text);
   background: var(--hc-bg);
-  font-family:
-    Inter, Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--hc-font-base);
   font-synthesis: none;
   line-height: 1.5;
   text-rendering: optimizeLegibility;
@@ -116,6 +118,7 @@ p {
   justify-content: center;
   line-height: 1;
   outline: none;
+  text-decoration: none;
   transition:
     background-color 160ms ease,
     border-color 160ms ease,
@@ -140,7 +143,7 @@ p {
 }
 
 .hc-button-md {
-  min-height: 44px;
+  min-height: 48px;
   padding: 0 16px;
 }
 
@@ -637,6 +640,7 @@ p {
   display: inline-flex;
   gap: 12px;
   min-width: 0;
+  text-decoration: none;
 }
 
 .app-nav-brand-mark {
@@ -772,7 +776,11 @@ p {
   box-shadow: 0 18px 44px rgba(13, 52, 122, 0.16);
   display: grid;
   gap: 6px;
+  /* Se ajusta al ancho del contenido (p. ej. el correo) entre un mínimo y un máximo; pasado el
+     máximo, el ellipsis del correo evita que el panel crezca sin control. */
+  width: max-content;
   min-width: 280px;
+  max-width: min(420px, 92vw);
   padding: 10px;
   position: absolute;
   right: 0;
@@ -1159,5 +1167,218 @@ p {
 
   .login-card-header {
     text-align: center;
+  }
+}
+
+/* ===== Citas: conmutador de vista (Calendario / Lista) ===== */
+.hc-view-toggle {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--hc-surface-alt);
+  border: 1px solid var(--hc-border);
+  border-radius: 10px;
+}
+
+/* ===== Citas: vista calendario (react-big-calendar con paleta de marca) ===== */
+.calendar-card {
+  padding: 16px;
+}
+
+.hc-calendar {
+  height: 70vh;
+  min-height: 560px;
+}
+
+.hc-calendar .rbc-calendar {
+  font-family: inherit;
+  color: var(--hc-text);
+}
+
+/* Barra superior del calendario (Hoy / Anterior / Siguiente + Mes/Semana/Día) */
+.hc-calendar .rbc-toolbar {
+  margin-bottom: 14px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hc-calendar .rbc-toolbar-label {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--hc-text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.hc-calendar .rbc-btn-group > button {
+  color: var(--hc-primary);
+  border: 1px solid var(--hc-border-strong);
+  background: var(--hc-surface);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 600;
+  box-shadow: var(--hc-shadow-soft);
+}
+
+.hc-calendar .rbc-btn-group > button:hover {
+  background: var(--hc-primary-soft);
+  border-color: var(--hc-primary);
+  color: var(--hc-primary);
+}
+
+.hc-calendar .rbc-btn-group > button:active {
+  transform: translateY(1px);
+}
+
+.hc-calendar .rbc-btn-group > button.rbc-active,
+.hc-calendar .rbc-btn-group > button.rbc-active:hover {
+  background: var(--hc-primary);
+  border-color: var(--hc-primary);
+  color: #fff;
+  box-shadow: none;
+}
+
+/* Rejilla — bordes algo más marcados para que las celdas se distingan al navegar */
+.hc-calendar .rbc-month-view,
+.hc-calendar .rbc-time-view,
+.hc-calendar .rbc-time-header-content,
+.hc-calendar .rbc-header,
+.hc-calendar .rbc-header + .rbc-header,
+.hc-calendar .rbc-day-bg + .rbc-day-bg,
+.hc-calendar .rbc-month-row + .rbc-month-row,
+.hc-calendar .rbc-time-content,
+.hc-calendar .rbc-timeslot-group {
+  border-color: var(--hc-border-strong);
+}
+
+.hc-calendar .rbc-month-view {
+  border: 1px solid var(--hc-border-strong);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Escala vertical: cada franja horaria (vistas semana/día) más alta para que los eventos
+   tengan más cuerpo (por defecto react-big-calendar usa 40px por hora). */
+.hc-calendar .rbc-timeslot-group {
+  min-height: 64px;
+}
+
+/* Vista mes de excepciones: filas algo más altas para que los días "respiren". */
+.hc-calendar-month .rbc-month-row {
+  min-height: 96px;
+}
+
+/* En react-big-calendar la capa de contenido (z-index 4) tapa el fondo del día, así que el :hover por
+   celda no llegaría. Dejamos pasar el puntero al fondo y reactivamos solo eventos y números de día,
+   para resaltar la celda completa al pasar el ratón sin perder los clics. */
+.hc-calendar-month .rbc-row-content {
+  pointer-events: none;
+}
+.hc-calendar-month .rbc-row-content .rbc-event,
+.hc-calendar-month .rbc-row-content .rbc-show-more,
+.hc-calendar-month .rbc-row-content .rbc-button-link {
+  pointer-events: auto;
+}
+
+.hc-calendar-month .rbc-day-bg {
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+/* Resaltado dorado de la app al pasar el ratón sobre un día */
+.hc-calendar-month .rbc-day-bg:hover {
+  background-color: rgba(224, 170, 44, 0.18);
+}
+
+/* Marcador "No laboral": es un evento informativo, no debe capturar el clic del día (así al pulsar
+   se sigue abriendo el modal para marcar el día como excepción). Aspecto ligeramente más tenue. */
+.hc-calendar-month .rbc-row-content .rbc-event.rbc-nonworking-event {
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* Leyenda de colores de las excepciones */
+.hc-exception-legend {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+  color: var(--hc-text-secondary);
+}
+
+.hc-exception-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.hc-exception-legend i {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* Lista de definición para el detalle en modales (fecha, tipo, horario, descripción) */
+.hc-detail {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+}
+
+.hc-detail dt {
+  font-size: 0.8rem;
+  color: var(--hc-text-muted);
+  margin-bottom: 2px;
+}
+
+.hc-detail dd {
+  margin: 0;
+  color: var(--hc-text);
+}
+
+.hc-calendar .rbc-header {
+  padding: 8px 6px;
+  font-weight: 600;
+  color: var(--hc-text-secondary);
+}
+
+.hc-calendar .rbc-off-range-bg {
+  background: var(--hc-surface-alt);
+}
+
+.hc-calendar .rbc-today {
+  background: var(--hc-primary-soft);
+}
+
+/* Eventos (cada cita). El color de fondo lo fija el estado vía eventPropGetter. */
+.hc-calendar .rbc-event,
+.hc-calendar .rbc-event.rbc-selected {
+  border: none;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: var(--hc-shadow-soft);
+}
+
+.hc-calendar .rbc-event:focus {
+  outline: 2px solid var(--hc-primary);
+  outline-offset: 1px;
+}
+
+.hc-calendar .rbc-show-more {
+  color: var(--hc-primary);
+  font-weight: 600;
+  background: transparent;
+}
+
+@media (max-width: 640px) {
+  .hc-calendar {
+    height: auto;
+    min-height: 460px;
+  }
+  .hc-calendar .rbc-toolbar {
+    justify-content: center;
   }
 }

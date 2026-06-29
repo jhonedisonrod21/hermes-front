@@ -1,11 +1,32 @@
-import { useEffect, useMemo, useState, type PropsWithChildren } from 'react';
+import { useEffect, useMemo, useRef, useState, type PropsWithChildren } from 'react';
 import { authService } from './authService';
 import { AuthContext, type AuthContextValue } from './authContext';
+import { onSessionExpired } from './sessionExpiry';
 import type { HermesSession } from './sessionStore';
+import { SessionExpiredDialog } from '../components/SessionExpiredDialog';
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<HermesSession | null>(null);
   const [loading, setLoading] = useState(true);
+  const [expired, setExpired] = useState(false);
+
+  // Solo mostramos el diálogo de expiración si había una sesión activa (un 401 en la carga inicial
+  // es simplemente "no autenticado", que lleva a la landing/login, no a reautenticar).
+  const sessionRef = useRef(session);
+  sessionRef.current = session;
+  useEffect(
+    () =>
+      onSessionExpired(() => {
+        if (sessionRef.current) setExpired(true);
+      }),
+    []
+  );
+
+  // Al expirar la sesión, cerramos la del BFF para expirar su cookie HttpOnly (que de otro modo
+  // sobrevive y reengancha el bucle de 401). Solo corre una vez: `expired` no vuelve a false.
+  useEffect(() => {
+    if (expired) void authService.endServerSession();
+  }, [expired]);
 
   useEffect(() => {
     let mounted = true;
@@ -48,5 +69,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
     [loading, session]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+      {expired ? <SessionExpiredDialog /> : null}
+    </AuthContext.Provider>
+  );
 }

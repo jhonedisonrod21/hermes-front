@@ -149,7 +149,7 @@ function GuestOverview() {
           <span className="guest-empty-mark"><Compass size={26} /></span>
           <strong>{t('overview:guest.noNext')}</strong>
           <p>{t('overview:guest.noNextHint')}</p>
-          <Link to="/explorar" className="hc-button hc-button-primary hc-button-md">
+          <Link to="/" className="hc-button hc-button-primary hc-button-md">
             <span className="hc-button-icon"><Compass size={17} /></span>
             <span>{t('overview:guest.exploreCta')}</span>
           </Link>
@@ -191,7 +191,7 @@ function PartnerOverview() {
   );
   const customerLabel = useMemo(() => {
     const map = new Map((customers.data ?? []).map((c) => [c.id, c]));
-    return (id: string) => map.get(id)?.email || map.get(id)?.username || `${id.slice(0, 8)}…`;
+    return (id: string) => map.get(id)?.name || map.get(id)?.email || map.get(id)?.username || `${id.slice(0, 8)}…`;
   }, [customers.data]);
 
   const now = new Date();
@@ -247,8 +247,9 @@ function PartnerOverview() {
   );
 }
 
-/** Nombre amable a partir del perfil: prioriza usuario, luego la parte local del correo. */
+/** Nombre amable a partir del perfil: usa el nombre real si existe; si no, deriva del usuario/correo. */
 function displayName(profile: HermesProfile | undefined, fallback: string) {
+  if (profile?.name?.trim()) return profile.name.trim();
   const raw = profile?.preferred_username || profile?.email || profile?.sub || fallback;
   const local = raw.includes('@') ? raw.split('@')[0] : raw;
   return local.replace(/[._-]+/g, ' ').replace(/\b\p{L}/gu, (c) => c.toUpperCase());
@@ -268,7 +269,7 @@ const QUICK_LINKS: Record<ActorKind, { to: string; key: string; icon: ReactNode 
     { to: '/admin/usuarios', key: 'users', icon: <ShieldCheck size={18} /> }
   ],
   guest: [
-    { to: '/explorar', key: 'explore', icon: <Compass size={18} /> },
+    { to: '/', key: 'explore', icon: <Compass size={18} /> },
     { to: '/mis-reservas', key: 'bookings', icon: <CalendarCheck size={18} /> }
   ]
 };

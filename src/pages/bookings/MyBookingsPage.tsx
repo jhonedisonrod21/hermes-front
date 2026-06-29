@@ -163,7 +163,7 @@ export function MyBookingsPage() {
         title={t('bookings:title')}
         description={t('bookings:listDescription')}
         actions={
-          <Link to="/explorar" className="hc-button hc-button-secondary hc-button-md">
+          <Link to="/" className="hc-button hc-button-secondary hc-button-md">
             <span className="hc-button-icon"><Compass size={18} /></span>
             <span>{t('bookings:explore')}</span>
           </Link>

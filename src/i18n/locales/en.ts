@@ -6,7 +6,7 @@ export const en = {
     roleNames: {
       SYSTEM_ADMIN: 'System administrator',
       TENANT_ADMIN: 'Administrator',
-      TENANT_PARTNER: 'Professional',
+      TENANT_PARTNER: 'Collaborator',
       TENANT_STAFF: 'Staff',
       GUEST_USER: 'Client'
     },
@@ -33,14 +33,43 @@ export const en = {
       close: 'Close',
       label: 'Actions'
     },
+    pdfViewer: {
+      loading: 'Loading document…',
+      download: 'Download',
+      print: 'Print',
+      error: 'Could not load the document.',
+      notFound: 'The document is not available.'
+    },
+    boolean: {
+      yes: 'Yes',
+      no: 'No'
+    },
     search: {
-      placeholder: 'Search...'
+      placeholder: 'Search...',
+      servicesPlaceholder: 'Search services...'
+    },
+    footer: {
+      tagline: 'Booking and appointment management for your organization.',
+      product: 'Product',
+      company: 'Company',
+      legal: 'Legal',
+      links: {
+        features: 'Features',
+        pricing: 'Pricing',
+        about: 'About',
+        contact: 'Contact',
+        terms: 'Terms',
+        privacy: 'Privacy'
+      },
+      rights: 'All rights reserved.'
     },
     pagination: {
       page: 'Page {{current}} of {{total}}',
       items: '{{count}} results',
       previous: 'Previous',
-      next: 'Next'
+      next: 'Next',
+      currentPageFilter: 'Filters this page',
+      currentPageFilterHint: 'This filter only affects the current page; search spans all results.'
     },
     feedback: {
       created: 'Created successfully.',
@@ -86,6 +115,11 @@ export const en = {
     }
   },
   auth: {
+    sessionExpired: {
+      title: 'Session expired',
+      message: 'Your session has expired for security. Please sign in again to continue.',
+      action: 'Sign in'
+    },
     login: {
       ariaLabel: 'Login form',
       title: 'Sign in',
@@ -133,6 +167,8 @@ export const en = {
     },
     register: {
       title: 'Create account',
+      name: 'Name',
+      namePlaceholder: 'Your name',
       email: 'Email',
       emailPlaceholder: 'you@email.com',
       password: 'Password',
@@ -148,6 +184,7 @@ export const en = {
         emailTaken: 'That email is already registered.',
         passwordTooShort: 'Password must be at least {{min}} characters.',
         passwordMismatch: 'Passwords do not match.',
+        nameRequired: 'Enter your name.',
         failed: 'Could not create the account.'
       }
     },
@@ -175,7 +212,10 @@ export const en = {
       searchPlaceholder: 'Search appointments, patients, or resources'
     },
     userMenu: {
-      profile: 'User profile'
+      profile: 'User profile',
+      explore: 'Explore services',
+      bookings: 'My bookings',
+      changePassword: 'Change password'
     },
     hero: {
       sessionActive: 'Active session',
@@ -216,17 +256,24 @@ export const en = {
     }
   },
   app: {
+    breadcrumb: 'Breadcrumb',
     nav: {
       ariaLabel: 'Main navigation',
       toggle: 'Toggle menu',
       pendingHint: 'Module pending backend',
-      overview: 'Overview',
-      catalog: 'Catalog',
+      overview: 'Home',
+      catalog: 'Services',
       schedule: 'Schedule',
+      orgProfile: 'Profile',
+      orgHours: 'Business hours',
+      orgExceptions: 'Non-working days',
       reports: 'Reports',
       appointments: 'Appointments',
       bookings: 'My bookings',
       payments: 'Payments',
+      paymentsConfig: 'Wompi',
+      paymentsMercadoPago: 'MercadoPago',
+      paymentsHistory: 'Transaction history',
       team: 'Team',
       organization: 'Organization',
       tenants: 'Organizations',
@@ -353,7 +400,7 @@ export const en = {
       currency: 'Currency',
       description: 'Description',
       status: 'Status',
-      requiresOnlinePayment: 'Requires upfront online payment'
+      requiresOnlinePayment: 'Enable upfront online payments for this service'
     },
     hints: {
       name: 'The service name your clients will see.',
@@ -366,6 +413,7 @@ export const en = {
     },
     payment: {
       needsConfig: 'To charge upfront you must first set up and enable online payments.',
+      unavailableTag: '(Not available)',
       configure: 'Set up payments'
     },
     modality: {
@@ -381,62 +429,92 @@ export const en = {
   schedule: {
     eyebrow: 'Schedule',
     title: 'Business hours',
-    description: 'Set the weekly hours and exceptions (closures or special days).',
+    description: 'Set the weekly hours and non-working days (closures).',
     hours: {
-      title: 'Weekly hours',
+      title: 'Business hours',
       save: 'Save hours',
       invalidRange: 'On {{day}}, the opening time must be earlier than the closing time.',
+      overlap: 'On {{day}}, the time slots overlap.',
       noneTitle: 'No open days',
-      noneMessage: 'You left no open days: clients won’t be able to book. Save anyway?'
+      noneMessage: 'You left no open days: clients won’t be able to book. Save anyway?',
+      closed: 'Closed',
+      addSlot: 'Add slot',
+      removeSlot: 'Remove slot',
+      modify: 'Modify hours',
+      modifyTitle: 'Modify hours · {{day}}',
+      modifyHint: 'Define one or more time slots for this day.'
     },
     exceptions: {
-      title: 'Exceptions',
-      add: 'Add exception',
-      empty: 'No exceptions registered.',
+      title: 'Non-working days',
+      add: 'Mark non-working day',
+      empty: 'No non-working days marked.',
       invalidRange: 'The opening time must be earlier than the closing time.',
       date: 'Date',
-      dateHint: 'A specific day that overrides your usual hours.',
+      dateHint: 'A specific non-working day, different from your usual hours.',
       type: 'Type',
       typeHint: 'Closed all day, or special hours just for that day.',
-      closed: 'Closed',
+      closed: 'Non-working day',
       customHours: 'Custom hours',
       opensAt: 'Opens',
       closesAt: 'Closes',
       description: 'Description',
-      descriptionHint: 'Reason for the exception (optional), e.g. Holiday.'
+      descriptionHint: 'Reason (optional), e.g. Holiday or vacation.',
+      calendarHint: 'Click a day to mark it as non-working, or drag to select several (holidays).',
+      markOne: 'Mark {{date}} as a non-working day',
+      markMany: 'Mark {{count}} days as non-working',
+      create: 'Mark',
+      closedNote: 'Marks the whole day as non-working.',
+      nonWorkingDayInfo: 'That day is already non-working per the business hours.',
+      change: 'Change',
+      replaceNote: 'That date is already marked as non-working; it will be replaced ({{count}}).',
+      detailTitle: 'Non-working day',
+      hours: 'Hours',
+      nonWorking: 'Non-working (schedule)',
+      alreadyMarked: 'Those days are already marked.',
+      created: '{{count}} day(s) marked.',
+      createdFailed: 'Could not mark {{count}} day(s).',
+      noEvents: 'No non-working days this month.'
     },
     toast: {
       hoursSaved: 'Hours saved.',
-      exceptionAdded: 'Exception added.'
+      exceptionAdded: 'Non-working day marked.'
     },
     confirm: {
-      deleteExceptionTitle: 'Delete exception',
-      deleteExceptionMessage: 'Delete this exception from the calendar?'
+      deleteExceptionTitle: 'Delete non-working day',
+      deleteExceptionMessage: 'Remove this non-working day from the calendar?'
     }
   },
   team: {
     eyebrow: 'Team',
-    title: 'Organization members',
-    description: 'Add professionals to your organization or remove them.',
-    addAsPartner: 'Added as Professional. The Administrator role is granted only by the system administrator.',
+    title: 'Team',
+    description: 'Add collaborators to your organization or remove them.',
+    addAsPartner: 'Added as Collaborator. The Administrator role is granted only by the system administrator.',
+    adminManagedBySystem: 'Only the system administrator can manage organization administrators.',
     empty: 'No members besides you yet.',
-    searchPlaceholder: 'Search by ID or role...',
     allRoles: 'All roles',
     actions: {
       add: 'Add member'
+    },
+    add: {
+      title: 'Add member',
+      email: 'User email',
+      emailPlaceholder: 'person@email.com',
+      search: 'Search',
+      confirm: 'Add',
+      notFound: 'No user found with that email.',
+      alreadyMember: 'That user is already a member of the organization.'
     },
     toast: {
       added: 'Member added.'
     },
     confirm: {
       removeTitle: 'Remove member',
-      removeMessage: 'Remove user {{id}} from the organization?'
+      removeMessage: 'Remove {{name}} from the organization?'
     },
     fields: {
-      userId: 'User ID',
-      userIdHint: 'The user UUID. Each person finds theirs on their "Account" screen.',
+      member: 'Member',
       role: 'Role',
-      roleHint: 'Admin manages the whole organization; Professional only handles their appointments.',
+      roleHint: 'Admin manages the whole organization; Collaborator only handles their appointments.',
       roles: 'Roles',
       status: 'Status',
       since: 'Since'
@@ -448,18 +526,39 @@ export const en = {
   },
   organization: {
     eyebrow: 'Organization',
-    title: 'Organization profile',
+    title: 'Profile',
     description: 'Update your organization contact details.',
     saved: 'Changes saved',
-    readonlyNote: 'Name, country and city can only be changed by a system administrator.',
+    readonlyNote: 'Name and country can only be changed by a system administrator.',
+    editRestricted: 'Edit name or country',
+    indicators: {
+      active: 'Active',
+      inactive: 'Inactive',
+      activeHint: 'Organization active in the system',
+      inactiveHint: 'Organization inactive in the system',
+      hours: 'Hours',
+      hoursHint: 'Business hours set',
+      noHoursHint: 'Business hours not set',
+      location: 'Location',
+      locationHint: 'Location configured',
+      noLocationHint: 'No location configured',
+      payments: 'Payments',
+      paymentsHint: 'Payments configured and active',
+      noPaymentsHint: 'Payments not configured'
+    },
     fields: {
       name: 'Name',
       taxId: 'Tax ID',
       country: 'Country',
       countryPlaceholder: 'Select a country',
       city: 'City',
+      cityPlaceholder: 'Select a city',
       address: 'Address',
-      description: 'Description'
+      description: 'Description',
+      timeZone: 'Time zone',
+      latitude: 'Latitude',
+      longitude: 'Longitude',
+      location: 'Location on the map'
     },
     hints: {
       name: 'Public trading name of the organization.',
@@ -467,7 +566,22 @@ export const en = {
       country: 'Country where the organization is registered.',
       city: 'Main city where you operate.',
       address: 'Physical address where you serve clients.',
-      description: 'A short description your clients will see.'
+      description: 'A short description your clients will see.',
+      timeZone: 'IANA time zone for your schedule and reminders (e.g. America/Bogota).',
+      latitude: 'Coordinate of your location (-90 to 90). Optional.',
+      longitude: 'Coordinate of your location (-180 to 180). Optional.'
+    },
+    validation: {
+      latitude: 'Invalid latitude (must be between -90 and 90).',
+      longitude: 'Invalid longitude (must be between -180 and 180).'
+    },
+    map: {
+      ariaLabel: 'Map to select the location',
+      searchPlaceholder: 'Search your address…',
+      searchAction: 'Search',
+      noResults: 'That address was not found.',
+      hint: 'Search your address or click on the map to set the location.',
+      selected: 'Selected location: {{lat}}, {{lng}}'
     }
   },
   admin: {
@@ -512,7 +626,7 @@ export const en = {
       hideLocked: 'Hide locked',
       matches: '{{count}} available',
       assignRole: 'Role in organization',
-      assignRoleHint: 'Admin manages the organization; Professional handles appointments.',
+      assignRoleHint: 'Admin manages the organization; Collaborator handles appointments.',
       empty: 'No members yet. Find a user above and add them.',
       roles: {
         TENANT_ADMIN: 'Administrator',
@@ -528,6 +642,8 @@ export const en = {
       allRoles: 'All roles',
       allStatus: 'All statuses',
       editTitle: 'Edit user',
+      name: 'Name',
+      nameHint: "User's full name.",
       username: 'Username',
       usernameHint: 'Name the user signs in with.',
       email: 'Email',
@@ -555,10 +671,18 @@ export const en = {
     title: 'Find services',
     heroTitle: 'Book your next appointment',
     heroSubtitle: 'Browse services from Hermes organizations and book your slot in seconds.',
+    resultsFor: 'Results for “{{query}}”',
+    filtersTitle: 'Filters',
+    anyCategory: 'All categories',
+    clearFilters: 'Clear filters',
     description: 'Search for services available across Hermes organizations.',
     search: 'Search',
     book: 'Book now',
+    view: 'View',
     onlinePayment: 'Online payment',
+    establishment: 'Establishment',
+    requirements: 'Required details',
+    noLocation: 'This establishment has not provided its location.',
     anyModality: 'Any modality',
     noResults: 'No services found for your search.',
     viewLabel: 'How to view services',
@@ -608,6 +732,22 @@ export const en = {
       upcoming: 'Upcoming',
       past: 'Past'
     },
+    view: {
+      label: 'View',
+      calendar: 'Calendar',
+      list: 'List'
+    },
+    calendar: {
+      today: 'Today',
+      previous: 'Back',
+      next: 'Next',
+      month: 'Month',
+      week: 'Week',
+      day: 'Day',
+      event: 'Appointment',
+      noEvents: 'No appointments in this range.',
+      showMore: '+{{count}} more'
+    },
     detail: {
       title: 'Appointment detail',
       service: 'Service',
@@ -620,7 +760,14 @@ export const en = {
       paymentOnsite: 'No online payment required',
       created: 'Booked on',
       requirements: 'Details provided by the customer',
-      noRequirements: 'The customer provided no extra details.'
+      noRequirements: 'The customer provided no extra details.',
+      paid: 'Paid',
+      viewFile: 'View attachment',
+      viewReceipt: 'View receipt',
+      receiptTitle: 'Payment receipt',
+      generating: 'Generating…',
+      download: 'Download',
+      receiptError: 'Could not load the receipt.'
     },
     confirm: {
       cancelTitle: 'Cancel appointment',
@@ -651,16 +798,26 @@ export const en = {
   reports: {
     eyebrow: 'Analytics',
     title: 'Reports',
-    description: 'Download your organization reports as PDF.',
+    description: 'Generate and review your organization reports as PDF.',
     from: 'From',
     to: 'To',
-    rangeHint: 'Report date range. Default: from the 1st of the month to today.',
     invalidRange: '"From" cannot be later than "To".',
-    viewSales: 'View sales (PDF)',
-    viewStats: 'View statistics (PDF)',
     generating: 'Generating...',
-    previewTitle: 'Report preview',
-    download: 'Download PDF'
+    generate: 'Generate report',
+    download: 'Download PDF',
+    print: 'Print',
+    stats: {
+      title: 'Organization statistics',
+      desc: 'Establishment indicators and metrics.'
+    },
+    sales: {
+      title: 'Generate sales report',
+      desc: 'Revenue by date range.'
+    },
+    custom: {
+      title: 'Custom reports',
+      desc: 'Coming soon.'
+    }
   },
   bookings: {
     eyebrow: 'Bookings',
@@ -690,12 +847,15 @@ export const en = {
       typeHint: {
         NUMBER: 'Enter numbers only.',
         DATE: 'Select a date.',
-        FILE: 'Attach the requested file.'
+        FILE: 'Attach the document as PDF.'
       },
+      onlyPdf: 'Only PDF files are allowed.',
       paymentNote: 'requires online payment',
       confirm: 'Confirm booking',
       booking: 'Booking...',
-      booked: 'Booking created. Check it in "My bookings".'
+      booked: 'Booking created. Check it in "My bookings".',
+      uploading: 'Uploading file…',
+      fileReady: 'File ready: {{name}}'
     },
     pay: {
       action: 'Pay',
@@ -742,6 +902,7 @@ export const en = {
     workspace: 'Organization',
     profile: {
       title: 'Profile',
+      name: 'Name',
       email: 'Email',
       role: 'Role',
       userId: 'User ID',
@@ -777,8 +938,16 @@ export const en = {
   },
   payments: {
     eyebrow: 'Collections',
-    title: 'Payment settings',
+    title: 'Payments',
     description: 'Connect your PSE gateway to charge for your service bookings.',
+    configTitle: 'Wompi',
+    configDescription: 'Connect your Wompi gateway to charge online for your service bookings.',
+    historyTitle: 'Transaction history',
+    historyDescription: 'Payments received from your customers.',
+    mercadopago: {
+      description: 'MercadoPago integration for online payments. Coming soon.',
+      capabilities: ['MercadoPago checkout', 'Payment notifications (webhooks)', 'Transaction reconciliation']
+    },
     notConfigured: 'Not configured',
     active: 'Collections on',
     inactive: 'Collections off',
@@ -795,7 +964,7 @@ export const en = {
     },
     fields: {
       provider: 'Gateway',
-      enabled: 'Enable online collections',
+      enabled: 'Enable online payments',
       merchantAccount: 'Merchant account',
       publicKey: 'Public key',
       privateKey: 'Private key',
@@ -807,7 +976,7 @@ export const en = {
       publicKey: 'Public key provided by the gateway.'
     },
     providers: {
-      FAKE_PSE: 'Test PSE',
+      FAKE_PSE: 'Wompi',
       WOMPI: 'Wompi',
       PAYU: 'PayU'
     },
@@ -841,6 +1010,62 @@ export const en = {
     nav: {
       signIn: 'Sign in',
       getStarted: 'Create account'
+    },
+    corporate: {
+      title: 'Built for small businesses',
+      subtitle: 'Manage your calendar and deliver reports and receipts effortlessly.',
+      items: {
+        calendar: {
+          title: 'Calendar management',
+          body: "Organize your team's schedule, business hours and exceptions from a single panel."
+        },
+        reports: {
+          title: 'Reports & receipts',
+          body: 'Generate sales and statistics reports, and deliver payment receipts to your clients.'
+        }
+      }
+    },
+    products: {
+      title: 'Book in any category',
+      subtitle: 'A taste of what you can find and schedule in minutes.',
+      items: {
+        haircut: { name: 'Haircut & styling', category: 'Beauty' },
+        medical: { name: 'Medical consultation', category: 'Health' },
+        yoga: { name: 'Yoga class', category: 'Wellness' },
+        legal: { name: 'Legal advice', category: 'Professional' }
+      }
+    },
+    carousel: {
+      prev: 'Previous',
+      next: 'Next',
+      goTo: 'Go to card {{n}}',
+      slides: {
+        book: {
+          title: 'Book in seconds',
+          body: 'Find the service you need and schedule your appointment instantly — no queues, no calls.',
+          note: 'Pick, confirm and done: the slot is reserved in your name right away.'
+        },
+        anywhere: {
+          title: 'From anywhere',
+          body: 'Your next appointment is one click away, on your phone or computer, whenever it suits you.',
+          note: 'Get reminders so you never miss an appointment.'
+        },
+        pay: {
+          title: 'Secure online payments',
+          body: 'Pay upfront when the service requires it, with complete confidence.',
+          note: 'Your payment is protected end to end, with no sensitive data shared.'
+        },
+        manage: {
+          title: "You're in control",
+          body: 'View, reschedule or cancel your bookings whenever you need.',
+          note: 'Instant changes from your dashboard — no calls, no waiting.'
+        },
+        org: {
+          title: 'For every organization',
+          body: 'Professionals and businesses manage their schedule and team in one place.',
+          note: 'Catalog, hours and staff always in sync.'
+        }
+      }
     },
     hero: {
       eyebrow: 'Bookings · Schedule · Payments',

@@ -13,32 +13,35 @@ type Props = {
   onSaved: () => void;
 };
 
-type FormErrors = Partial<Record<'username' | 'email', string>>;
+type FormErrors = Partial<Record<'name' | 'username' | 'email', string>>;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function UserEditModal({ user, onClose, onSaved }: Props) {
   const { t } = useTranslation(['admin', 'common']);
   const toast = useToast();
   const open = user !== null;
-  const [form, setForm] = useState({ username: '', email: '' });
+  const [form, setForm] = useState({ name: '', username: '', email: '' });
   const [errors, setErrors] = useState<FormErrors>({});
-  const save = useMutation(() => identityApi.updateUser(user!.id, { username: form.username.trim(), email: form.email.trim() }));
+  const save = useMutation(() =>
+    identityApi.updateUser(user!.id, { name: form.name.trim(), username: form.username.trim(), email: form.email.trim() })
+  );
 
   const [lastId, setLastId] = useState<string | null>(null);
   if (user && user.id !== lastId) {
     setLastId(user.id);
-    setForm({ username: user.username, email: user.email });
+    setForm({ name: user.name ?? '', username: user.username, email: user.email });
     setErrors({});
     save.reset();
   }
 
-  const set = (k: 'username' | 'email', v: string) => {
+  const set = (k: 'name' | 'username' | 'email', v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
     setErrors((e) => ({ ...e, [k]: undefined }));
   };
 
   function validate(): FormErrors {
     const e: FormErrors = {};
+    if (!form.name.trim()) e.name = t('common:validation.required');
     if (!form.username.trim()) e.username = t('common:validation.required');
     if (!form.email.trim()) e.email = t('common:validation.required');
     else if (!EMAIL_RE.test(form.email.trim())) e.email = t('common:validation.email');
@@ -80,6 +83,13 @@ export function UserEditModal({ user, onClose, onSaved }: Props) {
       }
     >
       <form id="user-form" className="hc-form" onSubmit={submit} noValidate>
+        <TextField
+          label={t('admin:users.name')}
+          hint={t('admin:users.nameHint')}
+          value={form.name}
+          error={errors.name}
+          onChange={(e) => set('name', e.target.value)}
+        />
         <TextField
           label={t('admin:users.username')}
           hint={t('admin:users.usernameHint')}

@@ -5,6 +5,7 @@ export type HermesProfile = {
   user_id?: string;
   preferred_username?: string;
   email?: string;
+  name?: string;
   account_scope?: AccountScope;
   tenant_id?: string;
   tenant_slug?: string;

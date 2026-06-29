@@ -32,6 +32,7 @@ function toSession(user: BffSessionUser): HermesSession {
     user_id: user.userId,
     preferred_username: user.preferredUsername,
     email: user.email,
+    name: typeof user.claims?.['name'] === 'string' ? (user.claims['name'] as string) : undefined,
     account_scope: resolveAccountScope(user),
     tenant_id: user.tenantId,
     tenant_slug: user.tenantSlug,
@@ -61,11 +62,11 @@ async function createServerSession(username: string, password: string) {
 
 export type RegistrationResult = { userId: string; email: string; role: string };
 
-async function registerUser(email: string, password: string): Promise<RegistrationResult> {
+async function registerUser(name: string, email: string, password: string): Promise<RegistrationResult> {
   const response = await fetch(oauthEndpoints.register, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ name, email, password })
   });
 
   if (!response.ok) {
@@ -85,8 +86,8 @@ export const authService = {
     window.location.assign(oauthEndpoints.bffLogin);
   },
 
-  async register(email: string, password: string) {
-    return registerUser(email, password);
+  async register(name: string, email: string, password: string) {
+    return registerUser(name, email, password);
   },
 
   /** Solicita un código de restablecimiento al correo (público, sin sesión). */
@@ -154,5 +155,19 @@ export const authService = {
     });
     clearSession();
     window.location.assign('/');
+  },
+
+  /**
+   * Invalida la sesión del BFF (expira su cookie HttpOnly) sin navegar. Se usa al detectar una sesión
+   * expirada: el access token caducó y no se pudo refrescar, pero la WebSession del BFF sigue viva; si
+   * no la cerramos, su cookie sobrevive y vuelve a "autenticar" al recargar, reenganchando el bucle de
+   * 401. Tolerante a fallos: si el logout no responde, igual seguimos con la limpieza local.
+   */
+  async endServerSession(): Promise<void> {
+    try {
+      await fetch(oauthEndpoints.bffLogout, { method: 'POST', credentials: 'include' });
+    } catch {
+      /* red/servidor caído: la reautenticación posterior fuerza de todos modos un flujo limpio */
+    }
   }
 };

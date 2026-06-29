@@ -6,7 +6,7 @@ export const es = {
     roleNames: {
       SYSTEM_ADMIN: 'Administrador del sistema',
       TENANT_ADMIN: 'Administrador',
-      TENANT_PARTNER: 'Profesional',
+      TENANT_PARTNER: 'Colaborador',
       TENANT_STAFF: 'Personal',
       GUEST_USER: 'Cliente'
     },
@@ -33,14 +33,43 @@ export const es = {
       close: 'Cerrar',
       label: 'Acciones'
     },
+    pdfViewer: {
+      loading: 'Cargando documento…',
+      download: 'Descargar',
+      print: 'Imprimir',
+      error: 'No se pudo cargar el documento.',
+      notFound: 'El documento no está disponible.'
+    },
+    boolean: {
+      yes: 'Sí',
+      no: 'No'
+    },
     search: {
-      placeholder: 'Buscar...'
+      placeholder: 'Buscar...',
+      servicesPlaceholder: 'Buscar servicios...'
+    },
+    footer: {
+      tagline: 'Reserva y gestión de citas para tu organización.',
+      product: 'Producto',
+      company: 'Empresa',
+      legal: 'Legal',
+      links: {
+        features: 'Características',
+        pricing: 'Planes',
+        about: 'Nosotros',
+        contact: 'Contacto',
+        terms: 'Términos',
+        privacy: 'Privacidad'
+      },
+      rights: 'Todos los derechos reservados.'
     },
     pagination: {
       page: 'Página {{current}} de {{total}}',
       items: '{{count}} resultados',
       previous: 'Anterior',
-      next: 'Siguiente'
+      next: 'Siguiente',
+      currentPageFilter: 'Filtra esta página',
+      currentPageFilterHint: 'Este filtro solo afecta a la página actual; la búsqueda recorre todos los resultados.'
     },
     feedback: {
       created: 'Creado correctamente.',
@@ -86,6 +115,11 @@ export const es = {
     }
   },
   auth: {
+    sessionExpired: {
+      title: 'Sesión expirada',
+      message: 'Tu sesión ha caducado por seguridad. Vuelve a iniciar sesión para continuar.',
+      action: 'Iniciar sesión'
+    },
     login: {
       ariaLabel: 'Formulario de inicio de sesion',
       title: 'Iniciar sesion',
@@ -133,6 +167,8 @@ export const es = {
     },
     register: {
       title: 'Crear cuenta',
+      name: 'Nombre',
+      namePlaceholder: 'Tu nombre',
       email: 'Correo',
       emailPlaceholder: 'tu@correo.com',
       password: 'Contraseña',
@@ -148,6 +184,7 @@ export const es = {
         emailTaken: 'Ese correo ya está registrado.',
         passwordTooShort: 'La contraseña debe tener al menos {{min}} caracteres.',
         passwordMismatch: 'Las contraseñas no coinciden.',
+        nameRequired: 'Indica tu nombre.',
         failed: 'No fue posible crear la cuenta.'
       }
     },
@@ -175,7 +212,10 @@ export const es = {
       searchPlaceholder: 'Buscar citas, pacientes o recursos'
     },
     userMenu: {
-      profile: 'Perfil de usuario'
+      profile: 'Perfil de usuario',
+      explore: 'Explorar servicios',
+      bookings: 'Mis reservas',
+      changePassword: 'Cambiar contraseña'
     },
     hero: {
       sessionActive: 'Sesion activa',
@@ -216,17 +256,24 @@ export const es = {
     }
   },
   app: {
+    breadcrumb: 'Ruta de navegación',
     nav: {
       ariaLabel: 'Navegación principal',
       toggle: 'Alternar menú',
       pendingHint: 'Módulo pendiente del backend',
-      overview: 'Resumen',
-      catalog: 'Catálogo',
+      overview: 'Inicio',
+      catalog: 'Servicios',
       schedule: 'Agenda',
+      orgProfile: 'Perfil',
+      orgHours: 'Horario de atención',
+      orgExceptions: 'Días no laborales',
       reports: 'Reportes',
       appointments: 'Citas',
       bookings: 'Mis reservas',
       payments: 'Pagos',
+      paymentsConfig: 'Wompi',
+      paymentsMercadoPago: 'MercadoPago',
+      paymentsHistory: 'Historial de transacciones',
       team: 'Equipo',
       organization: 'Organización',
       tenants: 'Organizaciones',
@@ -353,7 +400,7 @@ export const es = {
       currency: 'Moneda',
       description: 'Descripción',
       status: 'Estado',
-      requiresOnlinePayment: 'Requiere pago online por adelantado'
+      requiresOnlinePayment: 'Activar pagos en línea por adelantado a este servicio'
     },
     hints: {
       name: 'Nombre del servicio tal como lo verán tus clientes.',
@@ -366,6 +413,7 @@ export const es = {
     },
     payment: {
       needsConfig: 'Para cobrar por adelantado primero debes configurar y activar los pagos en línea.',
+      unavailableTag: '(No disponible)',
       configure: 'Configurar pagos'
     },
     modality: {
@@ -381,62 +429,92 @@ export const es = {
   schedule: {
     eyebrow: 'Agenda',
     title: 'Horarios de atención',
-    description: 'Configura el horario semanal y las excepciones (cierres o jornadas especiales).',
+    description: 'Configura el horario semanal y los días no laborales (cierres).',
     hours: {
-      title: 'Horario semanal',
+      title: 'Horario de atención',
       save: 'Guardar horario',
       invalidRange: 'En {{day}} la hora de apertura debe ser anterior a la de cierre.',
+      overlap: 'En {{day}} las franjas horarias se solapan.',
       noneTitle: 'Agenda sin días abiertos',
-      noneMessage: 'No has dejado ningún día abierto: tus clientes no podrán reservar. ¿Guardar igualmente?'
+      noneMessage: 'No has dejado ningún día abierto: tus clientes no podrán reservar. ¿Guardar igualmente?',
+      closed: 'Cerrado',
+      addSlot: 'Añadir franja',
+      removeSlot: 'Quitar franja',
+      modify: 'Modificar horario',
+      modifyTitle: 'Modificar horario · {{day}}',
+      modifyHint: 'Define una o varias franjas para este día.'
     },
     exceptions: {
-      title: 'Excepciones',
-      add: 'Agregar excepción',
-      empty: 'No hay excepciones registradas.',
+      title: 'Días no laborales',
+      add: 'Marcar día no laboral',
+      empty: 'No hay días no laborales marcados.',
       invalidRange: 'La hora de apertura debe ser anterior a la de cierre.',
       date: 'Fecha',
-      dateHint: 'Día concreto que será una excepción a tu horario habitual.',
+      dateHint: 'Día concreto no laboral, distinto de tu horario habitual.',
       type: 'Tipo',
       typeHint: 'Cerrado todo el día u horario especial solo ese día.',
-      closed: 'Cerrado',
+      closed: 'Día no laboral',
       customHours: 'Horario especial',
       opensAt: 'Abre',
       closesAt: 'Cierra',
       description: 'Descripción',
-      descriptionHint: 'Motivo de la excepción (opcional), p. ej. Festivo.'
+      descriptionHint: 'Motivo (opcional), p. ej. Festivo o vacaciones.',
+      calendarHint: 'Haz clic en un día para marcarlo como no laboral, o arrastra para seleccionar varios (vacaciones).',
+      markOne: 'Marcar el {{date}} como día no laboral',
+      markMany: 'Marcar {{count}} días como no laborales',
+      create: 'Marcar',
+      closedNote: 'Marca el día completo como no laboral.',
+      nonWorkingDayInfo: 'Ese día ya es no laboral según el horario de atención.',
+      change: 'Cambiar',
+      replaceNote: 'Esa fecha ya está marcada como no laboral; se reemplazará ({{count}}).',
+      detailTitle: 'Día no laboral',
+      hours: 'Horario',
+      nonWorking: 'No laboral (horario)',
+      alreadyMarked: 'Esos días ya están marcados.',
+      created: '{{count}} día(s) marcado(s).',
+      createdFailed: 'No se pudieron marcar {{count}} día(s).',
+      noEvents: 'Sin días no laborales este mes.'
     },
     toast: {
       hoursSaved: 'Horario guardado.',
-      exceptionAdded: 'Excepción agregada.'
+      exceptionAdded: 'Día no laboral marcado.'
     },
     confirm: {
-      deleteExceptionTitle: 'Eliminar excepción',
-      deleteExceptionMessage: '¿Eliminar esta excepción del calendario?'
+      deleteExceptionTitle: 'Eliminar día no laboral',
+      deleteExceptionMessage: '¿Quitar este día no laboral del calendario?'
     }
   },
   team: {
     eyebrow: 'Equipo',
-    title: 'Miembros de la organización',
-    description: 'Agrega Profesionales a tu organización o quítalos.',
-    addAsPartner: 'Se añadirá como Profesional. El rol Administrador solo lo concede el administrador del sistema.',
+    title: 'Equipo',
+    description: 'Agrega colaboradores a tu organización o quítalos.',
+    addAsPartner: 'Se añadirá como Colaborador. El rol Administrador solo lo concede el administrador del sistema.',
+    adminManagedBySystem: 'Solo el administrador del sistema puede gestionar administradores de la organización.',
     empty: 'Todavía no hay miembros además de ti.',
-    searchPlaceholder: 'Buscar por ID o rol...',
     allRoles: 'Todos los roles',
     actions: {
       add: 'Agregar miembro'
+    },
+    add: {
+      title: 'Agregar miembro',
+      email: 'Correo del usuario',
+      emailPlaceholder: 'persona@correo.com',
+      search: 'Buscar',
+      confirm: 'Agregar',
+      notFound: 'No existe un usuario con ese correo.',
+      alreadyMember: 'Ese usuario ya es miembro de la organización.'
     },
     toast: {
       added: 'Miembro agregado.'
     },
     confirm: {
       removeTitle: 'Quitar miembro',
-      removeMessage: '¿Quitar al usuario {{id}} de la organización?'
+      removeMessage: '¿Quitar a {{name}} de la organización?'
     },
     fields: {
-      userId: 'ID de usuario',
-      userIdHint: 'UUID del usuario. Cada persona encuentra el suyo en su pantalla "Cuenta".',
+      member: 'Miembro',
       role: 'Rol',
-      roleHint: 'Admin gestiona toda la organización; Profesional solo atiende sus citas.',
+      roleHint: 'Admin gestiona toda la organización; Colaborador solo atiende sus citas.',
       roles: 'Roles',
       status: 'Estado',
       since: 'Desde'
@@ -448,18 +526,39 @@ export const es = {
   },
   organization: {
     eyebrow: 'Organización',
-    title: 'Perfil de la organización',
+    title: 'Perfil',
     description: 'Actualiza los datos de contacto de tu organización.',
     saved: 'Cambios guardados',
-    readonlyNote: 'El nombre, país y ciudad solo los puede cambiar un administrador del sistema.',
+    readonlyNote: 'El nombre y el país solo los puede cambiar un administrador del sistema.',
+    editRestricted: 'Editar nombre o país',
+    indicators: {
+      active: 'Activa',
+      inactive: 'Inactiva',
+      activeHint: 'Organización activa en el sistema',
+      inactiveHint: 'Organización inactiva en el sistema',
+      hours: 'Horario',
+      hoursHint: 'Horario de atención definido',
+      noHoursHint: 'Horario de atención sin definir',
+      location: 'Ubicación',
+      locationHint: 'Ubicación configurada',
+      noLocationHint: 'Sin ubicación configurada',
+      payments: 'Pagos',
+      paymentsHint: 'Pagos configurados y activos',
+      noPaymentsHint: 'Pagos sin configurar'
+    },
     fields: {
       name: 'Nombre',
       taxId: 'Identificación fiscal',
       country: 'País',
       countryPlaceholder: 'Selecciona un país',
       city: 'Ciudad',
+      cityPlaceholder: 'Selecciona una ciudad',
       address: 'Dirección',
-      description: 'Descripción'
+      description: 'Descripción',
+      timeZone: 'Zona horaria',
+      latitude: 'Latitud',
+      longitude: 'Longitud',
+      location: 'Ubicación en el mapa'
     },
     hints: {
       name: 'Nombre comercial de la organización.',
@@ -467,7 +566,22 @@ export const es = {
       country: 'País donde está registrada la organización.',
       city: 'Ciudad principal donde operas.',
       address: 'Dirección física donde atiendes a tus clientes.',
-      description: 'Breve descripción que verán tus clientes.'
+      description: 'Breve descripción que verán tus clientes.',
+      timeZone: 'Zona horaria IANA para tus horarios y recordatorios (p. ej. America/Bogota).',
+      latitude: 'Coordenada de tu ubicación (-90 a 90). Opcional.',
+      longitude: 'Coordenada de tu ubicación (-180 a 180). Opcional.'
+    },
+    validation: {
+      latitude: 'Latitud inválida (debe estar entre -90 y 90).',
+      longitude: 'Longitud inválida (debe estar entre -180 y 180).'
+    },
+    map: {
+      ariaLabel: 'Mapa para seleccionar la ubicación',
+      searchPlaceholder: 'Busca tu dirección…',
+      searchAction: 'Buscar',
+      noResults: 'No se encontró esa dirección.',
+      hint: 'Busca tu dirección o pincha en el mapa para fijar la ubicación.',
+      selected: 'Ubicación seleccionada: {{lat}}, {{lng}}'
     }
   },
   admin: {
@@ -512,7 +626,7 @@ export const es = {
       hideLocked: 'Ocultar bloqueados',
       matches: '{{count}} disponibles',
       assignRole: 'Rol en la organización',
-      assignRoleHint: 'Administrador gestiona la organización; Profesional atiende citas.',
+      assignRoleHint: 'Administrador gestiona la organización; Colaborador atiende citas.',
       empty: 'Aún no hay miembros. Busca un usuario arriba y agrégalo.',
       roles: {
         TENANT_ADMIN: 'Administrador',
@@ -528,6 +642,8 @@ export const es = {
       allRoles: 'Todos los roles',
       allStatus: 'Todos los estados',
       editTitle: 'Editar usuario',
+      name: 'Nombre',
+      nameHint: 'Nombre y apellido del usuario.',
       username: 'Usuario',
       usernameHint: 'Nombre con el que el usuario inicia sesión.',
       email: 'Correo',
@@ -555,10 +671,18 @@ export const es = {
     title: 'Encuentra servicios',
     heroTitle: 'Reserva tu próxima cita',
     heroSubtitle: 'Explora servicios de las organizaciones de Hermes y reserva tu horario en segundos.',
+    resultsFor: 'Resultados para “{{query}}”',
+    filtersTitle: 'Filtros',
+    anyCategory: 'Todas las categorías',
+    clearFilters: 'Limpiar filtros',
     description: 'Busca servicios disponibles en las organizaciones de Hermes.',
     search: 'Buscar',
     book: 'Reservar ahora',
+    view: 'Ver',
     onlinePayment: 'Pago en línea',
+    establishment: 'Establecimiento',
+    requirements: 'Datos requeridos',
+    noLocation: 'Este establecimiento no indicó su ubicación.',
     anyModality: 'Cualquier modalidad',
     noResults: 'No se encontraron servicios para tu búsqueda.',
     viewLabel: 'Cómo ver los servicios',
@@ -608,6 +732,22 @@ export const es = {
       upcoming: 'Próximas',
       past: 'Pasadas'
     },
+    view: {
+      label: 'Vista',
+      calendar: 'Calendario',
+      list: 'Lista'
+    },
+    calendar: {
+      today: 'Hoy',
+      previous: 'Anterior',
+      next: 'Siguiente',
+      month: 'Mes',
+      week: 'Semana',
+      day: 'Día',
+      event: 'Cita',
+      noEvents: 'No hay citas en este rango.',
+      showMore: '+{{count}} más'
+    },
     detail: {
       title: 'Detalle de la cita',
       service: 'Servicio',
@@ -620,7 +760,14 @@ export const es = {
       paymentOnsite: 'No requiere pago en línea',
       created: 'Reservada el',
       requirements: 'Datos que indicó el cliente',
-      noRequirements: 'El cliente no indicó datos adicionales.'
+      noRequirements: 'El cliente no indicó datos adicionales.',
+      paid: 'Pagada',
+      viewFile: 'Ver anexo',
+      viewReceipt: 'Ver comprobante',
+      receiptTitle: 'Comprobante de pago',
+      generating: 'Generando…',
+      download: 'Descargar',
+      receiptError: 'No se pudo obtener el comprobante.'
     },
     confirm: {
       cancelTitle: 'Cancelar cita',
@@ -651,16 +798,26 @@ export const es = {
   reports: {
     eyebrow: 'Análisis',
     title: 'Reportes',
-    description: 'Descarga los reportes de tu organización en PDF.',
+    description: 'Genera y consulta los reportes de tu organización en PDF.',
     from: 'Desde',
     to: 'Hasta',
-    rangeHint: 'Rango de fechas del reporte. Por defecto: del 1º del mes a hoy.',
     invalidRange: 'La fecha "Desde" no puede ser posterior a "Hasta".',
-    viewSales: 'Ver ventas (PDF)',
-    viewStats: 'Ver estadísticas (PDF)',
     generating: 'Generando...',
-    previewTitle: 'Vista previa del reporte',
-    download: 'Descargar PDF'
+    generate: 'Generar informe',
+    download: 'Descargar PDF',
+    print: 'Imprimir',
+    stats: {
+      title: 'Estadísticas de la organización',
+      desc: 'Indicadores y métricas del establecimiento.'
+    },
+    sales: {
+      title: 'Generar informe de ventas',
+      desc: 'Ingresos por rango de fechas.'
+    },
+    custom: {
+      title: 'Reportes personalizados',
+      desc: 'Próximamente.'
+    }
   },
   bookings: {
     eyebrow: 'Reservas',
@@ -690,12 +847,15 @@ export const es = {
       typeHint: {
         NUMBER: 'Ingresa solo números.',
         DATE: 'Selecciona una fecha.',
-        FILE: 'Adjunta el archivo solicitado.'
+        FILE: 'Adjunta el documento en PDF.'
       },
+      onlyPdf: 'Solo se admiten archivos PDF.',
       paymentNote: 'requiere pago en línea',
       confirm: 'Confirmar reserva',
       booking: 'Reservando...',
-      booked: 'Reserva creada. Revísala en "Mis reservas".'
+      booked: 'Reserva creada. Revísala en "Mis reservas".',
+      uploading: 'Subiendo archivo…',
+      fileReady: 'Archivo listo: {{name}}'
     },
     pay: {
       action: 'Pagar',
@@ -742,6 +902,7 @@ export const es = {
     workspace: 'Organización',
     profile: {
       title: 'Perfil',
+      name: 'Nombre',
       email: 'Correo',
       role: 'Rol',
       userId: 'ID de usuario',
@@ -777,8 +938,16 @@ export const es = {
   },
   payments: {
     eyebrow: 'Cobros',
-    title: 'Configuración de pagos',
+    title: 'Pagos',
     description: 'Conecta tu pasarela PSE para cobrar las reservas de tus servicios.',
+    configTitle: 'Wompi',
+    configDescription: 'Conecta tu pasarela Wompi para cobrar en línea las reservas de tus servicios.',
+    historyTitle: 'Historial de transacciones',
+    historyDescription: 'Pagos recibidos de tus clientes.',
+    mercadopago: {
+      description: 'Integración con MercadoPago para cobros en línea. Estará disponible próximamente.',
+      capabilities: ['Checkout de MercadoPago', 'Notificaciones de pago (webhooks)', 'Conciliación de transacciones']
+    },
     notConfigured: 'Sin configurar',
     active: 'Cobros activos',
     inactive: 'Cobros inactivos',
@@ -795,7 +964,7 @@ export const es = {
     },
     fields: {
       provider: 'Pasarela',
-      enabled: 'Activar cobros en línea',
+      enabled: 'Activar pagos en línea',
       merchantAccount: 'Cuenta de comercio',
       publicKey: 'Llave pública',
       privateKey: 'Llave privada',
@@ -807,7 +976,7 @@ export const es = {
       publicKey: 'Clave pública que te entrega la pasarela.'
     },
     providers: {
-      FAKE_PSE: 'PSE de prueba',
+      FAKE_PSE: 'Wompi',
       WOMPI: 'Wompi',
       PAYU: 'PayU'
     },
@@ -841,6 +1010,62 @@ export const es = {
     nav: {
       signIn: 'Iniciar sesión',
       getStarted: 'Crear cuenta'
+    },
+    corporate: {
+      title: 'Pensado para pequeñas empresas',
+      subtitle: 'Gestiona tu calendario y entrega reportes y comprobantes sin esfuerzo.',
+      items: {
+        calendar: {
+          title: 'Gestión de calendario',
+          body: 'Organiza la agenda de tu equipo, los horarios y las excepciones desde un solo panel.'
+        },
+        reports: {
+          title: 'Reportes y comprobantes',
+          body: 'Genera reportes de ventas y estadísticas, y entrega comprobantes de pago a tus clientes.'
+        }
+      }
+    },
+    products: {
+      title: 'Reserva en cualquier categoría',
+      subtitle: 'Una muestra de lo que puedes encontrar y agendar en minutos.',
+      items: {
+        haircut: { name: 'Corte y peinado', category: 'Belleza' },
+        medical: { name: 'Consulta médica', category: 'Salud' },
+        yoga: { name: 'Clase de yoga', category: 'Bienestar' },
+        legal: { name: 'Asesoría legal', category: 'Profesional' }
+      }
+    },
+    carousel: {
+      prev: 'Anterior',
+      next: 'Siguiente',
+      goTo: 'Ir a la tarjeta {{n}}',
+      slides: {
+        book: {
+          title: 'Reserva en segundos',
+          body: 'Encuentra el servicio que necesitas y agenda tu cita al instante, sin filas ni llamadas.',
+          note: 'Eliges, confirmas y listo: el cupo queda reservado a tu nombre de inmediato.'
+        },
+        anywhere: {
+          title: 'Desde cualquier lugar',
+          body: 'Tu próxima cita está a un clic, en el móvil o el computador, cuando te quede bien.',
+          note: 'Recibe recordatorios para que nunca se te pase una cita.'
+        },
+        pay: {
+          title: 'Pagos en línea seguros',
+          body: 'Paga por adelantado cuando el servicio lo requiera, con total confianza.',
+          note: 'Tu pago queda protegido de principio a fin, sin compartir datos sensibles.'
+        },
+        manage: {
+          title: 'Tú tienes el control',
+          body: 'Consulta, reprograma o cancela tus reservas cuando lo necesites.',
+          note: 'Cambios al instante desde tu panel, sin llamadas ni esperas.'
+        },
+        org: {
+          title: 'Para cada organización',
+          body: 'Profesionales y negocios gestionan su agenda y su equipo en un solo lugar.',
+          note: 'Catálogo, horarios y colaboradores siempre sincronizados.'
+        }
+      }
     },
     hero: {
       eyebrow: 'Reservas · Agenda · Pagos',

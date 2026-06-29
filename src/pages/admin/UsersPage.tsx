@@ -1,12 +1,12 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Lock, Pencil, Unlock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '../../components/PageHeader';
 import { DataState } from '../../components/DataState';
 import { Badge, Button, Card, Pagination, SearchInput, Select } from '../../components/ui';
 import { UserEditModal } from './UserEditModal';
-import { useResource } from '../../hooks/useResource';
-import { useClientTable } from '../../hooks/useClientTable';
+import { useServerTable } from '../../hooks/useServerTable';
+import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import { useToast } from '../../components/feedback/toast';
 import { useConfirm } from '../../components/feedback/confirm';
 import { identityApi } from '../../api/services';
@@ -14,28 +14,30 @@ import type { UserResponse } from '../../api/types';
 import { formatDate } from '../../lib/format';
 import { roleLabel } from '../../lib/roles';
 
-const matchUser = (u: UserResponse, q: string) =>
-  u.username.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
-
 export function UsersPage() {
   const { t, i18n } = useTranslation(['admin', 'common']);
   const toast = useToast();
   const confirm = useConfirm();
-  const users = useResource(() => identityApi.listUsers({ size: 200, sort: 'createdAt,desc' }), []);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [editing, setEditing] = useState<UserResponse | null>(null);
   const [query, setQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  const items = useMemo(() => users.data?.content ?? [], [users.data]);
-  const availableRoles = useMemo(
-    () => Array.from(new Set(items.flatMap((u) => u.roles ?? []))).sort(),
-    [items]
+  // Búsqueda server-side (el endpoint /admin/users acepta `q`); rol/estado filtran la página cargada.
+  const debouncedQuery = useDebouncedValue(query.trim(), 300);
+  const table = useServerTable(
+    (p) => identityApi.listUsers({ ...p, q: debouncedQuery || undefined, sort: 'createdAt,desc' }),
+    { size: 12, resetKey: debouncedQuery }
   );
-  const visible = useMemo(
+
+  const availableRoles = useMemo(
+    () => Array.from(new Set(table.items.flatMap((u) => u.roles ?? []))).sort(),
+    [table.items]
+  );
+  const clientFiltered = useMemo(
     () =>
-      items
+      table.items
         .filter((u) => (roleFilter ? (u.roles ?? []).includes(roleFilter) : true))
         .filter((u) => {
           if (!statusFilter) return true;
@@ -44,13 +46,9 @@ export function UsersPage() {
           if (statusFilter === 'disabled') return !u.enabled && !u.locked;
           return true;
         }),
-    [items, roleFilter, statusFilter]
+    [table.items, roleFilter, statusFilter]
   );
-  const { paged, page, setPage, totalPages, total } = useClientTable(visible, {
-    query,
-    match: useCallback(matchUser, []),
-    resetKey: `${roleFilter}|${statusFilter}`
-  });
+  const pageFilterActive = Boolean(roleFilter || statusFilter);
 
   async function toggleLock(u: UserResponse) {
     if (!u.locked) {
@@ -66,7 +64,7 @@ export function UsersPage() {
     try {
       await identityApi.setLock(u.id, { locked: !u.locked });
       toast.success(u.locked ? t('admin:users.toast.unlocked') : t('admin:users.toast.locked'));
-      users.reload();
+      table.reload();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t('common:feedback.error'));
     } finally {
@@ -76,11 +74,12 @@ export function UsersPage() {
 
   return (
     <div className="page">
-      <PageHeader eyebrow={t('admin:users.eyebrow')} title={t('admin:users.title')} description={t('admin:users.description')} />
-
-      <Card className="table-card">
-        <div className="table-toolbar">
-          <div className="table-toolbar-filters">
+      <PageHeader
+        eyebrow={t('admin:users.eyebrow')}
+        title={t('admin:users.title')}
+        description={t('admin:users.description')}
+        tools={
+          <>
             <SearchInput
               placeholder={t('admin:users.searchPlaceholder')}
               value={query}
@@ -104,21 +103,29 @@ export function UsersPage() {
                 { value: 'disabled', label: t('admin:users.disabled') }
               ]}
             />
-          </div>
-          <span className="table-toolbar-count">{t('common:pagination.items', { count: total })}</span>
-        </div>
+            <span className="table-toolbar-count">{t('common:pagination.items', { count: table.totalElements })}</span>
+            {pageFilterActive ? (
+              <span className="table-toolbar-hint" title={t('common:pagination.currentPageFilterHint')}>
+                {t('common:pagination.currentPageFilter')}
+              </span>
+            ) : null}
+          </>
+        }
+      />
+
+      <Card className="table-card">
         <DataState
-          loading={users.loading}
-          error={users.error}
-          empty={total === 0}
+          loading={table.loading}
+          error={table.error}
+          empty={clientFiltered.length === 0}
           emptyMessage={t('admin:users.empty')}
-          onRetry={users.reload}
+          onRetry={table.reload}
         >
           <div className="hc-table-scroll">
           <table className="hc-table">
             <thead>
               <tr>
-                <th>{t('admin:users.username')}</th>
+                <th>{t('admin:users.name')}</th>
                 <th>{t('admin:users.email')}</th>
                 <th>{t('admin:users.roles')}</th>
                 <th>{t('admin:users.status')}</th>
@@ -127,9 +134,9 @@ export function UsersPage() {
               </tr>
             </thead>
             <tbody>
-              {paged.map((u) => (
+              {clientFiltered.map((u) => (
                 <tr key={u.id}>
-                  <td><strong>{u.username}</strong></td>
+                  <td><strong className="cell-upper">{u.name || '—'}</strong></td>
                   <td>{u.email}</td>
                   <td className="cell-chips">
                     {(u.roles ?? []).map((r) => (
@@ -161,11 +168,16 @@ export function UsersPage() {
             </tbody>
           </table>
           </div>
-          <Pagination page={page} totalPages={totalPages} totalElements={total} onChange={setPage} />
+          <Pagination
+            page={table.page}
+            totalPages={table.totalPages}
+            totalElements={table.totalElements}
+            onChange={table.setPage}
+          />
         </DataState>
       </Card>
 
-      <UserEditModal user={editing} onClose={() => setEditing(null)} onSaved={() => users.reload()} />
+      <UserEditModal user={editing} onClose={() => setEditing(null)} onSaved={() => table.reload()} />
     </div>
   );
 }

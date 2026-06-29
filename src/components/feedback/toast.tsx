@@ -52,10 +52,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           const Icon = ICONS[toast.tone];
           return (
             <div key={toast.id} className={`hc-toast hc-toast-${toast.tone}`} role="status">
-              <Icon size={18} />
+              <Icon size={22} />
               <span>{toast.message}</span>
               <button className="hc-toast-close" type="button" onClick={() => remove(toast.id)} aria-label="Cerrar">
-                <X size={15} />
+                <X size={17} />
               </button>
             </div>
           );

@@ -74,7 +74,11 @@ export function OfferingFormModal({ open, editing, categories = [], onClose, onS
   );
   // Cobrar por adelantado exige tener los pagos configurados Y activados.
   const paymentsReady = Boolean(paymentConfig.data?.enabled);
-  const blockedByPayments = form.requiresOnlinePayment && !paymentConfig.loading && !paymentsReady;
+  // El checkbox solo está disponible si la organización ya tiene los pagos en línea listos.
+  // Si por edición un servicio quedó marcado con los pagos ahora inactivos, dejamos desmarcar.
+  const paymentsUnavailable = !paymentConfig.loading && !paymentsReady;
+  const paymentCheckboxDisabled = paymentConfig.loading || (paymentsUnavailable && !form.requiresOnlinePayment);
+  const blockedByPayments = form.requiresOnlinePayment && paymentsUnavailable;
 
   // Reinicia el formulario cuando cambia el registro en edición o se reabre el modal.
   const [lastKey, setLastKey] = useState<string>('');
@@ -229,8 +233,13 @@ export function OfferingFormModal({ open, editing, categories = [], onClose, onS
           onChange={(e) => set('description', e.target.value)}
         />
         <Checkbox
-          label={t('catalog:fields.requiresOnlinePayment')}
+          label={
+            paymentsUnavailable
+              ? `${t('catalog:fields.requiresOnlinePayment')} ${t('catalog:payment.unavailableTag')}`
+              : t('catalog:fields.requiresOnlinePayment')
+          }
           checked={form.requiresOnlinePayment}
+          disabled={paymentCheckboxDisabled}
           onChange={(e) => set('requiresOnlinePayment', e.target.checked)}
         />
         {blockedByPayments ? (

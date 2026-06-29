@@ -15,9 +15,10 @@
   --lp-ink-soft: #4b5565;
   --lp-mist: #9fb0ce;
 
-  --lp-display: "Fraunces", Georgia, "Times New Roman", serif;
+  /* Tipografía unificada con el resto del proyecto: una sola familia (Inter). */
   --lp-body: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --lp-mono: "Space Mono", ui-monospace, "SFMono-Regular", monospace;
+  --lp-display: var(--lp-body);
+  --lp-mono: var(--lp-body);
 
   background: var(--lp-paper);
   color: var(--lp-ink);

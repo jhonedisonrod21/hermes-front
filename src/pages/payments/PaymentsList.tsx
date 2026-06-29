@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
-import { Download, ExternalLink, FileText } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ExternalLink, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { DataState } from '../../components/DataState';
-import { Modal } from '../../components/Modal';
+import { PdfViewerModal } from '../../components/PdfViewerModal';
 import { Badge, Button, Card } from '../../components/ui';
 import { useResource } from '../../hooks/useResource';
-import { useToast } from '../../components/feedback/toast';
 import type { Page } from '../../api/http';
 import type { PaymentResponse, PaymentStatus } from '../../api/types';
 import { formatDateTime, formatMoney } from '../../lib/format';
@@ -26,51 +25,44 @@ type Props = {
   /** Cargador del comprobante PDF por pago. Si se pasa, muestra el botón en pagos PAGADOS.
    *  Tenant: reportsApi.receiptBlob · Invitado: reportsApi.myReceiptBlob. */
   receiptLoader?: (paymentId: string) => Promise<Blob>;
+  /** Oculta el toolbar interno (título + conteo) cuando la página ya lo maneja junto a la miga de pan. */
+  showToolbar?: boolean;
+  /** Notifica el total y cuántos se muestran, para que la página lo exponga en la cabecera. */
+  onTotal?: (total: number, shown: number) => void;
 };
 
 /** Lista reutilizable de pagos: cobros recibidos (tenant) o historial propio (invitado). */
-export function PaymentsList({ title, loader, hideWhenEmpty = false, receiptLoader }: Props) {
+export function PaymentsList({ title, loader, hideWhenEmpty = false, receiptLoader, showToolbar = true, onTotal }: Props) {
   const { t, i18n } = useTranslation(['payments', 'common']);
-  const toast = useToast();
   const payments = useResource<Page<PaymentResponse>>(loader, []);
   const items = payments.data?.content ?? [];
   const total = payments.data?.totalElements ?? items.length;
   // El loader trae una ventana (p. ej. 50); si hay más, lo indicamos para no engañar con el conteo.
   const truncated = total > items.length;
 
-  const [loadingId, setLoadingId] = useState<string | null>(null);
-  const [receipt, setReceipt] = useState<{ url: string; name: string } | null>(null);
+  // Pago cuyo comprobante se está visualizando en el visor de PDF compartido.
+  const [receiptOf, setReceiptOf] = useState<PaymentResponse | null>(null);
 
-  // Libera la URL de objeto del comprobante al cerrar/cambiar o al desmontar.
-  useEffect(() => () => {
-    if (receipt) URL.revokeObjectURL(receipt.url);
-  }, [receipt]);
-
-  async function openReceipt(p: PaymentResponse) {
-    if (!receiptLoader) return;
-    setLoadingId(p.id);
-    try {
-      const blob = await receiptLoader(p.id);
-      setReceipt({ url: URL.createObjectURL(blob), name: `comprobante-${p.id}.pdf` });
-    } catch {
-      // Mensaje amable: el comprobante puede no estar disponible (p. ej. invitado sin endpoint aún).
-      toast.error(t('payments:history.receiptError'));
-    } finally {
-      setLoadingId(null);
-    }
-  }
+  // Sube el conteo a la página (para mostrarlo junto a la miga) sin acoplar la identidad del callback.
+  const onTotalRef = useRef(onTotal);
+  onTotalRef.current = onTotal;
+  useEffect(() => {
+    onTotalRef.current?.(total, items.length);
+  }, [total, items.length]);
 
   if (hideWhenEmpty && !payments.loading && !payments.error && items.length === 0) return null;
 
   return (
     <Card className="table-card">
-      <div className="table-toolbar">
-        <strong className="payments-list-title">{title ?? t('payments:history.title')}</strong>
-        <span className="table-toolbar-count">
-          {t('common:pagination.items', { count: total })}
-          {truncated ? ` · ${t('payments:history.showingLatest', { count: items.length })}` : ''}
-        </span>
-      </div>
+      {showToolbar ? (
+        <div className="table-toolbar">
+          <strong className="payments-list-title">{title ?? t('payments:history.title')}</strong>
+          <span className="table-toolbar-count">
+            {t('common:pagination.items', { count: total })}
+            {truncated ? ` · ${t('payments:history.showingLatest', { count: items.length })}` : ''}
+          </span>
+        </div>
+      ) : null}
       <DataState
         loading={payments.loading}
         error={payments.error}
@@ -110,10 +102,9 @@ export function PaymentsList({ title, loader, hideWhenEmpty = false, receiptLoad
                         variant="ghost"
                         size="sm"
                         icon={<FileText size={15} />}
-                        disabled={loadingId === p.id}
-                        onClick={() => openReceipt(p)}
+                        onClick={() => setReceiptOf(p)}
                       >
-                        {loadingId === p.id ? t('payments:history.generating') : t('payments:history.receipt')}
+                        {t('payments:history.receipt')}
                       </Button>
                     ) : null}
                   </td>
@@ -124,23 +115,15 @@ export function PaymentsList({ title, loader, hideWhenEmpty = false, receiptLoad
         </div>
       </DataState>
 
-      <Modal
-        open={receipt !== null}
-        title={t('payments:history.receiptTitle')}
-        onClose={() => setReceipt(null)}
-        footer={
-          receipt ? (
-            <a className="hc-button hc-button-primary hc-button-md" href={receipt.url} download={receipt.name}>
-              <span className="hc-button-icon"><Download size={16} /></span>
-              <span>{t('payments:history.download')}</span>
-            </a>
-          ) : null
-        }
-      >
-        {receipt ? (
-          <iframe className="report-preview" src={receipt.url} title={t('payments:history.receiptTitle')} />
-        ) : null}
-      </Modal>
+      {receiptLoader && receiptOf ? (
+        <PdfViewerModal
+          open
+          title={t('payments:history.receiptTitle')}
+          fileName={`comprobante-${receiptOf.id}.pdf`}
+          load={() => receiptLoader(receiptOf.id)}
+          onClose={() => setReceiptOf(null)}
+        />
+      ) : null}
     </Card>
   );
 }

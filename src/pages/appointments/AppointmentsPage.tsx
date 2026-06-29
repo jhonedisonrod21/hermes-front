@@ -1,116 +1,94 @@
 import { useCallback, useMemo, useState } from 'react';
-import { CalendarClock, CheckCircle2, Eye, UserX, XCircle } from 'lucide-react';
+import { CalendarClock, CalendarDays, CheckCircle2, Eye, List, UserX, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, startOfDay, addDays, subDays, format } from 'date-fns';
+import type { View } from 'react-big-calendar';
 import { PageHeader } from '../../components/PageHeader';
 import { DataState } from '../../components/DataState';
 import { RescheduleModal } from './RescheduleModal';
 import { AppointmentDetailModal } from './AppointmentDetailModal';
+import { AppointmentCalendar, type CalendarEvent } from './AppointmentCalendar';
 import { Badge, Button, Card, Pagination, SearchInput, Select } from '../../components/ui';
 import { useResource } from '../../hooks/useResource';
-import { useClientTable } from '../../hooks/useClientTable';
-import { useToast } from '../../components/feedback/toast';
-import { useConfirm } from '../../components/feedback/confirm';
-import { catalogApi, identityApi, tenantAppointmentsApi } from '../../api/services';
-import type { AppointmentResponse, AppointmentStatus } from '../../api/types';
+import { useServerTable } from '../../hooks/useServerTable';
+import { tenantAppointmentsApi } from '../../api/services';
+import type { AppointmentResponse } from '../../api/types';
 import { formatDateTime, formatMoney } from '../../lib/format';
+import { useAppointmentDirectory } from './useAppointmentDirectory';
+import { useAppointmentActions } from './useAppointmentActions';
+import { ACTIVE, STATUS_TONE, STATUSES } from './appointmentMeta';
 
+type ViewMode = 'calendar' | 'list';
 type Scope = '' | 'today' | 'upcoming' | 'past';
 const SCOPES: Scope[] = ['', 'today', 'upcoming', 'past'];
 
 function isSameLocalDay(iso: string, ref: Date) {
   const d = new Date(iso);
-  return (
-    d.getFullYear() === ref.getFullYear() &&
-    d.getMonth() === ref.getMonth() &&
-    d.getDate() === ref.getDate()
-  );
+  return d.getFullYear() === ref.getFullYear() && d.getMonth() === ref.getMonth() && d.getDate() === ref.getDate();
 }
 
-const STATUSES: AppointmentStatus[] = ['PENDING_PAYMENT', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'NO_SHOW', 'EXPIRED'];
-
-const STATUS_TONE: Record<AppointmentStatus, 'success' | 'warning' | 'danger' | 'info'> = {
-  PENDING_PAYMENT: 'warning',
-  CONFIRMED: 'info',
-  COMPLETED: 'success',
-  CANCELLED: 'danger',
-  NO_SHOW: 'danger',
-  EXPIRED: 'warning'
-};
-
-/** Estados sobre los que aún se puede actuar (cancelar / reprogramar). */
-const ACTIVE: AppointmentStatus[] = ['PENDING_PAYMENT', 'CONFIRMED'];
+/** Rango [from, to) que cubre la vista del calendario, con holgura para la rejilla del mes/semana. */
+function calendarRange(date: Date, view: View): { from: string; to: string } {
+  let start: Date;
+  let end: Date;
+  if (view === 'day') {
+    start = startOfDay(date);
+    end = addDays(start, 1);
+  } else if (view === 'week') {
+    start = subDays(startOfWeek(date), 1);
+    end = addDays(endOfWeek(date), 2);
+  } else {
+    start = subDays(startOfMonth(date), 7);
+    end = addDays(endOfMonth(date), 7);
+  }
+  const fmt = (d: Date) => format(d, "yyyy-MM-dd'T'HH:mm:ss");
+  return { from: fmt(start), to: fmt(end) };
+}
 
 export function AppointmentsPage() {
   const { t, i18n } = useTranslation(['appointments', 'common']);
-  const toast = useToast();
-  const confirm = useConfirm();
-  const appts = useResource(() => tenantAppointmentsApi.list({ size: 200, sort: 'slotStart,desc' }), []);
+  const [view, setView] = useState<ViewMode>('calendar');
+
+  // --- Vista lista (paginada en servidor + filtros locales sobre la página cargada) ---
+  const table = useServerTable((p) => tenantAppointmentsApi.list({ ...p, sort: 'slotStart,desc' }), { size: 12 });
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [scope, setScope] = useState<Scope>('');
-  const [busyId, setBusyId] = useState<string | null>(null);
+
+  // --- Vista calendario (citas del rango visible) ---
+  const [calDate, setCalDate] = useState<Date>(() => new Date());
+  const [rbcView, setRbcView] = useState<View>('month');
+  const range = useMemo(() => calendarRange(calDate, rbcView), [calDate, rbcView]);
+  const calendar = useResource(() => tenantAppointmentsApi.listCalendar(range.from, range.to), [range.from, range.to]);
+
   const [rescheduleOf, setRescheduleOf] = useState<AppointmentResponse | null>(null);
   const [detailOf, setDetailOf] = useState<AppointmentResponse | null>(null);
 
-  const items = appts.data?.content ?? [];
+  // El conjunto activo (según la vista) alimenta la resolución de nombres y la recarga tras una acción.
+  const activeItems = view === 'calendar' ? calendar.data ?? [] : table.items;
+  const dir = useAppointmentDirectory(activeItems);
+  const reloadActive = useCallback(() => {
+    if (view === 'calendar') calendar.reload();
+    else table.reload();
+  }, [view, calendar, table]);
+  const actions = useAppointmentActions(reloadActive);
 
-  // El nombre y los requisitos de cada servicio se resuelven por el detalle público de la oferta
-  // (/catalog/search/{id}), accesible tanto al TENANT_ADMIN como al TENANT_PARTNER. El listado
-  // administrativo del catálogo no está permitido al colaborador, por eso no se usa aquí.
-  const offeringIdsKey = useMemo(
-    () => [...new Set(items.map((a) => a.offeringId))].sort().join(','),
-    [items]
-  );
-  const offerings = useResource(
+  const events: CalendarEvent[] = useMemo(
     () =>
-      Promise.all(
-        (offeringIdsKey ? offeringIdsKey.split(',') : []).map((id) =>
-          catalogApi.getPublicOffering(id).catch(() => null)
-        )
-      ),
-    [offeringIdsKey]
-  );
-  const offeringName = useMemo(() => {
-    const map = new Map((offerings.data ?? []).filter(Boolean).map((o) => [o!.id, o!.name]));
-    return (id: string) => map.get(id) ?? id.slice(0, 8);
-  }, [offerings.data]);
-
-  // Etiqueta legible de cada requisito (offeringId -> key -> label) para el detalle.
-  const requirementLabel = useMemo(() => {
-    const byOffering = new Map(
-      (offerings.data ?? [])
-        .filter(Boolean)
-        .map((o) => [o!.id, new Map((o!.requirements ?? []).map((r) => [r.key, r.label]))])
-    );
-    return (offeringId: string, key: string) => byOffering.get(offeringId)?.get(key) ?? key;
-  }, [offerings.data]);
-
-  // Resuelve el contacto del cliente (id -> nombre/correo) en lote desde el directorio del tenant.
-  const customerIdsKey = useMemo(
-    () => [...new Set(items.map((a) => a.customerUserId))].sort().join(','),
-    [items]
-  );
-  const customers = useResource(
-    // El directorio resuelve hasta 100 ids por lote: acotamos para no exceder el límite del backend.
-    () => (customerIdsKey ? identityApi.getUserCards(customerIdsKey.split(',').slice(0, 100)) : Promise.resolve([])),
-    [customerIdsKey]
-  );
-  const customerCard = useMemo(() => {
-    const map = new Map((customers.data ?? []).map((c) => [c.id, c]));
-    return (id: string) => map.get(id);
-  }, [customers.data]);
-  const customerLabel = useCallback(
-    (a: AppointmentResponse) => {
-      const c = customerCard(a.customerUserId);
-      return c?.email || c?.username || `${a.customerUserId.slice(0, 8)}…`;
-    },
-    [customerCard]
+      (calendar.data ?? []).map((a) => ({
+        id: a.id,
+        title: `${dir.offeringName(a.offeringId)} · ${dir.customerLabel(a)}`,
+        start: new Date(a.slotStart),
+        end: new Date(a.slotEnd),
+        appointment: a
+      })),
+    [calendar.data, dir]
   );
 
-  // Filtro por estado + alcance temporal, y orden (próximas/hoy: lo más cercano primero).
+  // Filtro por estado + alcance temporal y orden (solo aplica a la vista lista).
   const visible = useMemo(() => {
     const now = new Date();
-    let list = statusFilter ? items.filter((a) => a.status === statusFilter) : items;
+    let list = statusFilter ? table.items.filter((a) => a.status === statusFilter) : table.items;
     if (scope === 'today') list = list.filter((a) => isSameLocalDay(a.slotStart, now));
     else if (scope === 'upcoming') list = list.filter((a) => new Date(a.slotStart).getTime() >= now.getTime());
     else if (scope === 'past') list = list.filter((a) => new Date(a.slotStart).getTime() < now.getTime());
@@ -120,220 +98,222 @@ export function AppointmentsPage() {
         ? new Date(a.slotStart).getTime() - new Date(b.slotStart).getTime()
         : new Date(b.slotStart).getTime() - new Date(a.slotStart).getTime()
     );
-  }, [items, statusFilter, scope]);
+  }, [table.items, statusFilter, scope]);
   const match = useCallback(
-    (a: AppointmentResponse, q: string) =>
-      offeringName(a.offeringId).toLowerCase().includes(q) ||
-      customerLabel(a).toLowerCase().includes(q) ||
-      a.customerUserId.toLowerCase().includes(q),
-    [offeringName, customerLabel]
+    (a: AppointmentResponse, qq: string) =>
+      dir.offeringName(a.offeringId).toLowerCase().includes(qq) ||
+      dir.customerLabel(a).toLowerCase().includes(qq) ||
+      a.customerUserId.toLowerCase().includes(qq),
+    [dir]
   );
-  const { paged, page, setPage, totalPages, total } = useClientTable(visible, {
-    query,
-    match,
-    resetKey: `${statusFilter}|${scope}`
-  });
+  const q = query.trim().toLowerCase();
+  const clientFiltered = useMemo(() => (q ? visible.filter((a) => match(a, q)) : visible), [visible, match, q]);
+  const pageFilterActive = Boolean(q || statusFilter || scope);
 
-  async function cancel(a: AppointmentResponse) {
-    const ok = await confirm({
-      title: t('appointments:confirm.cancelTitle'),
-      message: t('appointments:confirm.cancelMessage'),
-      confirmLabel: t('appointments:confirm.cancelConfirm'),
-      cancelLabel: t('common:actions.back'),
-      danger: true
-    });
-    if (!ok) return;
-    setBusyId(a.id);
-    try {
-      await tenantAppointmentsApi.cancel(a.id);
-      toast.success(t('appointments:toast.cancelled'));
-      appts.reload();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('common:feedback.error'));
-    } finally {
-      setBusyId(null);
-    }
-  }
-
-  // Marca la cita como atendida (CONFIRMED -> COMPLETED). Estado terminal: confirma antes.
-  async function complete(a: AppointmentResponse) {
-    const ok = await confirm({
-      title: t('appointments:confirm.completeTitle'),
-      message: t('appointments:confirm.completeMessage'),
-      confirmLabel: t('appointments:actions.complete')
-    });
-    if (!ok) return;
-    setBusyId(a.id);
-    try {
-      await tenantAppointmentsApi.complete(a.id);
-      toast.success(t('appointments:toast.completed'));
-      appts.reload();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('common:feedback.error'));
-    } finally {
-      setBusyId(null);
-    }
-  }
-
-  // Marca que el cliente no se presentó (CONFIRMED -> NO_SHOW). Terminal: pide confirmación.
-  async function markNoShow(a: AppointmentResponse) {
-    const ok = await confirm({
-      title: t('appointments:confirm.noShowTitle'),
-      message: t('appointments:confirm.noShowMessage'),
-      confirmLabel: t('appointments:actions.noShow'),
-      danger: true
-    });
-    if (!ok) return;
-    setBusyId(a.id);
-    try {
-      await tenantAppointmentsApi.noShow(a.id);
-      toast.success(t('appointments:toast.noShow'));
-      appts.reload();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('common:feedback.error'));
-    } finally {
-      setBusyId(null);
-    }
-  }
+  const viewToggle = (
+    <div className="hc-view-toggle" role="group" aria-label={t('appointments:view.label')}>
+      <Button
+        variant={view === 'calendar' ? undefined : 'ghost'}
+        size="sm"
+        icon={<CalendarDays size={16} />}
+        aria-pressed={view === 'calendar'}
+        onClick={() => setView('calendar')}
+      >
+        {t('appointments:view.calendar')}
+      </Button>
+      <Button
+        variant={view === 'list' ? undefined : 'ghost'}
+        size="sm"
+        icon={<List size={16} />}
+        aria-pressed={view === 'list'}
+        onClick={() => setView('list')}
+      >
+        {t('appointments:view.list')}
+      </Button>
+    </div>
+  );
 
   return (
     <div className="page">
-      <PageHeader eyebrow={t('appointments:eyebrow')} title={t('appointments:title')} description={t('appointments:listDescription')} />
+      <PageHeader
+        eyebrow={t('appointments:eyebrow')}
+        title={t('appointments:title')}
+        description={t('appointments:listDescription')}
+        tools={
+          view === 'list' ? (
+            <>
+              {viewToggle}
+              <SearchInput
+                placeholder={t('appointments:searchPlaceholder')}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+              <Select
+                className="toolbar-filter"
+                value={scope}
+                onChange={(e) => setScope(e.target.value as Scope)}
+                options={SCOPES.map((s) => ({ value: s, label: s ? t(`appointments:scope.${s}`) : t('appointments:scope.all') }))}
+              />
+              <Select
+                className="toolbar-filter"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                placeholder={t('appointments:allStatus')}
+                options={STATUSES.map((s) => ({ value: s, label: t(`appointments:status.${s}`) }))}
+              />
+              <span className="table-toolbar-count">{t('common:pagination.items', { count: table.totalElements })}</span>
+              {pageFilterActive ? (
+                <span className="table-toolbar-hint" title={t('common:pagination.currentPageFilterHint')}>
+                  {t('common:pagination.currentPageFilter')}
+                </span>
+              ) : null}
+            </>
+          ) : (
+            viewToggle
+          )
+        }
+      />
 
-      <Card className="table-card">
-        <div className="table-toolbar">
-          <div className="table-toolbar-filters">
-            <SearchInput placeholder={t('appointments:searchPlaceholder')} value={query} onChange={(e) => setQuery(e.target.value)} />
-            <Select
-              className="toolbar-filter"
-              value={scope}
-              onChange={(e) => setScope(e.target.value as Scope)}
-              options={SCOPES.map((s) => ({
-                value: s,
-                label: s ? t(`appointments:scope.${s}`) : t('appointments:scope.all')
-              }))}
+      {view === 'calendar' ? (
+        <Card className="panel calendar-card">
+          <DataState
+            loading={calendar.loading && events.length === 0}
+            error={calendar.error}
+            onRetry={calendar.reload}
+          >
+            <AppointmentCalendar
+              events={events}
+              date={calDate}
+              view={rbcView}
+              onView={setRbcView}
+              onNavigate={setCalDate}
+              onSelectEvent={setDetailOf}
             />
-            <Select
-              className="toolbar-filter"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              placeholder={t('appointments:allStatus')}
-              options={STATUSES.map((s) => ({ value: s, label: t(`appointments:status.${s}`) }))}
-            />
-          </div>
-          <span className="table-toolbar-count">{t('common:pagination.items', { count: total })}</span>
-        </div>
-        <DataState
-          loading={appts.loading}
-          error={appts.error}
-          empty={total === 0}
-          emptyMessage={t('appointments:empty')}
-          onRetry={appts.reload}
-        >
-          <div className="hc-table-scroll">
-            <table className="hc-table">
-              <thead>
-                <tr>
-                  <th>{t('appointments:columns.service')}</th>
-                  <th>{t('appointments:columns.customer')}</th>
-                  <th>{t('appointments:columns.start')}</th>
-                  <th>{t('appointments:columns.status')}</th>
-                  <th>{t('appointments:columns.price')}</th>
-                  <th aria-label={t('common:actions.label')} />
-                </tr>
-              </thead>
-              <tbody>
-                {paged.map((a) => (
-                  <tr key={a.id}>
-                    <td className="cell-clamp"><strong>{offeringName(a.offeringId)}</strong></td>
-                    <td className="cell-clamp">{customerLabel(a)}</td>
-                    <td className="cell-nowrap">{formatDateTime(a.slotStart, i18n.language)}</td>
-                    <td>
-                      <Badge tone={STATUS_TONE[a.status]}>{t(`appointments:status.${a.status}`)}</Badge>
-                    </td>
-                    <td className="cell-nowrap">{a.priceAmount != null ? formatMoney(a.priceAmount, a.priceCurrency ?? 'USD', i18n.language) : '—'}</td>
-                    <td className="row-actions row-actions-icons">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="row-icon"
-                        icon={<Eye size={16} />}
-                        aria-label={t('appointments:actions.view')}
-                        title={t('appointments:actions.view')}
-                        onClick={() => setDetailOf(a)}
-                      />
-                      {a.status === 'CONFIRMED' ? (
-                        <>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="row-icon appt-complete"
-                            icon={<CheckCircle2 size={16} />}
-                            aria-label={t('appointments:actions.complete')}
-                            title={t('appointments:actions.complete')}
-                            disabled={busyId === a.id}
-                            onClick={() => complete(a)}
-                          />
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="row-icon appt-noshow"
-                            icon={<UserX size={16} />}
-                            aria-label={t('appointments:actions.noShow')}
-                            title={t('appointments:actions.noShow')}
-                            disabled={busyId === a.id}
-                            onClick={() => markNoShow(a)}
-                          />
-                        </>
-                      ) : null}
-                      {ACTIVE.includes(a.status) ? (
-                        <>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="row-icon"
-                            icon={<CalendarClock size={16} />}
-                            aria-label={t('appointments:actions.reschedule')}
-                            title={t('appointments:actions.reschedule')}
-                            onClick={() => setRescheduleOf(a)}
-                          />
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="row-icon appt-noshow"
-                            icon={<XCircle size={16} />}
-                            aria-label={t('appointments:actions.cancel')}
-                            title={t('appointments:actions.cancel')}
-                            disabled={busyId === a.id}
-                            onClick={() => cancel(a)}
-                          />
-                        </>
-                      ) : null}
-                    </td>
+          </DataState>
+        </Card>
+      ) : (
+        <Card className="table-card">
+          <DataState
+            loading={table.loading}
+            error={table.error}
+            empty={clientFiltered.length === 0}
+            emptyMessage={t('appointments:empty')}
+            onRetry={table.reload}
+          >
+            <div className="hc-table-scroll">
+              <table className="hc-table">
+                <thead>
+                  <tr>
+                    <th>{t('appointments:columns.service')}</th>
+                    <th>{t('appointments:columns.customer')}</th>
+                    <th>{t('appointments:columns.start')}</th>
+                    <th>{t('appointments:columns.status')}</th>
+                    <th>{t('appointments:columns.price')}</th>
+                    <th aria-label={t('common:actions.label')} />
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <Pagination page={page} totalPages={totalPages} totalElements={total} onChange={setPage} />
-        </DataState>
-      </Card>
+                </thead>
+                <tbody>
+                  {clientFiltered.map((a) => (
+                    <tr key={a.id}>
+                      <td className="cell-clamp"><strong>{dir.offeringName(a.offeringId)}</strong></td>
+                      <td className="cell-clamp">{dir.customerLabel(a)}</td>
+                      <td className="cell-nowrap">{formatDateTime(a.slotStart, i18n.language)}</td>
+                      <td>
+                        <Badge tone={STATUS_TONE[a.status]}>{t(`appointments:status.${a.status}`)}</Badge>
+                      </td>
+                      <td className="cell-nowrap">
+                        {a.priceAmount != null ? formatMoney(a.priceAmount, a.priceCurrency ?? 'USD', i18n.language) : '—'}
+                      </td>
+                      <td className="row-actions row-actions-icons">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="row-icon"
+                          icon={<Eye size={16} />}
+                          aria-label={t('appointments:actions.view')}
+                          title={t('appointments:actions.view')}
+                          onClick={() => setDetailOf(a)}
+                        />
+                        {a.status === 'CONFIRMED' ? (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="row-icon appt-complete"
+                              icon={<CheckCircle2 size={16} />}
+                              aria-label={t('appointments:actions.complete')}
+                              title={t('appointments:actions.complete')}
+                              disabled={actions.busyId === a.id}
+                              onClick={() => actions.complete(a)}
+                            />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="row-icon appt-noshow"
+                              icon={<UserX size={16} />}
+                              aria-label={t('appointments:actions.noShow')}
+                              title={t('appointments:actions.noShow')}
+                              disabled={actions.busyId === a.id}
+                              onClick={() => actions.markNoShow(a)}
+                            />
+                          </>
+                        ) : null}
+                        {ACTIVE.includes(a.status) ? (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="row-icon"
+                              icon={<CalendarClock size={16} />}
+                              aria-label={t('appointments:actions.reschedule')}
+                              title={t('appointments:actions.reschedule')}
+                              onClick={() => setRescheduleOf(a)}
+                            />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="row-icon appt-noshow"
+                              icon={<XCircle size={16} />}
+                              aria-label={t('appointments:actions.cancel')}
+                              title={t('appointments:actions.cancel')}
+                              disabled={actions.busyId === a.id}
+                              onClick={() => actions.cancel(a)}
+                            />
+                          </>
+                        ) : null}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <Pagination page={table.page} totalPages={table.totalPages} totalElements={table.totalElements} onChange={table.setPage} />
+          </DataState>
+        </Card>
+      )}
 
       <RescheduleModal
         appointment={rescheduleOf}
-        serviceName={offeringName}
+        serviceName={dir.offeringName}
         reschedule={tenantAppointmentsApi.reschedule}
         onClose={() => setRescheduleOf(null)}
-        onDone={appts.reload}
+        onDone={reloadActive}
       />
       <AppointmentDetailModal
         appointment={detailOf}
-        serviceName={offeringName}
-        requirementLabel={requirementLabel}
-        customer={detailOf ? customerCard(detailOf.customerUserId) : undefined}
+        serviceName={dir.offeringName}
+        requirementLabel={dir.requirementLabel}
+        requirementType={dir.requirementType}
+        customer={detailOf ? dir.customerCard(detailOf.customerUserId) : undefined}
+        onComplete={actions.complete}
+        onNoShow={actions.markNoShow}
+        onReschedule={(a) => {
+          setDetailOf(null);
+          setRescheduleOf(a);
+        }}
+        busy={detailOf ? actions.busyId === detailOf.id : false}
         onClose={() => setDetailOf(null)}
       />
     </div>
   );
 }
-

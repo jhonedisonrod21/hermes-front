@@ -32,6 +32,9 @@ export function BookingModal({ offering, onClose }: Props) {
   const [slot, setSlot] = useState<AvailableSlot | null>(null);
   const [values, setValues] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string | undefined>>({});
+  // Anexos de archivo (tipo FILE): valor = fileId subido; guardamos también el nombre y si está subiendo.
+  const [uploading, setUploading] = useState<Record<string, boolean>>({});
+  const [fileNames, setFileNames] = useState<Record<string, string>>({});
 
   // Reinicia el estado al abrir o cambiar de servicio.
   const [lastKey, setLastKey] = useState('');
@@ -42,6 +45,8 @@ export function BookingModal({ offering, onClose }: Props) {
     setSlot(null);
     setValues({});
     setFieldErrors({});
+    setUploading({});
+    setFileNames({});
   }
 
   const availability = useResource(
@@ -60,6 +65,30 @@ export function BookingModal({ offering, onClose }: Props) {
     setValues((s) => ({ ...s, [k]: v }));
     setFieldErrors((e) => ({ ...e, [k]: undefined }));
   };
+  const anyUploading = Object.values(uploading).some(Boolean);
+
+  // Sube el anexo de un requisito FILE y guarda el fileId como su valor (lo consume la reserva).
+  async function handleFile(k: string, file: File | undefined) {
+    if (!file) return;
+    // Solo PDF: el visor de anexos (ver/descargar/imprimir) trabaja con PDF.
+    if (file.type !== 'application/pdf') {
+      setFieldErrors((e) => ({ ...e, [k]: t('bookings:book.onlyPdf') }));
+      return;
+    }
+    setUploading((u) => ({ ...u, [k]: true }));
+    setFieldErrors((e) => ({ ...e, [k]: undefined }));
+    try {
+      const res = await appointmentsApi.uploadRequirementFile(file);
+      setValues((s) => ({ ...s, [k]: res.fileId }));
+      setFileNames((n) => ({ ...n, [k]: res.filename }));
+    } catch (err) {
+      setValues((s) => ({ ...s, [k]: '' }));
+      setFileNames((n) => ({ ...n, [k]: '' }));
+      toast.error(err instanceof Error ? err.message : t('common:feedback.error'));
+    } finally {
+      setUploading((u) => ({ ...u, [k]: false }));
+    }
+  }
   const timeOf = (iso: string) => new Intl.DateTimeFormat(i18n.language, { timeStyle: 'short' }).format(new Date(iso));
   // Ayuda según el tipo del requisito (los requisitos no traen descripción propia del backend).
   const reqHint = (type: string): string | undefined => {
@@ -107,7 +136,7 @@ export function BookingModal({ offering, onClose }: Props) {
           <Button variant="secondary" onClick={onClose} disabled={book.submitting}>
             {t('common:actions.cancel')}
           </Button>
-          <Button type="submit" form="booking-form" disabled={book.submitting || !slot}>
+          <Button type="submit" form="booking-form" disabled={book.submitting || !slot || anyUploading}>
             {book.submitting ? t('bookings:book.booking') : t('bookings:book.confirm')}
           </Button>
         </>
@@ -172,6 +201,29 @@ export function BookingModal({ offering, onClose }: Props) {
                   checked={values[r.key] === 'true'}
                   onChange={(e) => setVal(r.key, e.target.checked ? 'true' : 'false')}
                 />
+              ) : r.type === 'FILE' ? (
+                <div className="hc-field" key={r.key}>
+                  <label className="hc-field-label" htmlFor={r.key}>
+                    {r.required ? `${r.label} *` : r.label}
+                  </label>
+                  <input
+                    id={r.key}
+                    name={r.key}
+                    type="file"
+                    accept="application/pdf"
+                    className="hc-file-input"
+                    disabled={uploading[r.key]}
+                    onChange={(e) => handleFile(r.key, e.target.files?.[0])}
+                  />
+                  {uploading[r.key] ? (
+                    <p className="hc-field-message">{t('bookings:book.uploading')}</p>
+                  ) : fileNames[r.key] ? (
+                    <p className="hc-field-message">{t('bookings:book.fileReady', { name: fileNames[r.key] })}</p>
+                  ) : (
+                    <p className="hc-field-message">{reqHint('FILE')}</p>
+                  )}
+                  {fieldErrors[r.key] ? <p className="hc-field-message hc-field-error">{fieldErrors[r.key]}</p> : null}
+                </div>
               ) : (
                 <TextField
                   key={r.key}

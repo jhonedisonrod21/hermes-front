@@ -1,12 +1,11 @@
-import { useCallback, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pencil, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '../../components/PageHeader';
 import { DataState } from '../../components/DataState';
 import { Badge, Button, Card, Pagination, SearchInput, Select } from '../../components/ui';
 import { OfferingFormModal } from './OfferingFormModal';
-import { useResource } from '../../hooks/useResource';
-import { useClientTable } from '../../hooks/useClientTable';
+import { useServerTable } from '../../hooks/useServerTable';
 import { useToast } from '../../components/feedback/toast';
 import { useConfirm } from '../../components/feedback/confirm';
 import { catalogApi } from '../../api/services';
@@ -20,20 +19,23 @@ export function OfferingsPage() {
   const { t, i18n } = useTranslation(['catalog', 'common']);
   const toast = useToast();
   const confirm = useConfirm();
-  const offerings = useResource(() => catalogApi.listOfferings({ size: 200, sort: 'name,asc' }), []);
+  const table = useServerTable((p) => catalogApi.listOfferings({ ...p, sort: 'name,asc' }), { size: 12 });
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<OfferingResponse | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  const items = offerings.data?.content ?? [];
-  const visible = statusFilter ? items.filter((o) => (statusFilter === 'active' ? o.active : !o.active)) : items;
-  const { paged, page, setPage, totalPages, total } = useClientTable(visible, {
-    query,
-    match: useCallback(matchOffering, []),
-    resetKey: statusFilter
-  });
+  // El endpoint no acepta búsqueda; el filtro/búsqueda se aplica sobre la página cargada (se avisa).
+  const q = query.trim().toLowerCase();
+  const clientFiltered = useMemo(
+    () =>
+      table.items
+        .filter((o) => (statusFilter ? (statusFilter === 'active' ? o.active : !o.active) : true))
+        .filter((o) => (q ? matchOffering(o, q) : true)),
+    [table.items, statusFilter, q]
+  );
+  const pageFilterActive = Boolean(q || statusFilter);
 
   function openCreate() {
     setEditing(null);
@@ -58,7 +60,7 @@ export function OfferingsPage() {
     try {
       await catalogApi.setActive(o.id, !o.active);
       toast.success(o.active ? t('catalog:toast.deactivated') : t('catalog:toast.activated'));
-      offerings.reload();
+      table.reload();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t('common:feedback.error'));
     } finally {
@@ -77,11 +79,8 @@ export function OfferingsPage() {
             {t('catalog:actions.new')}
           </Button>
         }
-      />
-
-      <Card className="table-card">
-        <div className="table-toolbar">
-          <div className="table-toolbar-filters">
+        tools={
+          <>
             <SearchInput
               placeholder={t('catalog:searchPlaceholder')}
               value={query}
@@ -97,18 +96,26 @@ export function OfferingsPage() {
                 { value: 'inactive', label: t('catalog:status.inactive') }
               ]}
             />
-          </div>
-          <span className="table-toolbar-count">{t('common:pagination.items', { count: total })}</span>
-        </div>
+            <span className="table-toolbar-count">{t('common:pagination.items', { count: table.totalElements })}</span>
+            {pageFilterActive ? (
+              <span className="table-toolbar-hint" title={t('common:pagination.currentPageFilterHint')}>
+                {t('common:pagination.currentPageFilter')}
+              </span>
+            ) : null}
+          </>
+        }
+      />
+
+      <Card className="table-card">
         <DataState
-          loading={offerings.loading}
-          error={offerings.error}
-          empty={total === 0}
+          loading={table.loading}
+          error={table.error}
+          empty={clientFiltered.length === 0}
           emptyMessage={t('catalog:empty')}
-          onRetry={offerings.reload}
+          onRetry={table.reload}
         >
           <div className="hc-table-scroll">
-          <table className="hc-table">
+          <table className="hc-table catalog-table">
             <thead>
               <tr>
                 <th>{t('catalog:fields.name')}</th>
@@ -121,10 +128,10 @@ export function OfferingsPage() {
               </tr>
             </thead>
             <tbody>
-              {paged.map((o) => (
+              {clientFiltered.map((o) => (
                 <tr key={o.id}>
                   <td>
-                    <strong>{o.name}</strong>
+                    <strong className="cell-upper">{o.name}</strong>
                     {o.requiresOnlinePayment ? (
                       <Badge tone="accent" className="row-badge">
                         {t('catalog:badges.onlinePayment')}
@@ -136,8 +143,8 @@ export function OfferingsPage() {
                       </Badge>
                     ) : null}
                   </td>
-                  <td>{o.category ?? '—'}</td>
-                  <td>{t(`catalog:modality.${o.modality}`, o.modality)}</td>
+                  <td className="cell-upper">{o.category ?? '—'}</td>
+                  <td className="cell-upper">{t(`catalog:modality.${o.modality}`, o.modality)}</td>
                   <td>{formatDuration(o.durationMinutes, t('common:units.hour'), t('common:units.minute'))}</td>
                   <td>{formatMoney(o.priceAmount, o.priceCurrency, i18n.language)}</td>
                   <td>
@@ -163,16 +170,21 @@ export function OfferingsPage() {
             </tbody>
           </table>
           </div>
-          <Pagination page={page} totalPages={totalPages} totalElements={total} onChange={setPage} />
+          <Pagination
+            page={table.page}
+            totalPages={table.totalPages}
+            totalElements={table.totalElements}
+            onChange={table.setPage}
+          />
         </DataState>
       </Card>
 
       <OfferingFormModal
         open={modalOpen}
         editing={editing}
-        categories={Array.from(new Set(items.map((o) => o.category).filter((c): c is string => Boolean(c)))).sort()}
+        categories={Array.from(new Set(table.items.map((o) => o.category).filter((c): c is string => Boolean(c)))).sort()}
         onClose={() => setModalOpen(false)}
-        onSaved={offerings.reload}
+        onSaved={table.reload}
       />
     </div>
   );
