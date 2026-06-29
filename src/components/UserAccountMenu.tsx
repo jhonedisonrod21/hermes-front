@@ -20,7 +20,7 @@ function firstName(profile?: HermesProfile, fallback = 'Hermes') {
   return localPart.split(/[.\s_-]+/).find(Boolean) ?? fallback;
 }
 
-export function UserAccountMenu({ profile, onLogout }: UserAccountMenuProps) {
+export function UserAccountMenu({ profile, onLogout }: Readonly<UserAccountMenuProps>) {
   const { t } = useTranslation(['common', 'dashboard']);
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);

@@ -164,7 +164,7 @@ function GuestOverview() {
   );
 }
 
-const ACTIVE_STATUSES: AppointmentStatus[] = ['PENDING_PAYMENT', 'CONFIRMED'];
+const ACTIVE_STATUSES = new Set<AppointmentStatus>(['PENDING_PAYMENT', 'CONFIRMED']);
 
 function isLocalToday(iso: string, ref: Date) {
   const d = new Date(iso);
@@ -184,7 +184,7 @@ function PartnerOverview() {
   }, [offerings.data]);
 
   // Resuelve el correo del cliente (id -> ficha) en lote desde el directorio del tenant.
-  const customerIdsKey = useMemo(() => [...new Set(items.map((a) => a.customerUserId))].sort().join(','), [items]);
+  const customerIdsKey = useMemo(() => [...new Set(items.map((a) => a.customerUserId))].sort((a, b) => a.localeCompare(b)).join(','), [items]);
   const customers = useResource(
     () => (customerIdsKey ? identityApi.getUserCards(customerIdsKey.split(',').slice(0, 100)) : Promise.resolve([])),
     [customerIdsKey]
@@ -196,7 +196,7 @@ function PartnerOverview() {
 
   const now = new Date();
   const todayCount = useMemo(
-    () => items.filter((a) => ACTIVE_STATUSES.includes(a.status) && isLocalToday(a.slotStart, now)).length,
+    () => items.filter((a) => ACTIVE_STATUSES.has(a.status) && isLocalToday(a.slotStart, now)).length,
     [items, now]
   );
   const upcoming = useMemo(
@@ -289,7 +289,7 @@ export function OverviewPage() {
 
   return (
     <div className="page">
-      <PageHeader eyebrow={t('overview:eyebrow')} title={t('overview:greeting', { name: userLabel })} />
+      <PageHeader title={t('overview:greeting', { name: userLabel })} />
 
       <Card className="dashboard-hero" tone="highlight">
         <div>

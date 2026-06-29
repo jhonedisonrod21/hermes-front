@@ -83,7 +83,6 @@ export function TenantsPage() {
   return (
     <div className="page">
       <PageHeader
-        eyebrow={t('admin:tenants.eyebrow')}
         title={t('admin:tenants.title')}
         description={t('admin:tenants.description')}
         actions={

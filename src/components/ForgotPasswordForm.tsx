@@ -9,7 +9,7 @@ import { authService } from '../hermes-security/authService';
  * dispara el envío de un enlace de restablecimiento (endpoint público). El usuario continúa desde
  * el enlace del correo, que abre la página /reset-password.
  */
-export function ForgotPasswordForm({ onDone }: { onDone: () => void }) {
+export function ForgotPasswordForm({ onDone }: Readonly<{ onDone: () => void }>) {
   const { t } = useTranslation('auth');
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);

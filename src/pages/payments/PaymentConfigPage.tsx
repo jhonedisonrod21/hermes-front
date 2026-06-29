@@ -38,7 +38,7 @@ const keyChars = (v: string) => v.replace(/[^a-zA-Z0-9_-]/g, '');
 
 function toForm(c: TenantPaymentConfigResponse | null) {
   return {
-    provider: (c?.provider ?? 'FAKE_PSE') as PaymentProvider,
+    provider: c?.provider ?? 'FAKE_PSE',
     enabled: c?.enabled ?? false,
     // Los valores reales no se cargan en los inputs: se muestran enmascarados como placeholder.
     merchantAccount: '',
@@ -120,7 +120,6 @@ export function PaymentConfigPage() {
   return (
     <div className="page">
       <PageHeader
-        eyebrow={t('payments:eyebrow')}
         title={t('payments:configTitle')}
         description={t('payments:configDescription')}
         actions={

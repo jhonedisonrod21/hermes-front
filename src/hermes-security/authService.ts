@@ -32,7 +32,7 @@ function toSession(user: BffSessionUser): HermesSession {
     user_id: user.userId,
     preferred_username: user.preferredUsername,
     email: user.email,
-    name: typeof user.claims?.['name'] === 'string' ? (user.claims['name'] as string) : undefined,
+    name: typeof user.claims?.['name'] === 'string' ? user.claims['name'] : undefined,
     account_scope: resolveAccountScope(user),
     tenant_id: user.tenantId,
     tenant_slug: user.tenantSlug,
@@ -83,7 +83,7 @@ async function registerUser(name: string, email: string, password: string): Prom
 export const authService = {
   async login(username: string, password: string) {
     await createServerSession(username, password);
-    window.location.assign(oauthEndpoints.bffLogin);
+    globalThis.location.assign(oauthEndpoints.bffLogin);
   },
 
   async register(name: string, email: string, password: string) {
@@ -154,7 +154,7 @@ export const authService = {
       credentials: 'include'
     });
     clearSession();
-    window.location.assign('/');
+    globalThis.location.assign('/');
   },
 
   /**

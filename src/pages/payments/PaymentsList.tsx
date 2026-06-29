@@ -32,7 +32,7 @@ type Props = {
 };
 
 /** Lista reutilizable de pagos: cobros recibidos (tenant) o historial propio (invitado). */
-export function PaymentsList({ title, loader, hideWhenEmpty = false, receiptLoader, showToolbar = true, onTotal }: Props) {
+export function PaymentsList({ title, loader, hideWhenEmpty = false, receiptLoader, showToolbar = true, onTotal }: Readonly<Props>) {
   const { t, i18n } = useTranslation(['payments', 'common']);
   const payments = useResource<Page<PaymentResponse>>(loader, []);
   const items = payments.data?.content ?? [];

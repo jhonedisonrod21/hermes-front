@@ -135,7 +135,6 @@ export function OrganizationPage() {
   return (
     <div className="page">
       <PageHeader
-        eyebrow={t('organization:eyebrow')}
         title={t('organization:title')}
         description={t('organization:description')}
         actions={

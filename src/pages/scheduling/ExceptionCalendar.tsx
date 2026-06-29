@@ -38,7 +38,7 @@ type Props = {
  * un evento de día completo y se puede hacer clic en un día (o arrastrar varios) para marcar nuevos.
  * Los días no laborables llegan como eventos virtuales (exception null) que no son clicables.
  */
-export function ExceptionCalendar({ events, date, onNavigate, onSelectSlot, onSelectEvent }: Props) {
+export function ExceptionCalendar({ events, date, onNavigate, onSelectSlot, onSelectEvent }: Readonly<Props>) {
   const { t, i18n } = useTranslation(['schedule', 'appointments']);
   const culture = i18n.language.startsWith('es') ? 'es' : 'en';
 

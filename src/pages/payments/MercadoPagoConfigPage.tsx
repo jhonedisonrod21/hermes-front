@@ -7,7 +7,6 @@ export function MercadoPagoConfigPage() {
 
   return (
     <ModulePlaceholder
-      eyebrow={t('payments:eyebrow')}
       title={t('app:nav.paymentsMercadoPago')}
       description={t('payments:mercadopago.description')}
       service="hermes-payment-service · MercadoPago"

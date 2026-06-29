@@ -20,7 +20,7 @@ type Props = {
  * Marca uno o varios días como excepción: un día completo no laborable (cierre). El horario no se
  * solicita —la jornada se considera cerrada— solo un motivo opcional (festivo, vacaciones, etc.).
  */
-export function ExceptionFormModal({ dates, existing, onClose, onCreated }: Props) {
+export function ExceptionFormModal({ dates, existing, onClose, onCreated }: Readonly<Props>) {
   const { t, i18n } = useTranslation(['schedule', 'common']);
   const toast = useToast();
   const [description, setDescription] = useState('');

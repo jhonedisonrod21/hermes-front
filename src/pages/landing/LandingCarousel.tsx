@@ -78,8 +78,8 @@ export function LandingCarousel() {
   // Auto-avance, pausado al pasar el cursor o si la pestaña no está visible.
   useEffect(() => {
     if (paused) return undefined;
-    const id = window.setInterval(() => setIndex((i) => (i + 1) % count), AUTO_MS);
-    return () => window.clearInterval(id);
+    const id = globalThis.setInterval(() => setIndex((i) => (i + 1) % count), AUTO_MS);
+    return () => globalThis.clearInterval(id);
   }, [paused, count]);
 
   return (

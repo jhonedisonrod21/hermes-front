@@ -20,7 +20,7 @@ type Props = {
   onClose: () => void;
 };
 
-export function TenantMembersModal({ tenant, onClose }: Props) {
+export function TenantMembersModal({ tenant, onClose }: Readonly<Props>) {
   const { t } = useTranslation(['admin', 'team', 'common']);
   const toast = useToast();
   const confirm = useConfirm();
@@ -52,7 +52,7 @@ export function TenantMembersModal({ tenant, onClose }: Props) {
 
   // Roles presentes entre los candidatos (para el filtro): ya sin SYSTEM_ADMIN.
   const availableRoles = useMemo(
-    () => Array.from(new Set(candidates.flatMap((u) => u.roles ?? []))).sort(),
+    () => Array.from(new Set(candidates.flatMap((u) => u.roles ?? []))).sort((a, b) => a.localeCompare(b)),
     [candidates]
   );
 

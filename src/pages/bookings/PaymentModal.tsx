@@ -19,7 +19,7 @@ type Props = {
   onClose: () => void;
 };
 
-export function PaymentModal({ appointment, serviceName, onClose }: Props) {
+export function PaymentModal({ appointment, serviceName, onClose }: Readonly<Props>) {
   const { t } = useTranslation(['bookings', 'common']);
   const toast = useToast();
   const { session } = useAuth();
@@ -102,7 +102,7 @@ export function PaymentModal({ appointment, serviceName, onClose }: Props) {
     try {
       const res = await checkout.run();
       // Redirige a la pasarela PSE para completar el pago.
-      window.location.assign(res.checkoutUrl);
+      globalThis.location.assign(res.checkoutUrl);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t('common:feedback.error'));
     }

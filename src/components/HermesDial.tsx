@@ -15,7 +15,7 @@ function polar(angleDeg: number, radius: number) {
 }
 
 /** Reloj mínimo (viewBox 40, trazo no escalable) marcando las 9:00 como el readout de marca. */
-function MinimalDial({ className = '' }: { className?: string }) {
+function MinimalDial({ className = '' }: Readonly<{ className?: string }>) {
   // 12 marcas; las cardinales (12/3/6/9) más largas, como un reloj real.
   const ticks = Array.from({ length: 12 }, (_, i) => {
     const a = ((i * 30 - 90) * Math.PI) / 180;
@@ -63,7 +63,7 @@ function MinimalDial({ className = '' }: { className?: string }) {
  * Cronógrafo de Hermes: instrumento de latón sobre cielo nocturno. Reloj + la trayectoria
  * del mensajero alado. Es la pieza-firma de la marca; se reutiliza en toda la app.
  */
-export function HermesDial({ className = '', labels = true, minimal = false }: HermesDialProps) {
+export function HermesDial({ className = '', labels = true, minimal = false }: Readonly<HermesDialProps>) {
   if (minimal) {
     return <MinimalDial className={className} />;
   }

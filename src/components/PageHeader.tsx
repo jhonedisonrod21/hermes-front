@@ -6,8 +6,6 @@ import { actorKind } from '../hermes-security/sessionStore';
 import { flattenNav, navigationFor } from '../app/navigation';
 
 type PageHeaderProps = {
-  /** @deprecated La miga de pan sustituyó al "eyebrow"; se mantiene por compatibilidad y no se muestra. */
-  eyebrow?: string;
   title: string;
   /** Se muestra como tooltip (title) del crumb actual para no ocupar espacio vertical. */
   description?: string;
@@ -23,7 +21,7 @@ type Crumb = { label: string; to?: string };
  * encabezado voluminoso). Los crumbs padre se enlazan según la navegación del actor; el último es la
  * página actual ({@code title}). Las acciones van a la derecha en la misma fila.
  */
-export function PageHeader({ title, description, tools, actions }: PageHeaderProps) {
+export function PageHeader({ title, description, tools, actions }: Readonly<PageHeaderProps>) {
   const { t } = useTranslation(['app']);
   const { session } = useAuth();
   const { pathname } = useLocation();

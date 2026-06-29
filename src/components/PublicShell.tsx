@@ -9,7 +9,7 @@ import { SiteFooter } from './SiteFooter';
  * Cara pública (sin sesión): top-bar con búsqueda + contenido + footer común. La comparten la landing
  * y la página de exploración para que ambas tengan la misma navegación.
  */
-export function PublicShell({ children }: PropsWithChildren) {
+export function PublicShell({ children }: Readonly<PropsWithChildren>) {
   const { t } = useTranslation('landing');
 
   return (

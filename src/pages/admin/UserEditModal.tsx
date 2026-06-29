@@ -16,7 +16,7 @@ type Props = {
 type FormErrors = Partial<Record<'name' | 'username' | 'email', string>>;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export function UserEditModal({ user, onClose, onSaved }: Props) {
+export function UserEditModal({ user, onClose, onSaved }: Readonly<Props>) {
   const { t } = useTranslation(['admin', 'common']);
   const toast = useToast();
   const open = user !== null;

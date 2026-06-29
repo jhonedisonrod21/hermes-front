@@ -22,7 +22,7 @@ export function SessionExpiredDialog() {
     await authService.endServerSession();
     clearSession();
     // Recarga completa a la pantalla de acceso: descarta el estado de React y rehace el flujo de login.
-    window.location.assign('/acceso');
+    globalThis.location.assign('/acceso');
   }
 
   return (

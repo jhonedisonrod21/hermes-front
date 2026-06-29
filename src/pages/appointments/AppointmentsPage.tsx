@@ -136,7 +136,6 @@ export function AppointmentsPage() {
   return (
     <div className="page">
       <PageHeader
-        eyebrow={t('appointments:eyebrow')}
         title={t('appointments:title')}
         description={t('appointments:listDescription')}
         tools={

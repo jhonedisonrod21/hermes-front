@@ -15,7 +15,7 @@ type Props = {
  * logotipo, misma barra de búsqueda de servicios y mismo estilo (navy), con acciones distintas a la
  * derecha. La exploración de servicios vive aquí (maquetación: la búsqueda aún no dispara resultados).
  */
-export function PublicTopbar({ to = '/', children }: Props) {
+export function PublicTopbar({ to = '/', children }: Readonly<Props>) {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
   const [query, setQuery] = useState('');

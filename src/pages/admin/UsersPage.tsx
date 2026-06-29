@@ -32,7 +32,7 @@ export function UsersPage() {
   );
 
   const availableRoles = useMemo(
-    () => Array.from(new Set(table.items.flatMap((u) => u.roles ?? []))).sort(),
+    () => Array.from(new Set(table.items.flatMap((u) => u.roles ?? []))).sort((a, b) => a.localeCompare(b)),
     [table.items]
   );
   const clientFiltered = useMemo(
@@ -75,7 +75,6 @@ export function UsersPage() {
   return (
     <div className="page">
       <PageHeader
-        eyebrow={t('admin:users.eyebrow')}
         title={t('admin:users.title')}
         description={t('admin:users.description')}
         tools={

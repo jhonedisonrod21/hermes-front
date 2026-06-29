@@ -56,7 +56,7 @@ export function AppointmentDetailModal({
   onReschedule,
   busy = false,
   onClose
-}: Props) {
+}: Readonly<Props>) {
   const { t, i18n } = useTranslation(['appointments', 'common']);
   const a = appointment;
 
@@ -95,8 +95,8 @@ export function AppointmentDetailModal({
   // Acciones del establecimiento sobre la cita. Completar/no-asistió solo desde CONFIRMED; reprogramar
   // mientras la cita retiene el cupo (PENDING_PAYMENT o CONFIRMED).
   const isActive = Boolean(a && (a.status === 'PENDING_PAYMENT' || a.status === 'CONFIRMED'));
-  const canComplete = Boolean(a && a.status === 'CONFIRMED' && onComplete);
-  const canNoShow = Boolean(a && a.status === 'CONFIRMED' && onNoShow);
+  const canComplete = Boolean(a?.status === 'CONFIRMED' && onComplete);
+  const canNoShow = Boolean(a?.status === 'CONFIRMED' && onNoShow);
   const canReschedule = Boolean(a && isActive && onReschedule);
 
   async function handleComplete() {

@@ -25,7 +25,7 @@ function todayISO() {
 }
 
 /** Reprograma eligiendo un horario DISPONIBLE real (evita el 409 por horas arbitrarias). */
-export function RescheduleModal({ appointment, serviceName, reschedule, onClose, onDone }: Props) {
+export function RescheduleModal({ appointment, serviceName, reschedule, onClose, onDone }: Readonly<Props>) {
   const { t, i18n } = useTranslation(['appointments', 'common']);
   const toast = useToast();
   const open = appointment !== null;

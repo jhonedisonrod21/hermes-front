@@ -13,7 +13,7 @@ const brandSources = {
   appIcon: '/brand/hermes-logo-app-icon.svg'
 };
 
-export function BrandLogo({ className = '', compact = false, variant = 'full' }: BrandLogoProps) {
+export function BrandLogo({ className = '', compact = false, variant = 'full' }: Readonly<BrandLogoProps>) {
   const { t } = useTranslation('common');
   const showWordmark = !compact && variant !== 'full';
   const ariaLabel = t('brand.ariaLabel');

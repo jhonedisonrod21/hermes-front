@@ -14,7 +14,7 @@ import type { AppointmentResponse } from '../../api/types';
  */
 export function useAppointmentDirectory(items: AppointmentResponse[]) {
   const offeringIdsKey = useMemo(
-    () => [...new Set(items.map((a) => a.offeringId))].sort().join(','),
+    () => [...new Set(items.map((a) => a.offeringId))].sort((a, b) => a.localeCompare(b)).join(','),
     [items]
   );
   const offerings = useResource(
@@ -52,7 +52,7 @@ export function useAppointmentDirectory(items: AppointmentResponse[]) {
   }, [offerings.data]);
 
   const customerIdsKey = useMemo(
-    () => [...new Set(items.map((a) => a.customerUserId))].sort().join(','),
+    () => [...new Set(items.map((a) => a.customerUserId))].sort((a, b) => a.localeCompare(b)).join(','),
     [items]
   );
   const customers = useResource(

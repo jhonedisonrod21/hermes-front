@@ -45,7 +45,7 @@ export function OrganizationSwitcher() {
     try {
       await authService.switchTenant(tenantId);
       // El token quedó re-emitido en la sesión del BFF: recargamos bajo la nueva organización.
-      window.location.assign('/');
+      globalThis.location.assign('/');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t('common:feedback.error'));
       setSwitching(false);

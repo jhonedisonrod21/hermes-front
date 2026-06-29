@@ -22,7 +22,7 @@ type Props = {
  * Visor de PDF reutilizable: muestra el documento embebido y ofrece descargarlo e imprimirlo. Mismo
  * patrón que el visor de reportes/comprobantes (iframe + impresión vía contentWindow.print()).
  */
-export function PdfViewerModal({ open, title, fileName, load, onClose }: Props) {
+export function PdfViewerModal({ open, title, fileName, load, onClose }: Readonly<Props>) {
   const { t } = useTranslation('common');
   const toast = useToast();
   const [doc, setDoc] = useState<{ url: string } | null>(null);

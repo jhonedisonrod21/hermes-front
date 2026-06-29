@@ -33,7 +33,7 @@ export function MembersPage() {
 
   // Resuelve cada userId -> ficha (nombre/correo) desde el directorio, para no mostrar el id.
   const idsKey = useMemo(
-    () => [...new Set(table.items.map((m) => m.userId))].sort().join(','),
+    () => [...new Set(table.items.map((m) => m.userId))].sort((a, b) => a.localeCompare(b)).join(','),
     [table.items]
   );
   const cards = useResource(
@@ -69,7 +69,6 @@ export function MembersPage() {
   return (
     <div className="page">
       <PageHeader
-        eyebrow={t('team:eyebrow')}
         title={t('team:title')}
         description={t('team:description')}
         tools={

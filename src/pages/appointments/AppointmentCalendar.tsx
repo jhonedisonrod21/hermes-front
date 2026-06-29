@@ -37,7 +37,7 @@ type Props = {
  * eventos ya mapeados y delega navegación/selección al contenedor. El color del bloque sigue el estado
  * de la cita (paleta de marca en {@link STATUS_COLOR}).
  */
-export function AppointmentCalendar({ events, date, view, onView, onNavigate, onSelectEvent }: Props) {
+export function AppointmentCalendar({ events, date, view, onView, onNavigate, onSelectEvent }: Readonly<Props>) {
   const { t, i18n } = useTranslation(['appointments', 'common']);
   const culture = i18n.language.startsWith('es') ? 'es' : 'en';
 

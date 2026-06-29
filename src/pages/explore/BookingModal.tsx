@@ -22,7 +22,7 @@ function todayISO() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-export function BookingModal({ offering, onClose }: Props) {
+export function BookingModal({ offering, onClose }: Readonly<Props>) {
   const { t, i18n } = useTranslation(['bookings', 'catalog', 'common']);
   const toast = useToast();
   const navigate = useNavigate();

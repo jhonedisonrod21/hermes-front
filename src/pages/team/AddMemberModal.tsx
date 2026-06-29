@@ -18,7 +18,7 @@ type Props = {
 };
 
 /** Invita a un miembro buscándolo por correo (sin manejar el id). Lo añade como colaborador. */
-export function AddMemberModal({ open, onClose, onAdded }: Props) {
+export function AddMemberModal({ open, onClose, onAdded }: Readonly<Props>) {
   const { t } = useTranslation(['team', 'common']);
   const toast = useToast();
   const [email, setEmail] = useState('');

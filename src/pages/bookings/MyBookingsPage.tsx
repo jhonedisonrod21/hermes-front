@@ -24,7 +24,7 @@ const STATUS_TONE: Record<AppointmentStatus, 'success' | 'warning' | 'danger' | 
   EXPIRED: 'warning'
 };
 
-const ACTIVE: AppointmentStatus[] = ['PENDING_PAYMENT', 'CONFIRMED'];
+const ACTIVE = new Set<AppointmentStatus>(['PENDING_PAYMENT', 'CONFIRMED']);
 const PAGE = 6;
 
 export function MyBookingsPage() {
@@ -49,7 +49,7 @@ export function MyBookingsPage() {
     return d.getTime();
   }, []);
   const isUpcoming = (a: AppointmentResponse) =>
-    ACTIVE.includes(a.status) && new Date(a.slotStart).getTime() >= startOfToday;
+    ACTIVE.has(a.status) && new Date(a.slotStart).getTime() >= startOfToday;
   // Próximas: la más cercana primero. Historial (resto): la más reciente primero.
   const upcoming = useMemo(
     () =>
@@ -65,7 +65,7 @@ export function MyBookingsPage() {
         .sort((a, b) => new Date(b.slotStart).getTime() - new Date(a.slotStart).getTime()),
     [items, startOfToday]
   );
-  const offeringIdsKey = useMemo(() => [...new Set(items.map((a) => a.offeringId))].sort().join(','), [items]);
+  const offeringIdsKey = useMemo(() => [...new Set(items.map((a) => a.offeringId))].sort((a, b) => a.localeCompare(b)).join(','), [items]);
   // El invitado resuelve el nombre del servicio por el detalle público de cada oferta.
   const offerings = useResource(
     () =>
@@ -117,7 +117,7 @@ export function MyBookingsPage() {
             <p className="booking-price">{formatMoney(a.priceAmount, a.priceCurrency ?? 'USD', i18n.language)}</p>
           ) : null}
         </div>
-        {ACTIVE.includes(a.status) ? (
+        {ACTIVE.has(a.status) ? (
           <div className="booking-actions">
             {a.status === 'PENDING_PAYMENT' ? (
               <Button
@@ -159,7 +159,6 @@ export function MyBookingsPage() {
   return (
     <div className="page">
       <PageHeader
-        eyebrow={t('bookings:eyebrow')}
         title={t('bookings:title')}
         description={t('bookings:listDescription')}
         actions={

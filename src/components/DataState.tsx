@@ -14,7 +14,7 @@ type DataStateProps = {
 };
 
 /** Envuelve contenido cargado por `useResource`: muestra spinner/error/vacío o el contenido. */
-export function DataState({ loading, error, empty, emptyMessage, onRetry, children }: DataStateProps) {
+export function DataState({ loading, error, empty, emptyMessage, onRetry, children }: Readonly<DataStateProps>) {
   const { t } = useTranslation('common');
 
   if (loading) {

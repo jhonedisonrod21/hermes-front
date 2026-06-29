@@ -71,7 +71,6 @@ export function OfferingsPage() {
   return (
     <div className="page">
       <PageHeader
-        eyebrow={t('catalog:eyebrow')}
         title={t('catalog:title')}
         description={t('catalog:description')}
         actions={
@@ -182,7 +181,7 @@ export function OfferingsPage() {
       <OfferingFormModal
         open={modalOpen}
         editing={editing}
-        categories={Array.from(new Set(table.items.map((o) => o.category).filter((c): c is string => Boolean(c)))).sort()}
+        categories={Array.from(new Set(table.items.map((o) => o.category).filter((c): c is string => Boolean(c)))).sort((a, b) => a.localeCompare(b))}
         onClose={() => setModalOpen(false)}
         onSaved={table.reload}
       />

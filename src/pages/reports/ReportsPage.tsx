@@ -10,7 +10,7 @@ export function ReportsPage() {
 
   return (
     <div className="page">
-      <PageHeader eyebrow={t('reports:eyebrow')} title={t('reports:title')} description={t('reports:description')} />
+      <PageHeader title={t('reports:title')} description={t('reports:description')} />
 
       <div className="report-grid">
         <button type="button" className="report-tile" onClick={() => setOpen('statistics')}>

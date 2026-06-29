@@ -12,7 +12,7 @@ type ModalProps = {
   className?: string;
 };
 
-export function Modal({ open, title, onClose, children, footer, className = '' }: ModalProps) {
+export function Modal({ open, title, onClose, children, footer, className = '' }: Readonly<ModalProps>) {
   const { t } = useTranslation('common');
 
   useEffect(() => {

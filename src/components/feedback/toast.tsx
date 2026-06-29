@@ -18,7 +18,7 @@ const ICONS = {
   info: Info
 } as const;
 
-export function ToastProvider({ children }: { children: ReactNode }) {
+export function ToastProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const counter = useRef(0);
 
@@ -30,7 +30,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     (tone: ToastTone, message: string) => {
       const id = (counter.current += 1);
       setToasts((current) => [...current, { id, tone, message }]);
-      window.setTimeout(() => remove(id), 4200);
+      globalThis.setTimeout(() => remove(id), 4200);
     },
     [remove]
   );

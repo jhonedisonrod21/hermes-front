@@ -21,7 +21,7 @@ type Props = {
  * valida (apertura < cierre y sin solapes) y devuelve las franjas ordenadas al contenedor.
  * Debe montarse con `key={day}` para reinicializar al cambiar de día.
  */
-export function HoursDialog({ day, initialSlots, onClose, onSave }: Props) {
+export function HoursDialog({ day, initialSlots, onClose, onSave }: Readonly<Props>) {
   const { t } = useTranslation(['schedule', 'common']);
   const toast = useToast();
   const [slots, setSlots] = useState<Slot[]>(() =>

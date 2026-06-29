@@ -5,7 +5,7 @@ import { onSessionExpired } from './sessionExpiry';
 import type { HermesSession } from './sessionStore';
 import { SessionExpiredDialog } from '../components/SessionExpiredDialog';
 
-export function AuthProvider({ children }: PropsWithChildren) {
+export function AuthProvider({ children }: Readonly<PropsWithChildren>) {
   const [session, setSession] = useState<HermesSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [expired, setExpired] = useState(false);

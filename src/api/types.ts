@@ -111,7 +111,7 @@ export type PublicOrganizationResponse = {
   location?: GeoPointDto;
 };
 
-export type TenantStatus = 'ACTIVE' | 'SUSPENDED' | 'PENDING' | string;
+export type TenantStatus = 'ACTIVE' | 'INACTIVE' | 'SUSPENDED' | 'PENDING';
 
 export type TenantResponse = {
   id: string;

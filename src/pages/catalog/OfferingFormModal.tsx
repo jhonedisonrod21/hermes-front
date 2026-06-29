@@ -59,7 +59,7 @@ function slugifyKey(label: string) {
     .replace(/^_+|_+$/g, '');
 }
 
-export function OfferingFormModal({ open, editing, categories = [], onClose, onSaved }: Props) {
+export function OfferingFormModal({ open, editing, categories = [], onClose, onSaved }: Readonly<Props>) {
   const { t, i18n } = useTranslation(['catalog', 'common']);
   const toast = useToast();
   const currencies = useMemo(() => currencyOptions(i18n.language), [i18n.language]);
@@ -125,7 +125,7 @@ export function OfferingFormModal({ open, editing, categories = [], onClose, onS
     const requirements = form.requirements
       .filter((r) => r.label.trim())
       .map((r, i) => ({
-        key: (r.key.trim() || slugifyKey(r.label)) as string,
+        key: r.key.trim() || slugifyKey(r.label),
         label: r.label.trim(),
         type: r.type,
         required: r.required,

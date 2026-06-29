@@ -52,7 +52,6 @@ export function AccountPage() {
   return (
     <div className="page">
       <PageHeader
-        eyebrow={t('account:eyebrow')}
         title={t('account:title')}
         description={t('account:description')}
         actions={

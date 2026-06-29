@@ -38,7 +38,8 @@ function fieldErrorsOf(body: Record<string, unknown>): string | null {
       .map((e) => {
         if (typeof e === 'string') return e;
         const item = e as Record<string, unknown>;
-        const field = item.field ?? item.objectName;
+        const fieldValue = item.field ?? item.objectName;
+        const field = typeof fieldValue === 'string' ? fieldValue : null;
         const msg = item.defaultMessage ?? item.message ?? item.reason;
         if (typeof msg === 'string') return field ? `${field}: ${msg}` : msg;
         return null;

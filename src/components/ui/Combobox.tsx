@@ -30,7 +30,7 @@ export function Combobox({
   emptyText,
   clearLabel,
   moreText
-}: ComboboxProps) {
+}: Readonly<ComboboxProps>) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);

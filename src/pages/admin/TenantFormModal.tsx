@@ -32,7 +32,7 @@ function toForm(t: TenantResponse | null) {
 // Límites alineados con las restricciones de TenantCreateRequest/TenantUpdateRequest del backend.
 const MAX = { name: 160, taxId: 40, city: 120, address: 200, description: 500 };
 
-export function TenantFormModal({ open, editing, onClose, onSaved }: Props) {
+export function TenantFormModal({ open, editing, onClose, onSaved }: Readonly<Props>) {
   const { t, i18n } = useTranslation(['admin', 'organization', 'common']);
   const toast = useToast();
   const countries = useMemo(() => countryOptions(i18n.language), [i18n.language]);

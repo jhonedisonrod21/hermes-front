@@ -8,7 +8,7 @@ type PaginationProps = {
   onChange: (page: number) => void;
 };
 
-export function Pagination({ page, totalPages, totalElements, onChange }: PaginationProps) {
+export function Pagination({ page, totalPages, totalElements, onChange }: Readonly<PaginationProps>) {
   const { t } = useTranslation('common');
   if (totalPages <= 1) return null;
 

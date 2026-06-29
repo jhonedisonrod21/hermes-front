@@ -19,7 +19,7 @@ type Props = {
 };
 
 /** Detalle de una excepción existente, con opción de cambiarla (reemplazar) o eliminarla. */
-export function ExceptionDetailModal({ exception, onClose, onDeleted, onReplace }: Props) {
+export function ExceptionDetailModal({ exception, onClose, onDeleted, onReplace }: Readonly<Props>) {
   const { t, i18n } = useTranslation(['schedule', 'common']);
   const toast = useToast();
   const confirm = useConfirm();

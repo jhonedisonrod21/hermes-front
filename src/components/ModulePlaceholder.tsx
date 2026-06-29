@@ -5,7 +5,6 @@ import { PageHeader } from './PageHeader';
 import { HermesDial } from './HermesDial';
 
 type ModulePlaceholderProps = {
-  eyebrow: string;
   title: string;
   description: string;
   /** Servicio backend pendiente (p. ej. "hermes-scheduling-service · citas"). */
@@ -16,12 +15,12 @@ type ModulePlaceholderProps = {
 };
 
 /** Pantalla para módulos cuya navegación ya existe pero cuyo microservicio aún no está disponible. */
-export function ModulePlaceholder({ eyebrow, title, description, service, capabilities, children }: ModulePlaceholderProps) {
+export function ModulePlaceholder({ title, description, service, capabilities, children }: Readonly<ModulePlaceholderProps>) {
   const { t } = useTranslation('common');
 
   return (
     <div className="page">
-      <PageHeader eyebrow={eyebrow} title={title} description={description} />
+      <PageHeader title={title} description={description} />
 
       <Card className="panel placeholder-panel">
         <div className="placeholder-dial" aria-hidden="true">

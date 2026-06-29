@@ -57,7 +57,7 @@ export function Select({
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const optionRefs = useRef<(HTMLLIElement | null)[]>([]);
-  const typeahead = useRef<{ buffer: string; timer: number }>({ buffer: '', timer: 0 });
+  const typeahead = useRef<{ buffer: string; timer: ReturnType<typeof setTimeout> | undefined }>({ buffer: '', timer: undefined });
 
   // Cierra al hacer clic fuera. En fase de captura: dentro de un Modal el contenedor hace
   // stopPropagation() del mousedown, así que un listener en burbujeo nunca se enteraría.
@@ -82,7 +82,7 @@ export function Select({
   function openMenu() {
     if (disabled) return;
     const i = items.findIndex((o) => o.value === current);
-    setActiveIndex(i < 0 ? 0 : i);
+    setActiveIndex(Math.max(0, i));
     setOpen(true);
   }
 
@@ -99,9 +99,9 @@ export function Select({
   // letras se busca desde el inicio; para una sola letra, cíclicamente desde la opción actual.
   function typeaheadJump(key: string) {
     const state = typeahead.current;
-    window.clearTimeout(state.timer);
+    globalThis.clearTimeout(state.timer);
     state.buffer += key;
-    state.timer = window.setTimeout(() => {
+    state.timer = globalThis.setTimeout(() => {
       state.buffer = '';
     }, 700);
     const q = state.buffer.toLowerCase();

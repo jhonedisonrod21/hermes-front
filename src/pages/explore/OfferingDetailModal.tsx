@@ -17,7 +17,7 @@ type Props = {
 };
 
 /** Diálogo "Ver": todos los datos del producto + el establecimiento y su ubicación en el mapa. */
-export function OfferingDetailModal({ offering, onClose, onBook }: Props) {
+export function OfferingDetailModal({ offering, onClose, onBook }: Readonly<Props>) {
   const { t, i18n } = useTranslation(['explore', 'catalog', 'common']);
   const o = offering;
   const tenantId = o?.tenantId ?? null;

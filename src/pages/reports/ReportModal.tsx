@@ -27,7 +27,7 @@ type Props = {
  * Diálogo con visor de PDF para un reporte. Las estadísticas se generan al abrir; el informe de ventas
  * pide primero un rango de fechas. En ambos casos ofrece descargar e imprimir el PDF.
  */
-export function ReportModal({ kind, onClose }: Props) {
+export function ReportModal({ kind, onClose }: Readonly<Props>) {
   const { t } = useTranslation(['reports', 'common']);
   const toast = useToast();
   const [from, setFrom] = useState(monthStartISO());

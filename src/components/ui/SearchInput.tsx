@@ -3,7 +3,7 @@ import { Search } from 'lucide-react';
 
 type SearchInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'>;
 
-export function SearchInput({ className = '', ...props }: SearchInputProps) {
+export function SearchInput({ className = '', ...props }: Readonly<SearchInputProps>) {
   return (
     <span className={`hc-input-shell hc-search ${className}`.trim()}>
       <span className="hc-input-icon">

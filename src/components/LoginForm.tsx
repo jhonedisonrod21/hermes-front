@@ -8,7 +8,7 @@ import { Button, IconButton, TextField } from './ui';
 const INITIAL_USERNAME = import.meta.env.DEV ? 'admin@hermes.local' : '';
 const INITIAL_PASSWORD = import.meta.env.DEV ? 'admin123' : '';
 
-export function LoginForm({ onForgot }: { onForgot?: () => void }) {
+export function LoginForm({ onForgot }: Readonly<{ onForgot?: () => void }>) {
   const { login } = useAuth();
   const { t } = useTranslation('auth');
   const [username, setUsername] = useState(INITIAL_USERNAME);
